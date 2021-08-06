@@ -2,7 +2,7 @@ import Dependencies._
 import LiftSbtHelpers._
 
 ThisBuild / organization := "com.talenteca"
-ThisBuild / version := "1.0.0-SNAPSHOT"
+ThisBuild / version := "1.0.0"
 ThisBuild / description := "A derivative work of Lift focused on new updates and security recommendations."
 ThisBuild / homepage := Some(url("https://github.com/talenteca/olon-web-framework"))
 ThisBuild / licenses += ("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
