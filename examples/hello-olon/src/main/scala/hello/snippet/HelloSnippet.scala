@@ -1,11 +1,8 @@
-package code 
-package snippet 
+package hello.snippet 
 
-import scala.xml.{NodeSeq, Text}
-import olon.util._
-import olon.common._
+import olon.util.Helpers._
+
 import java.util.Date
-import Helpers._
 
 class HelloSnippet {
 

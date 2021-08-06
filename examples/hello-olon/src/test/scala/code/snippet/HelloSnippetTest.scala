@@ -1,5 +1,4 @@
-package code
-package snippet
+package hello.snippet
 
 import org.specs2._
 
