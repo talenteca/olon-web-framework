@@ -9,6 +9,8 @@ compatible, just change net.liftweb for the olon package.
 
 Don't forget to change the Boot.scala file to the package bootstrap.olon and also ensure you set the servlet filter to olon.http.LiftFilter on the servlet container configuration.
 
+Give it a check to examples for a reference.
+
 # Credit
 
 This framework is a derivative work of [Lift](https://liftweb.net/), a very big thank you to
