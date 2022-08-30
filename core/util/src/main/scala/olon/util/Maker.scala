@@ -170,26 +170,6 @@ trait Vendor[T] extends Maker[T] with Function0[T] {
 }
 
 /**
- * A bridge from Java to Scala
- */
-class VendorJBridge {
-  /**
-   * Create a Vendor from a Func0
-   */
-  def vendor[T](f: Func0[T]): Vendor[T] = Vendor(Func.lift(f))
-
-  /**
-   * Create a Vendor from a Callable
-   */
-  def vendor[T](f: Callable[T]): Vendor[T] = Vendor(Func.lift(f))
-
-  /**
-   * Create a Vendor from a value
-   */
-  def vendor[T](v: T): Vendor[T] = Vendor(v)
-}
-
-/**
  * A companion to the Vendor trait
  */
 object Vendor {

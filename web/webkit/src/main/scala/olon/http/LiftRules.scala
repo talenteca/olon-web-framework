@@ -928,17 +928,6 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
    */
   @volatile var ajaxStart: Box[() => JsCmd] = Empty
 
-  import FuncJBridge._
-
-  /**
-   * Set the Ajax end JavaScript function.  The
-   * Java-callable alternative to assigning the var ajaxStart
-   */
-  def setAjaxStart(f: Func0[JsCmd]): Unit = {
-    ajaxStart = Full(f: () => JsCmd)
-  }
-
-
   /**
    * The function that calculates if the response should be rendered in
    * IE6/7/8 compatibility mode
@@ -968,14 +957,6 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
    * Ajax request (for example, removing the spinning working thingy)
    */
   @volatile var ajaxEnd: Box[() => JsCmd] = Empty
-
-  /**
-   * Set the Ajax end JavaScript function.  The
-   * Java-callable alternative to assigning the var ajaxEnd
-   */
-  def setAjaxEnd(f: Func0[JsCmd]): Unit = {
-    ajaxEnd = Full(f: () => JsCmd)
-  }
 
   /**
    * An XML header is inserted at the very beginning of returned XHTML pages.
