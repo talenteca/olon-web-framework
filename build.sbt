@@ -45,7 +45,7 @@ ThisBuild / publishTo := {
 ThisBuild / publishMavenStyle := true
 
 
-lazy val olonProjects = core ++ web ++ persistence
+lazy val olonProjects = core ++ web
 
 lazy val root =
   (project in file("."))
@@ -106,7 +106,7 @@ lazy val json_scalaz7 =
     .dependsOn(json)
     .settings(
       description := "JSON Library based on Scalaz 7",
-      libraryDependencies ++= Seq(scalaz7)
+      libraryDependencies ++= Seq(scalaz7_core)
     )
     .settings(crossScalaVersions := crossUpVersions)
 
@@ -214,64 +214,3 @@ lazy val webkit =
     )
     .enablePlugins(SbtWeb)
     .settings(crossScalaVersions := crossUpVersions)
-
-// Persistence Projects
-// --------------------
-lazy val persistence: Seq[ProjectReference] =
-  Seq(db, proto, mapper, record, mongodb, mongodb_record)
-
-lazy val db =
-  persistenceProject("db")
-    .dependsOn(util, webkit)
-    .settings(libraryDependencies += mockito_scalatest)
-    .settings(crossScalaVersions := crossUpVersions)
-
-lazy val proto =
-  persistenceProject("proto")
-    .dependsOn(webkit)
-    .settings(crossScalaVersions := crossUpVersions)
-
-lazy val mapper =
-  persistenceProject("mapper")
-    .dependsOn(db, proto)
-    .settings(
-      description := "Mapper Library",
-      parallelExecution in Test := false,
-      libraryDependencies ++= Seq(h2, derby, jbcrypt),
-      initialize in Test := {
-        System.setProperty(
-          "derby.stream.error.file",
-          ((crossTarget in Test).value / "derby.log").absolutePath
-        )
-      }
-    )
-    .settings(crossScalaVersions := crossUpVersions)
-
-lazy val record =
-  persistenceProject("record")
-    .dependsOn(proto)
-    .settings(libraryDependencies ++= Seq(jbcrypt))
-    .settings(crossScalaVersions := crossUpVersions)
-
-lazy val mongodb =
-  persistenceProject("mongodb")
-    .dependsOn(json_ext, util)
-    .settings(
-      crossScalaVersions := crossUpVersions,
-      parallelExecution in Test := false,
-      libraryDependencies ++= Seq(mongo_java_driver, mongo_java_driver_async),
-      initialize in Test := {
-        System.setProperty(
-          "java.util.logging.config.file",
-          ((resourceDirectory in Test).value / "logging.properties").absolutePath
-        )
-      }
-    )
-
-lazy val mongodb_record =
-  persistenceProject("mongodb-record")
-    .dependsOn(record, mongodb)
-    .settings(
-      crossScalaVersions := crossUpVersions,
-      parallelExecution in Test := false
-    )
