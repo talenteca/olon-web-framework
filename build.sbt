@@ -77,15 +77,6 @@ lazy val actor =
     )
     .settings(crossScalaVersions := crossUpVersions)
 
-lazy val markdown =
-  coreProject("markdown")
-    .settings(
-      description := "Markdown Parser",
-      parallelExecution in Test := false,
-      libraryDependencies ++= Seq(scalatest, scalatest_junit, scala_xml, scala_parser)
-    )
-    .settings(crossScalaVersions := crossUpVersions)
-
 lazy val json =
   coreProject("json")
     .settings(
