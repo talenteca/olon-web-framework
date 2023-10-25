@@ -18,7 +18,7 @@ class WizardSpec extends Specification  {
   class WizardForTesting extends Wizard {
     object completeInfo extends WizardVar(false)
 
-    def finish() {
+    def finish(): Unit = {
       S.notice("Thank you for registering your pet")
       completeInfo.set(true)
     }
@@ -64,24 +64,24 @@ class WizardSpec extends Specification  {
     S.initIfUninitted(session) {
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
 
-      MyWizard.nextScreen
+      MyWizard.nextScreen()
 
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
 
       MyWizard.nameAndAge.name.set("David")
       MyWizard.nameAndAge.age.set(14)
 
-      MyWizard.nextScreen
+      MyWizard.nextScreen()
 
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.parentName
 
-      MyWizard.prevScreen
+      MyWizard.prevScreen()
 
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
 
       MyWizard.nameAndAge.age.set(45)
 
-      MyWizard.nextScreen
+      MyWizard.nextScreen()
 
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.favoritePet
 
@@ -89,7 +89,7 @@ class WizardSpec extends Specification  {
 
       MyWizard.favoritePet.petName.set("Elwood")
 
-      MyWizard.nextScreen
+      MyWizard.nextScreen()
 
       MyWizard.currentScreen must_== Empty
 
@@ -101,14 +101,14 @@ class WizardSpec extends Specification  {
     val ss = S.initIfUninitted(session) {
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
 
-      MyWizard.nextScreen
+      MyWizard.nextScreen()
 
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
 
       MyWizard.nameAndAge.name.set("David")
       MyWizard.nameAndAge.age.set(14)
 
-      MyWizard.nextScreen
+      MyWizard.nextScreen()
 
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.parentName
 
@@ -122,13 +122,13 @@ class WizardSpec extends Specification  {
     S.initIfUninitted(session) {
       ss.restore()
 
-      MyWizard.prevScreen
+      MyWizard.prevScreen()
 
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
 
       MyWizard.nameAndAge.age.set(45)
 
-      MyWizard.nextScreen
+      MyWizard.nextScreen()
 
       MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.favoritePet
 
@@ -136,7 +136,7 @@ class WizardSpec extends Specification  {
 
       MyWizard.favoritePet.petName.set("Elwood")
 
-      MyWizard.nextScreen
+      MyWizard.nextScreen()
 
       MyWizard.currentScreen must_== Empty
 

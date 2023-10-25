@@ -34,7 +34,7 @@ trait SimpleInjector extends Injector {
   /**
    * Register a function that will inject for the given Manifest
    */
-  def registerInjection[T](f: () => T)(implicit man: Manifest[T]) {
+  def registerInjection[T](f: () => T)(implicit man: Manifest[T]): Unit = {
     diHash.put(man.toString, f)
   }
 

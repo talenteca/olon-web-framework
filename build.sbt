@@ -18,7 +18,7 @@ ThisBuild / crossScalaVersions := crossUpVersions
 
 ThisBuild / libraryDependencies ++= Seq(specs2, specs2Matchers, specs2Mock, scalacheck, scalactic, scalatest)
 
-ThisBuild / scalacOptions ++= Seq("-deprecation")
+ThisBuild / scalacOptions ++= Seq("-deprecation", "-Ypatmat-exhaust-depth", "80")
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -64,7 +64,7 @@ lazy val common =
   coreProject("common")
     .settings(
       description := "Common Libraties and Utilities",
-      libraryDependencies ++= Seq(slf4j_api, logback, slf4j_log4j12, scala_xml, scala_parser)
+      libraryDependencies ++= Seq(slf4j_api, logback, scala_xml, scala_parser)
     )
     .settings(crossScalaVersions := crossUpVersions)
 
@@ -82,7 +82,7 @@ lazy val json =
     .settings(
       description := "JSON Library",
       parallelExecution in Test := false,
-      libraryDependencies ++= Seq(scalap(scalaVersion.value), paranamer,  scala_xml)
+      libraryDependencies ++= Seq(scalap(scalaVersion.value), paranamer,  scala_xml, json4s)
     )
     .settings(crossScalaVersions := crossUpVersions)
 
@@ -121,8 +121,6 @@ lazy val util =
         joda_time,
         joda_convert,
         commons_codec,
-        javamail,
-        log4j,
         htmlparser,
         xerces,
         jbcrypt

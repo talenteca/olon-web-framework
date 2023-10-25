@@ -23,7 +23,7 @@ trait HTTPProvider {
   /**
    * Call this from your implementation when the application terminates.
    */
-  protected def terminate {
+  protected def terminate: Unit = {
     if (actualServlet != null) {
       actualServlet.destroy
       actualServlet = null
@@ -67,47 +67,29 @@ trait HTTPProvider {
   protected def bootLift(loader: Box[String]): Unit = {
       try
       {
-        val b: Bootable = loader.map(b => Class.forName(b).newInstance.asInstanceOf[Bootable]) openOr DefaultBootstrap
-        preBoot
-        b.boot
+        val b: Bootable = loader.map(b => Class.forName(b).getDeclaredConstructor().newInstance().asInstanceOf[Bootable]) openOr DefaultBootstrap
+        preBoot()
+        b.boot()
       } catch {
         // The UnavailableException is the idiomatic way to tell a Java application container that
         // the boot process has gone horribly, horribly wrong. That _must_ bubble to the application
         // container that is invoking the app. See https://github.com/lift/framework/issues/1843
         case unavailableException: javax.servlet.UnavailableException =>
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("********** Failed to Boot! An UnavailableException was thrown and all futher boot activities are aborted", unavailableException);
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
+          logger.error("Failed to Boot! An UnavailableException was thrown and all futher boot activities are aborted", unavailableException);
 
           throw unavailableException
 
         case e: Exception =>
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("********** Failed to Boot! Your application may not run properly", e);
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
-          logger.error("------------------------------------------------------------------")
+          logger.error("Failed to Boot! Your application may not run properly", e);
       } finally {
-        postBoot
+        postBoot()
 
         actualServlet = new LiftServlet(context)
         actualServlet.init
       }
     }
 
-  private def preBoot() {
+  private def preBoot(): Unit = {
     // do this stateless
     LiftRules.statelessDispatch.prepend(NamedPF("Classpath service") {
       case r@Req(mainPath :: subPath, suffx, _) if (mainPath == LiftRules.resourceServerPath) =>
@@ -115,7 +97,7 @@ trait HTTPProvider {
     })
   }
 
-  private def postBoot {
+  private def postBoot(): Unit = {
     if (!LiftRules.logServiceRequestTiming) {
       LiftRules.installServiceRequestTimer(NoOpServiceTimer)
     }

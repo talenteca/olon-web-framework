@@ -11,7 +11,6 @@ import junit.framework.AssertionFailedError
 
 import common.Box
 
-
 final class JettyTestServer(baseUrlBox: Box[URL]) {
 
   def baseUrl = baseUrlBox getOrElse new URL("http://127.0.0.1:8080")
@@ -31,13 +30,13 @@ final class JettyTestServer(baseUrlBox: Box[URL]) {
     (server, context)
   }
 
-  def urlFor(path: String) = baseUrl + path
+  def urlFor(path: String) = s"${baseUrl}${path}"
 
-  def start() {
+  def start(): Unit = {
     server_.start()
   }
 
-  def stop() {
+  def stop(): Unit = {
     context_.setShutdown(true)
     server_.stop()
     server_.join()

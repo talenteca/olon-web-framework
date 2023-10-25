@@ -2,7 +2,6 @@ package olon.util
 
 import olon.common.Box
 import scala.xml.NodeSeq
-import util.parsing.json.JSONArray
 import olon.json.JsonAST.JValue
 import scala.reflect.runtime.universe._
 

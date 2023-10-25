@@ -31,13 +31,8 @@ object CSSHelpers extends ControlHelpers {
         reader close
       }
       val str = res toString;
-      (CSSParser(rootPrefix).fixCSS(str), str);
+      (CssUrlPrefixer(rootPrefix).fixCss(str), str);
   }
-}
-
-object CSSParser {
-  @deprecated("Please use CssUrlPrefixer instead; we are unifying capitalization across Lift.", "3.0")
-  def apply(prefix: String) = CssUrlPrefixer(prefix)
 }
 
 /**
@@ -169,7 +164,5 @@ case class CssUrlPrefixer(prefix: String) extends Parsers  {
     }
   }
 
-  @deprecated("Please use fixCss instead; we are unifying capitalization across Lift.", "3.0")
-  def fixCSS(in: String): Box[String] = fixCss(in)
 }
 

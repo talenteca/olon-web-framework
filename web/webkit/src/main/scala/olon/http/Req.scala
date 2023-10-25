@@ -53,7 +53,7 @@ object UserAgentCalculator extends Factory {
   /**
    * The built-in mechanism for calculating Safari
    */
-  def defaultSafariCalcFunction(userAgent: Box[String]): Box[Double] = 
+  def defaultSafariCalcFunction(userAgent: Box[String]): Box[Double] =
     for {
       ua <- userAgent
       m = safariPattern.pattern.matcher(ua)
@@ -293,7 +293,7 @@ class OnDiskFileParamHolder(override val name: String, override val mimeType: St
    */
   def length : Long = if (localPath == null) 0 else Files.size(localPath)
 
-  protected override def finalize {
+  protected override def finalize: Unit = {
     tryo(Files.delete(localPath))
   }
 }
@@ -304,7 +304,7 @@ object OnDiskFileParamHolder {
     val file: Path = Files.createTempFile("lift_mime", "upload")
     val fos = Files.newOutputStream(file)
     val ba = new Array[Byte](8192)
-    def doUpload() {
+    def doUpload(): Unit = {
       inputStream.read(ba) match {
         case x if x < 0 =>
         case 0 => doUpload()
@@ -312,7 +312,6 @@ object OnDiskFileParamHolder {
       }
 
     }
-
     doUpload()
     inputStream.close
     fos.close
@@ -877,7 +876,7 @@ class Req(val path: ParsePath,
   /**
    * Make the servlet session go away
    */
-  def destroyServletSession() {
+  def destroyServletSession(): Unit = {
     for {
       httpReq <- Box !! request
     } httpReq.destroyServletSession()

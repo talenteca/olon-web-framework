@@ -59,7 +59,7 @@ object LAPinger {
     try {
       service.schedule(r, delay, TimeUnit.MILLISECONDS)
     } catch {
-      case e: RejectedExecutionException => throw PingerException(msg + " could not be scheduled on " + to, e)
+      case e: RejectedExecutionException => throw PingerException(s"${msg} could not be scheduled on ${to}", e)
     }
   }
 

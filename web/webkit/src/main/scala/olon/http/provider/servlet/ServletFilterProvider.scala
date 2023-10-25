@@ -16,7 +16,7 @@ trait ServletFilterProvider extends Filter with HTTPProvider {
   var ctx: HTTPContext = _
 
   //We need to capture the ServletContext on init
-  def init(config: FilterConfig) {
+  def init(config: FilterConfig): Unit = {
     ctx = new HTTPServletContext(config.getServletContext)
 
     LiftRules.setContext(ctx)
@@ -26,7 +26,7 @@ trait ServletFilterProvider extends Filter with HTTPProvider {
   }
 
   //And throw it away on destruction
-  def destroy {
+  def destroy: Unit = {
     ctx = null
     terminate
   }

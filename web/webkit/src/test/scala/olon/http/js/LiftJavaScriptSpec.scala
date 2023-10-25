@@ -201,6 +201,8 @@ class LiftJavaScriptSpec extends Specification  {
   def formatjs(lines:List[String]):String = lines.map { _.stripMargin.linesIterator.toList match {
     case init :+ last => (init.map(_ + " ") :+ last).mkString
     case Nil => ""
+    case list =>
+      list.headOption.getOrElse("")
   }}.mkString("\n")
 
   object withEnglishLocale extends WithLocale(Locale.ENGLISH)

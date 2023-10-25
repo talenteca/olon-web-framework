@@ -29,14 +29,6 @@ trait TimeHelpers { self: ControlHelpers =>
   /** transforms an int to a TimeSpanBuilder object. Usage: 3.seconds returns a TimeSpan of 3000L millis  */
   implicit def intToTimeSpanBuilder(in: Int): TimeSpanBuilder = TimeSpanBuilder(in)
 
-  /** transforms a long to a TimeSpan object. Usage: 3000L returns a TimeSpan of 3000L millis  */
-  @deprecated("Long to TimeSpan conversion will be removed for possibility of ambiguous behaviours, use TimeSpan(in) instead if you are using in.millis", "3.0.0")
-  implicit def longToTimeSpan(in: Long): TimeSpan = TimeSpan(in)
-
-  /** transforms an int to a TimeSpan object. Usage: 3000 returns a TimeSpan of 3000L millis  */
-  @deprecated("Int to TimeSpan conversion will be removed for possibility of ambiguous behaviours, use TimeSpan(in) instead if you are using in.millis", "3.0.0")
-  implicit def intToTimeSpan(in: Int): TimeSpan = TimeSpan(in)
-
   /** class building TimeSpans given an amount (len) and a method specify the time unit  */
   case class TimeSpanBuilder(len: Long) {
     def seconds = new TimeSpan(Left(Duration.standardSeconds(len)))
@@ -49,14 +41,6 @@ trait TimeHelpers { self: ControlHelpers =>
     def day = days
     def weeks = new TimeSpan(Left(Duration.standardDays(len * 7L)))
     def week = weeks
-    @deprecated("This builder will be removed due to its unclear behavior; use Joda-Time `Period.months` and convert to `TimeSpan` manually instead.", "3.0.0")
-    def months = new TimeSpan(Right(new Period().plusMonths(len.toInt)))
-    @deprecated("This builder will be removed due to its unclear behavior; use Joda-Time `Period.months` and convert to `TimeSpan` manually instead.", "3.0.0")
-    def month = months
-    @deprecated("This builder will be removed due to its unclear behavior; use Joda-Time `Period.years` and convert to `TimeSpan` manually instead.", "3.0.0")
-    def years = new TimeSpan(Right(new Period().plusYears(len.toInt)))
-    @deprecated("This builder will be removed due to its unclear behavior; use Joda-Time `Period.years` and convert to `TimeSpan` manually instead.", "3.0.0")
-    def year = years
   }
 
   /**
@@ -258,8 +242,8 @@ trait TimeHelpers { self: ControlHelpers =>
         (total._1 / div._1, (total._1 % div._1, div._2) :: total._2)
       }._2
       def formatAmount(amountUnit: (Long, String)) = amountUnit match {
-        case (amount, unit) if (amount == 1) => amount + " " + unit
-        case (amount, unit) => amount + " " + unit + "s"
+        case (amount, unit) if (amount == 1) => s"${amount} ${unit}"
+        case (amount, unit) => s"${amount} ${unit}s"
       }
       divideInUnits(millis).filter(_._1 > 0).map(formatAmount(_)).mkString(", ")
     }
@@ -277,26 +261,6 @@ trait TimeHelpers { self: ControlHelpers =>
      */
     implicit def durationToTS(in: Duration): TimeSpan =
       new TimeSpan(Left(in))
-
-    /**
-     * Convert a Period to a TimeSpan
-     */
-    @deprecated("Implicit conversion from Period to TimeSpan will be removed due to its unclear behavior; use new Period(timeSpan.millis) instead.", "3.0.0")
-    implicit def periodToTS(in: Period): TimeSpan =
-      new TimeSpan(Right(in))
-
-    /**
-     * Convert a TimeSpan to a Period
-     */
-    @deprecated("Implicit conversion from TimeSpan to Period will be removed due to its unclear behavior; use new TimeSpan(period.toDurationFrom(startDateTime)) instead.", "3.0.0")
-    implicit def tsToPeriod[TS <% TimeSpan](in: TS): Period = in.toPeriod
-
-    /**
-     * Convert a DateTime to a TimeSpan
-     */
-    @deprecated("Implicit conversion from DateTime to TimeSpan will be removed due to its unclear behavior; use new TimeSpan(dateTime.getMillis) instead.", "3.0.0")
-    implicit def dateTimeToTS(in: DateTime): TimeSpan =
-      new TimeSpan(Left(new Duration(in.getMillis)))
   }
 
   /** @return the current System.nanoTime() */
@@ -502,7 +466,7 @@ trait TimeHelpers { self: ControlHelpers =>
     }
   }
 
-  implicit class PeriodExtension[P <% Period](period: P) {
+  implicit class PeriodExtension[P](period: P)(implicit ev: P => Period) {
     def later: DateTime = new DateTime(millis).plus(period)
 
     def ago: DateTime = new DateTime(millis).minus(period)

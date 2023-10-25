@@ -14,7 +14,7 @@ import mocks.MockHttpServletRequest
 * you could just use "() => bootstrap.Boot.boot".
 */
 object WebSpecSpecBoot {
-  def boot() {
+  def boot(): Unit = {
     // Add this so that withTemplateFor test works
     LiftRules.addToPackages("olon.mockweb")
 

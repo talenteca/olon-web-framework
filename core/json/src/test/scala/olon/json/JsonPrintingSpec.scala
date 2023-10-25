@@ -8,6 +8,7 @@ import org.specs2.ScalaCheck
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
+import org.json4s.native.JsonMethods
 
 /**
  * System under specification for JSON Printing.
@@ -22,7 +23,7 @@ class JsonPrintingSpec extends Specification  with JValueGen with ScalaCheck {
 
   "rendering special double values by default" should {
     "render a standard double as is" in {
-      val double = Random.nextDouble
+      val double = Random.nextDouble()
       JsonAST.compactRender(JDouble(double)) must_== double.toString
     }
 
@@ -48,7 +49,7 @@ class JsonPrintingSpec extends Specification  with JValueGen with ScalaCheck {
     }
 
     "render a standard double as is" in {
-      val double = Random.nextDouble
+      val double = Random.nextDouble()
       render(JDouble(double)) must_== double.toString
     }
 
@@ -74,7 +75,7 @@ class JsonPrintingSpec extends Specification  with JValueGen with ScalaCheck {
     }
 
     "render a standard double as is" in {
-      val double = Random.nextDouble
+      val double = Random.nextDouble()
       render(JDouble(double)) must_== double.toString
     }
 
@@ -91,7 +92,7 @@ class JsonPrintingSpec extends Specification  with JValueGen with ScalaCheck {
     }
   }
 
-  private def parse(json: String) = scala.util.parsing.json.JSON.parseRaw(json)
+  private def parse(json: String) = JsonMethods.parseOpt(json)
 
   implicit def arbDoc: Arbitrary[JValue] = Arbitrary(genJValue)
 }

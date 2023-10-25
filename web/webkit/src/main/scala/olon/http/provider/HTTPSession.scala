@@ -18,7 +18,7 @@ trait HTTPSession {
    *
    * @param liftSession - the LiftSession
    */
-  def link(liftSession: LiftSession)
+  def link(liftSession: LiftSession): Unit
 
   /**
    * The opposite of the <i>link</i>. Hence the LiftSession and the HTTP session no
@@ -26,7 +26,7 @@ trait HTTPSession {
    *
    * @param liftSession - the LiftSession
    */
-  def unlink(liftSession: LiftSession)
+  def unlink(liftSession: LiftSession): Unit
 
   /**
    * @return - the maximim interval in seconds between client request and the time when
@@ -42,7 +42,7 @@ trait HTTPSession {
    * @param interval - the value in seconds
    *
    */
-  def setMaxInactiveInterval(interval: Long)
+  def setMaxInactiveInterval(interval: Long): Unit
 
   /**
    * @return - the last time server receivsd a client request for this session
@@ -55,7 +55,7 @@ trait HTTPSession {
    * @param name - the attribute name
    * @param value - any value
    */
-  def setAttribute(name: String, value: Any)
+  def setAttribute(name: String, value: Any): Unit
 
   /**
    * @param name - the attribute name

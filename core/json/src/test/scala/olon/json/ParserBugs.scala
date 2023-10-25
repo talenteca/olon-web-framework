@@ -7,7 +7,7 @@ import org.specs2.mutable.Specification
 
 object ParserBugs extends Specification {
   "Unicode ffff is a valid char in string literal" in {
-    parseOpt(""" {"x":"\uffff"} """).isDefined mustEqual true
+    parseOpt(" {\"x\":\"\\uffff\"} ").isDefined mustEqual true
   }
 
   "Does not allow colon at start of array (1039)" in {

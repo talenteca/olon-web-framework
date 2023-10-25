@@ -53,7 +53,7 @@ trait ListHelpers {
     val ret: ListBuffer[Res] = new ListBuffer()
     var insertAfter: Box[T] = Empty
 
-    @tailrec def loop(o: List[T], n: List[T]) {
+    @tailrec def loop(o: List[T], n: List[T]): Unit = {
       (o, n) match {
         case (o, Nil) => o.foreach(t => ret += f(RemoveDelta(t)))
         case (Nil, n) => {
@@ -119,8 +119,8 @@ trait ListHelpers {
    */
   def first[B, C](in: Seq[B])(_f: B => Box[C]): Box[C] = {
     val f: B => Iterable[C] = _f andThen Box.box2Iterable[C]
-    // We use toStream here to avoid multiple execution of "f" for each element access (Issue #596)
-    Box(in.toStream.flatMap(f).headOption)
+    // We use LazyList here to avoid multiple execution of "f" for each element access (Issue #596)
+    Box(in.to(LazyList).flatMap(f).headOption)
   }
 
   /**
@@ -153,16 +153,16 @@ trait ListHelpers {
   /**
    * Convert a java.util.Enumeration to a List[T]
    */
-  def enumToList[T](enum: java.util.Enumeration[T]): List[T] = {
-    import scala.collection.JavaConverters._
-    enum.asScala.toList
+  def enumToList[T](_enum: java.util.Enumeration[T]): List[T] = {
+    import scala.jdk.CollectionConverters._
+    _enum.asScala.toList
   }
 
   /**
    * Convert a java.util.Enumeration to a List[String] using the toString method on each element
    */
-  def enumToStringList[C](enum: java.util.Enumeration[C]): List[String] =
-    enumToList(enum).map(_.toString)
+  def enumToStringList[C](_enum: java.util.Enumeration[C]): List[String] =
+    enumToList(_enum).map(_.toString)
 
   /**
    * Return the first element of a List or a default value if the list is empty

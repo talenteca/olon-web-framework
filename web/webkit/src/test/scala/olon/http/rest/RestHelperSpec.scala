@@ -10,7 +10,7 @@ import olon.json._
 import olon.http._
 
 object RestHelperSpecBoot {
-  def boot() {
+  def boot(): Unit = {
     LiftRules.dispatch.append(RestHelperSpecRest)
   }
 }

@@ -81,8 +81,8 @@ object SessionMaster extends LiftActor with Loggable {
    * End comet long polling for all sessions. This allows a clean reload of Nginx
    * because Nginx children stick around for long polling.
    */
-  def breakOutAllComet() {
-    import scala.collection.JavaConverters._
+  def breakOutAllComet(): Unit = {
+    import scala.jdk.CollectionConverters._
 
     val ses = lockRead(nsessions)
     ses.asScala.valuesIterator.foreach {
@@ -145,7 +145,7 @@ object SessionMaster extends LiftActor with Loggable {
    * Adds a new session to SessionMaster
    */
   def addSession(liftSession: LiftSession, req: Req,
-                 userAgent: Box[String], ipAddress: Box[String]) {
+                 userAgent: Box[String], ipAddress: Box[String]): Unit = {
     lockAndBump {
       Full(SessionInfo(liftSession, userAgent, ipAddress, -1, 0L)) // bumped twice during session creation.  Ticket #529 DPP
     }
@@ -162,8 +162,8 @@ object SessionMaster extends LiftActor with Loggable {
   /**
    * Shut down all sessions
    */
-  private[http] def shutDownAllSessions() {
-    import scala.collection.JavaConverters._
+  private[http] def shutDownAllSessions(): Unit = {
+    import scala.jdk.CollectionConverters._
 
     val ses = lockRead(nsessions)
     ses.asScala.foreach {
@@ -193,7 +193,7 @@ object SessionMaster extends LiftActor with Loggable {
           s.markedForShutDown_? = true
           Schedule.schedule(() => {
             try {
-              s.doShutDown
+              s.doShutDown()
               try {
                 s.httpSession.foreach(_.unlink(s))
               } catch {
@@ -210,7 +210,7 @@ object SessionMaster extends LiftActor with Loggable {
       }
 
     case CheckAndPurge =>
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
 
     /* remove dead sessions that are more than 45 minutes old */
     val now = Helpers.millis - 45.minutes
@@ -265,7 +265,7 @@ object SessionMaster extends LiftActor with Loggable {
       }
     }
 
-  private def doPing() {
+  private def doPing(): Unit = {
     if (!Props.inGAE) {
       try {
         Schedule.schedule(this, CheckAndPurge, 10.seconds)

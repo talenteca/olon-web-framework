@@ -60,32 +60,29 @@ class ConversionsSpec extends Specification with XmlMatchers {
 
   }
 
-  "A NodeSeqFunc" should {
+  "A NodeSeq => NodeSeq function" should {
 
     "be created by a NodeSeq constant" in {
-      val sf: NodeSeqFunc = <b>Foo</b>
-
-      sf.func() must ==/ (<b>Foo</b>)
+      val sf: NodeSeq => NodeSeq = _ => <b>Foo</b>
+      sf(NodeSeq.Empty) must ==/ (<b>Foo</b>)
     }
 
     "be created by a NodeSeq Function" in {
-      val sf: NodeSeqFunc = () => <i>Bar</i>
+      val sf: NodeSeq => NodeSeq = _ => <i>Bar</i>
 
-      sf.func() must ==/ (<i>Bar</i>)
+      sf(NodeSeq.Empty) must ==/ (<i>Bar</i>)
     }
 
     "be created by a constant that can be converted to a NodeSeq" in {
       implicit def intToNS(in: Int): NodeSeq = <a>{in}</a>
-      val sf: NodeSeqFunc = 55
-
-      sf.func() must ==/ (<a>55</a>)
+      val sf: NodeSeq => NodeSeq = _ => 55
+      sf(NodeSeq.Empty) must ==/ (<a>55</a>)
     }
 
     "be created by a function that can be converted to a NodeSeq" in {
       implicit def intToNodeSeq(in: Int): NodeSeq = <a>{in}</a>
-      val sf: NodeSeqFunc = () => 55
-
-      sf.func() must ==/ (<a>55</a>)
+      val sf: NodeSeq => NodeSeq = _ => 55
+      sf(NodeSeq.Empty) must ==/ (<a>55</a>)
     }
 
   }

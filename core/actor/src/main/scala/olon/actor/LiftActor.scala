@@ -55,7 +55,7 @@ object LAScheduler extends LAScheduler with Loggable {
                                })
 
       def execute(f: () => Unit): Unit =
-      es.execute(new Runnable{def run() {
+      es.execute(new Runnable{def run(): Unit = {
         try {
           f()
         } catch {
@@ -77,7 +77,7 @@ object LAScheduler extends LAScheduler with Loggable {
    *
    * @param f the function to execute on another thread
    */
-  def execute(f: () => Unit) {
+  def execute(f: () => Unit): Unit = {
     synchronized {
       if (exec eq null) {
         exec = createExecutor()
@@ -86,7 +86,7 @@ object LAScheduler extends LAScheduler with Loggable {
     }
   }
 
-  def shutdown() {
+  def shutdown(): Unit = {
     synchronized {
       if (exec ne null) {
         exec.shutdown()
@@ -113,7 +113,7 @@ trait SpecializedLiftActor[T] extends SimpleActor[T]  {
     if (f(this)) Full(this) else next.find(f)
     */
 
-    def remove() {
+    def remove(): Unit = {
       prev.next = next
       next.prev = prev
     }
@@ -205,7 +205,7 @@ trait SpecializedLiftActor[T] extends SimpleActor[T]  {
     toDo()
   }
 
-  private def processMailbox(ignoreProcessing: Boolean) {
+  private def processMailbox(ignoreProcessing: Boolean): Unit = {
     around {
       proc2(ignoreProcessing)
     }
@@ -224,7 +224,7 @@ trait SpecializedLiftActor[T] extends SimpleActor[T]  {
     case Nil => f
     case xs => CommonLoanWrapper(xs)(f)
   }
-  private def proc2(ignoreProcessing: Boolean) {
+  private def proc2(ignoreProcessing: Boolean): Unit = {
     var clearProcessing = true
     baseMailbox.synchronized {
       if (!ignoreProcessing && processing) return
@@ -388,7 +388,7 @@ with ForwardableActor[Any, Any] {
 
 
 
-  protected final def forwardMessageTo(msg: Any, forwardTo: TypedActor[Any, Any]) {
+  protected final def forwardMessageTo(msg: Any, forwardTo: TypedActor[Any, Any]): Unit = {
     if (null ne responseFuture) {
       forwardTo match {
         case la: LiftActor => la ! MsgWithResp(msg, responseFuture)
@@ -491,7 +491,7 @@ with ForwardableActor[Any, Any] {
   * The Actor should call this method with a reply
   * to the message
   */
-  protected def reply(v: Any) {
+  protected def reply(v: Any): Unit = {
     if (null ne responseFuture) {
       responseFuture.satisfy(v)
     }

@@ -34,11 +34,11 @@ trait SimpleController
       case _ => Empty
     }
 
-  def set(name: String, value: String) {
+  def set(name: String, value: String): Unit = {
     httpRequest.session.setAttribute(name, value)
   }
 
-  def unset(name: String) {
+  def unset(name: String): Unit = {
     httpRequest.session.removeAttribute(name)
   }
 }

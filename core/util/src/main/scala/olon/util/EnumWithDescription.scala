@@ -14,13 +14,13 @@ trait ValueWithDescription  {
 abstract class EnumWithDescription  {
   import scala.language.reflectiveCalls
 
-    type Value = enum.Value with ValueWithDescription
+    type Value = _enum.Value with ValueWithDescription
 
     private var _values: List[Value] = Nil
     def values = _values
 
     // possibly not a good idea using this directly
-    val enum = new Enumeration {
+    val _enum = new Enumeration {
         def Value(inName: String, inDescription: String): Value with ValueWithDescription = {
             new Val(nextId, inName) with ValueWithDescription {
                 def description = inDescription
@@ -30,7 +30,7 @@ abstract class EnumWithDescription  {
     }
 
     def Value(name: String, description: String): Value = {
-        val value = enum.Value(name, description)
+        val value = _enum.Value(name, description)
         _values = _values ::: List(value)  // build in order
         value
     }

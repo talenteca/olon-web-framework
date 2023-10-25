@@ -53,7 +53,7 @@ object Comet extends DispatchSnippet with LazyLoggable {
         cometActor.buildSpan(response.inSpan)
 
       case failedResult =>
-        cometActor.cometRenderTimeoutHandler openOr {
+        cometActor.cometRenderTimeoutHandler() openOr {
           throw new CometTimeoutException(s"Type: ${cometActor.theType}, name: ${cometActor.name}; result was: $failedResult")
         }
     }

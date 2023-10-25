@@ -11,7 +11,7 @@ import Helpers._
   * to modify lift's environment
   */
 class Boot {
-  def boot {
+  def boot: Unit = {
     // where to search snippet
     LiftRules.addToPackages("olon.webapptest")
 

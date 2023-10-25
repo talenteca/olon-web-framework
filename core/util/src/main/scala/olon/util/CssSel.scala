@@ -277,6 +277,28 @@ private class SelectorMap(binds: List[CssBind]) extends Function1[NodeSeq, NodeS
 
           }
         }
+
+        case (_, (_, AppendKidsSubNode())) =>
+          throw new RuntimeException("Invalid append kids sub node apply attributes rule")
+
+        case (_, (_, DontMergeAttributes)) =>
+          throw new RuntimeException("Invalid dont merge attributes apply attributes rule")
+
+        case (_, (_, DontMergeClass)) =>
+          throw new RuntimeException("Invalid dont merge class apply attributes rule")
+
+        case (_, (_, KidsSubNode())) =>
+          throw new RuntimeException("Invalid kids sub node apply attributes rule")
+
+        case (_, (_, PrependKidsSubNode())) =>
+          throw new RuntimeException("Invalid prepend kids sub node apply attributes rule")
+
+        case (_, (_, SelectThisNode(_))) =>
+          throw new RuntimeException("Invalid select this node apply attributes rule")
+
+        case (_, (_, SurroundKids())) =>
+          throw new RuntimeException("Invalid surround kids apply attributes rule")
+
       }
     }
 
@@ -361,10 +383,8 @@ private class SelectorMap(binds: List[CssBind]) extends Function1[NodeSeq, NodeS
       // we can do an open_! here because all the CssBind elems
       // have been vetted
       bind.css.openOrThrowException("Guarded with test before calling this method").subNodes match {
-        case Full(SelectThisNode(kids)) => {
+        case Full(SelectThisNode(kids)) =>
           throw new RetryWithException(if (kids) realE.child else realE)
-        }
-
         case Full(todo: WithKids) => {
           val calced = bind.calculate(realE.child)
           calced.length match {
@@ -438,24 +458,47 @@ private class SelectorMap(binds: List[CssBind]) extends Function1[NodeSeq, NodeS
             }
           }
         }
+
+        case Empty =>
+          throw new RuntimeException("Invalid case for empty subnodes")
+        case Failure(_, _, _) =>
+          throw new RuntimeException("Invalid case for failure subnodes")
+
+        case Full(AttrAppendSubNode(_)) =>
+          throw new RuntimeException("Invalid case for attribute append subnode subnodes")
+
+        case Full(AttrRemoveSubNode(_)) =>
+          throw new RuntimeException("Invalid case for attribute remove subnode subnodes")
+
+        case Full(AttrSubNode(_)) =>
+          throw new RuntimeException("Invalid case for attribute subnode subnodes")
+
+        case Full(DontMergeAttributes) =>
+          throw new RuntimeException("Invalid case for dont merge attributes subnodes")
+
+        case Full(DontMergeClass) =>
+          throw new RuntimeException("Invalid case for dont merge class subnodes")
+
+        case ParamFailure(_, _, _, _) =>
+          throw new RuntimeException("Invalid case for param failure subnodes")
       }
     }
 
 
-    final def forId(in: Elem, buff: ListBuffer[CssBind]) {
+    final def forId(in: Elem, buff: ListBuffer[CssBind]): Unit = {
       for {
         rid <- id
         bind <- idMap.get(rid)
       } buff ++= bind
     }
 
-    final def forElem(in: Elem, buff: ListBuffer[CssBind]) {
+    final def forElem(in: Elem, buff: ListBuffer[CssBind]): Unit = {
       for {
         bind <- elemMap.get(in.label)
       } buff ++= bind
     }
 
-    final def forStar(buff: ListBuffer[CssBind], depth: Int) {
+    final def forStar(buff: ListBuffer[CssBind], depth: Int): Unit = {
       for {
         binds <- starFunc
         bind <- binds if (bind match {
@@ -465,14 +508,14 @@ private class SelectorMap(binds: List[CssBind]) extends Function1[NodeSeq, NodeS
       } buff += bind
     }
 
-    final def forName(in: Elem, buff: ListBuffer[CssBind]) {
+    final def forName(in: Elem, buff: ListBuffer[CssBind]): Unit = {
       for {
         rid <- name
         bind <- nameMap.get(rid)
       } buff ++= bind
     }
 
-    def findClass(clz: List[String], buff: ListBuffer[CssBind]) {
+    def findClass(clz: List[String], buff: ListBuffer[CssBind]): Unit = {
       clz match {
         case Nil => ()
         case x :: xs => {
@@ -485,11 +528,11 @@ private class SelectorMap(binds: List[CssBind]) extends Function1[NodeSeq, NodeS
       }
     }
 
-    def forClass(in: Elem, buff: ListBuffer[CssBind]) {
+    def forClass(in: Elem, buff: ListBuffer[CssBind]): Unit = {
       findClass(classes, buff)
     }
 
-    def forAttr(in: Elem, buff: ListBuffer[CssBind]) {
+    def forAttr(in: Elem, buff: ListBuffer[CssBind]): Unit = {
       if (attrMap.isEmpty || attrs.isEmpty) ()
       else {
         for {
@@ -871,7 +914,7 @@ object CanBind extends CssBindImplicits {
   implicit def iterableDouble[T[Double]](implicit f: T[Double] => Iterable[Double]): CanBind[T[Double]] =
     new CanBind[T[Double]] {
       def apply(info: => T[Double])(ns: NodeSeq): Seq[NodeSeq] = f(info).toSeq.flatMap(a =>
-        if (a equals null) Nil else List(Text(a.toString)))
+        List(Text(a.toString)))
     }
 
   implicit def iterableBindableTransform[T[_]](implicit f: T[Bindable] => Iterable[Bindable]): CanBind[T[Bindable]] =

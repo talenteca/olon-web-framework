@@ -6,6 +6,7 @@ import java.lang.{Integer => JavaInteger, Long => JavaLong, Short => JavaShort, 
 import java.util.Date
 import java.sql.Timestamp
 import scala.reflect.Manifest
+import scala.collection.immutable.ArraySeq
 
 /** Function to extract values from JSON AST using case classes.
  *
@@ -142,9 +143,9 @@ object Extraction {
 
     def submap(prefix: String): Map[String, String] =
       Map(
-        map.filter(t => t._1 == prefix || t._1.startsWith(prefix + ".") || t._1.startsWith(prefix + "[")).map(
+        ArraySeq.unsafeWrapArray(map.filter(t => t._1 == prefix || t._1.startsWith(prefix + ".") || t._1.startsWith(prefix + "[")).map(
           t => (t._1.substring(prefix.length), t._2)
-        ).toList.toArray: _*
+        ).toList.toArray): _*
       )
 
     val ArrayProp = new Regex("""^(\.([^\.\[]+))\[(\d+)\].*$""")
@@ -376,15 +377,18 @@ object Extraction {
           fail("Expected tuple but found " + mappings)
         }
 
+      case HCol(targetType, mappings) =>
+        fail("Invalid type found " + targetType + " " + mappings)
+
       case Col(targetType, m) =>
         val custom = formats.customDeserializer(formats)
         val c = targetType.clazz
 
         if (custom.isDefinedAt(targetType, root)) custom(targetType, root)
-        else if (c == classOf[List[_]]) newCollection(root, m, a => List(a: _*))
-        else if (c == classOf[Set[_]]) newCollection(root, m, a => Set(a: _*))
+        else if (c == classOf[List[_]]) newCollection(root, m, a => List(ArraySeq.unsafeWrapArray(a): _*))
+        else if (c == classOf[Set[_]]) newCollection(root, m, a => Set(ArraySeq.unsafeWrapArray(a): _*))
         else if (c.isArray) newCollection(root, m, mkTypedArray(c))
-        else if (classOf[Seq[_]].isAssignableFrom(c)) newCollection(root, m, a => List(a: _*))
+        else if (classOf[Seq[_]].isAssignableFrom(c)) newCollection(root, m, a => List(ArraySeq.unsafeWrapArray(a): _*))
         else if (c == classOf[Option[_]]) newOption(root, m)
         else fail("Expected collection but got " + m + " for class " + c)
       case Dict(m) => root match {
@@ -430,24 +434,24 @@ object Extraction {
 
   private def convert(json: JValue, targetType: Class[_], formats: Formats): Any = json match {
     case JInt(x) if (targetType == classOf[Int]) => x.intValue
-    case JInt(x) if (targetType == classOf[JavaInteger]) => new JavaInteger(x.intValue)
+    case JInt(x) if (targetType == classOf[JavaInteger]) => JavaInteger.valueOf(x.intValue)
     case JInt(x) if (targetType == classOf[BigInt]) => x
     case JInt(x) if (targetType == classOf[Long]) => x.longValue
-    case JInt(x) if (targetType == classOf[JavaLong]) => new JavaLong(x.longValue)
+    case JInt(x) if (targetType == classOf[JavaLong]) => JavaLong.valueOf(x.longValue)
     case JInt(x) if (targetType == classOf[Double]) => x.doubleValue
-    case JInt(x) if (targetType == classOf[JavaDouble]) => new JavaDouble(x.doubleValue)
+    case JInt(x) if (targetType == classOf[JavaDouble]) => JavaDouble.valueOf(x.doubleValue)
     case JInt(x) if (targetType == classOf[Float]) => x.floatValue
-    case JInt(x) if (targetType == classOf[JavaFloat]) => new JavaFloat(x.floatValue)
+    case JInt(x) if (targetType == classOf[JavaFloat]) => JavaFloat.valueOf(x.floatValue)
     case JInt(x) if (targetType == classOf[Short]) => x.shortValue
-    case JInt(x) if (targetType == classOf[JavaShort]) => new JavaShort(x.shortValue)
+    case JInt(x) if (targetType == classOf[JavaShort]) => JavaShort.valueOf(x.shortValue)
     case JInt(x) if (targetType == classOf[Byte]) => x.byteValue
-    case JInt(x) if (targetType == classOf[JavaByte]) => new JavaByte(x.byteValue)
+    case JInt(x) if (targetType == classOf[JavaByte]) => JavaByte.valueOf(x.byteValue)
     case JInt(x) if (targetType == classOf[String]) => x.toString
     case JInt(x) if (targetType == classOf[Number]) => x.longValue
     case JDouble(x) if (targetType == classOf[Double]) => x
-    case JDouble(x) if (targetType == classOf[JavaDouble]) => new JavaDouble(x)
+    case JDouble(x) if (targetType == classOf[JavaDouble]) => JavaDouble.valueOf(x)
     case JDouble(x) if (targetType == classOf[Float]) => x.floatValue
-    case JDouble(x) if (targetType == classOf[JavaFloat]) => new JavaFloat(x.floatValue)
+    case JDouble(x) if (targetType == classOf[JavaFloat]) => JavaFloat.valueOf(x.floatValue)
     case JDouble(x) if (targetType == classOf[String]) => x.toString
     case JDouble(x) if (targetType == classOf[Int]) => x.intValue
     case JDouble(x) if (targetType == classOf[Long]) => x.longValue
@@ -457,7 +461,7 @@ object Extraction {
     case JString(s) if (targetType == classOf[Date]) => formats.dateFormat.parse(s).getOrElse(fail("Invalid date '" + s + "'"))
     case JString(s) if (targetType == classOf[Timestamp]) => new Timestamp(formats.dateFormat.parse(s).getOrElse(fail("Invalid date '" + s + "'")).getTime)
     case JBool(x) if (targetType == classOf[Boolean]) => x
-    case JBool(x) if (targetType == classOf[JavaBoolean]) => new JavaBoolean(x)
+    case JBool(x) if (targetType == classOf[JavaBoolean]) => JavaBoolean.valueOf(x)
     case j: JValue if (targetType == classOf[JValue]) => j
     case j: JObject if (targetType == classOf[JObject]) => j
     case j: JArray if (targetType == classOf[JArray]) => j

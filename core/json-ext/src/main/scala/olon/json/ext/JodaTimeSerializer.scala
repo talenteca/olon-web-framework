@@ -7,7 +7,7 @@ import JsonDSL._
 
 object JodaTimeSerializers {
   def all = List(DurationSerializer, InstantSerializer, DateTimeSerializer,
-                 DateMidnightSerializer, IntervalSerializer(), LocalDateSerializer(),
+                 IntervalSerializer(), LocalDateSerializer(),
                  LocalTimeSerializer(), PeriodSerializer)
 }
 
@@ -53,16 +53,6 @@ case object DateTimeSerializer extends CustomSerializer[DateTime](format => (
   },
   {
     case d: DateTime => JString(format.dateFormat.format(d.toDate))
-  }
-))
-
-case object DateMidnightSerializer extends CustomSerializer[DateMidnight](format => (
-  {
-    case JString(s) => new DateMidnight(DateParser.parse(s, format))
-    case JNull => null
-  },
-  {
-    case d: DateMidnight => JString(format.dateFormat.format(d.toDate))
   }
 ))
 

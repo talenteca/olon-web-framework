@@ -47,8 +47,7 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
    * return a function that vends the ServletAsyncProvider
    */
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
-    Full(req => new Jetty6AsyncProvider(req)).
-  filter(i => suspendResumeSupport_?)
+    Full(req => new Jetty6AsyncProvider(req)).filter(i => suspendResumeSupport_?)
 
 
 }
@@ -90,7 +89,7 @@ class Jetty6AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider with Lo
     try {
       val cont = getContinuation.invoke(contSupport, servletReq, LiftRules)
       logger.trace("About to suspend continuation")
-      val b = suspendMeth.invoke(cont, new java.lang.Long(timeout)).asInstanceOf[Boolean]
+      val b = suspendMeth.invoke(cont, java.lang.Long.valueOf(timeout)).asInstanceOf[Boolean]
       if (!b) RetryState.TIMED_OUT else RetryState.RESUMED
     } catch {
       case e: java.lang.reflect.InvocationTargetException if e.getCause.getClass.getName.endsWith("RetryRequest") =>

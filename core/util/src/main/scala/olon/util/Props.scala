@@ -4,9 +4,10 @@ package util
 import java.net.InetAddress
 import java.util.Properties
 import java.io.InputStream
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import Helpers._
 import common._
+import scala.collection.immutable.ArraySeq
 
 private[util] trait Props extends Logger {
   type PropProvider = scala.collection.Map[String, String]
@@ -71,7 +72,7 @@ private[util] trait Props extends Logger {
    * Ensure that all of the specified properties exist; throw an exception if
    * any of the specified values are not keys for available properties.
    */
-  def requireOrDie(what: String*) {
+  def requireOrDie(what: String*): Unit = {
     require(what :_*).toList match {
       case Nil =>
       case bad => throw new Exception("The following required properties are not defined: "+bad.mkString(","))
@@ -198,7 +199,7 @@ private[util] trait Props extends Logger {
 
     def allowModification = !runModeInitialised
 
-    def onModificationProhibited() {
+    def onModificationProhibited(): Unit = {
       warn("Setting property " + name + " has no effect. Run mode already initialised to " + mode + ".")
     }
   }
@@ -370,10 +371,10 @@ private[util] trait Props extends Logger {
     } match {
       // if we've got a propety file, create name/value pairs and turn them into a Map
       case Full(prop) =>
-        Map(prop.entrySet.toArray.flatMap{
+        Map(ArraySeq.unsafeWrapArray(prop.entrySet.toArray.flatMap{
           case s: JMap.Entry[_, _] => List((s.getKey.toString, s.getValue.toString))
           case _ => Nil
-        } :_*)
+        }) :_*)
 
       case _ =>
         error("Failed to find a properties file (but properties were accessed).  Searched: "+tried.reverse.mkString(", "))

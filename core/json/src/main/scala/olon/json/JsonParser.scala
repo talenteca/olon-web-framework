@@ -171,11 +171,11 @@ object JsonParser {
     // At the end of an object, if we're looking at an intermediate form of an
     // object or array, gather up all their component parts and create the final
     // object or array.
-    def closeBlock(v: Any) {
+    def closeBlock(v: Any): Unit = {
       def toJValue(x: Any) = x match {
         case json: JValue => json
-        case other: IntermediateJObject => JObject(other.fields.result)
-        case other: IntermediateJArray => JArray(other.bits.result)
+        case other: IntermediateJObject => JObject(other.fields.result())
+        case other: IntermediateJArray => JArray(other.bits.result())
         case _ => p.fail("unexpected field " + x)
       }
 
@@ -192,7 +192,7 @@ object JsonParser {
       }
     }
 
-    def newValue(v: JValue) {
+    def newValue(v: JValue): Unit = {
       if (!vals.isEmpty)
         vals.peekAny match {
           case JField(name, value) =>
@@ -206,8 +206,7 @@ object JsonParser {
         root = Some(v)
       }
     }
-
-    do {
+    def loop(): Unit = {
       token = p.nextToken
       token match {
         case OpenObj          => vals.push(IntermediateJObject(scala.collection.mutable.ListBuffer()))
@@ -222,8 +221,11 @@ object JsonParser {
         case CloseArr         => closeBlock(vals.popAny)
         case End              =>
       }
-    } while (token != End)
-
+      if (token != End) {
+        loop()
+      }
+    }
+    loop()
     root getOrElse JNothing
   }
 

@@ -7,6 +7,7 @@ import common.Loggable
 import util._
   import Helpers._
 import S.?
+import scala.collection.immutable.ArraySeq
 
 /**
  * Base class for things that require pagination. Implements a contract
@@ -143,7 +144,7 @@ trait PaginatorSnippet[T] extends Paginator[T] {
       Text(S.?("paginator.norecords"))
     else
       Text(S.?("paginator.displayingrecords",
-              Array(recordsFrom, recordsTo, count).map(_.asInstanceOf[AnyRef]) : _*))
+              ArraySeq.unsafeWrapArray(Array(recordsFrom, recordsTo, count).map(_.asInstanceOf[AnyRef])) : _*))
 
   /**
    * The template prefix for general navigation components

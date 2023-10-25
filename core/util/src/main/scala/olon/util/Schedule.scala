@@ -64,7 +64,7 @@ sealed trait Schedule extends Loggable {
   /**
    * Re-create the underlying <code>SingleThreadScheduledExecutor</code>
    */
-  def restart: Unit = synchronized
+  def restart(): Unit = synchronized
   { if ((service eq null) || service.isShutdown)
     service = buildService()
    if ((pool eq null) || pool.isShutdown)
@@ -134,7 +134,7 @@ sealed trait Schedule extends Loggable {
   def schedule(f: () => Unit, delay: TimeSpan): ScheduledFuture[Unit] = 
     synchronized {
       val r = new Runnable {
-        def run() { 
+        def run(): Unit = { 
           try {
             f.apply()
           } catch {
@@ -146,7 +146,7 @@ sealed trait Schedule extends Loggable {
       val fast = new java.util.concurrent.Callable[Unit] {
         def call(): Unit = {
           try {
-            Schedule.this.restart
+            Schedule.this.restart()
             pool.execute(r)
           } catch {
             case e: Exception => logger.error(e.getMessage, e)
@@ -155,7 +155,7 @@ sealed trait Schedule extends Loggable {
       }
       
       try {
-        this.restart
+        this.restart()
         service.schedule(fast, delay.millis, TimeUnit.MILLISECONDS)
       } catch {
         case e: RejectedExecutionException => throw ActorPingException("ping could not be scheduled", e)
