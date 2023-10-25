@@ -1,10 +1,10 @@
 import sbt._
 import Keys._
 
-object LiftSbtHelpers {
-  def coreProject = liftProject("core") _
-  def webProject = liftProject("web") _
-  def persistenceProject = liftProject("persistence") _
+object OlonSbtHelpers {
+  def coreProject = olonProject("core") _
+  def webProject = olonProject("web") _
+  def persistenceProject = olonProject("persistence") _
 
   /** Project definition helper that simplifies creation of `ProjectReference`.
     *
@@ -15,11 +15,11 @@ object LiftSbtHelpers {
     * @param prefix   the prefix of project module.
     * @param module   the name of the project module. Typically, a project id is of the form lift-`module`.
     */
-  def liftProject(base: String, prefix: String = "olon-")(module: String): Project =
-    liftProject(id = if (module.startsWith(prefix)) module else prefix + module,
+  def olonProject(base: String, prefix: String = "olon-")(module: String): Project =
+    olonProject(id = if (module.startsWith(prefix)) module else prefix + module,
                 base = file(base) / module.stripPrefix(prefix))
 
-  def liftProject(id: String, base: File): Project = {
+  def olonProject(id: String, base: File): Project = {
     Project(id, base)
       .settings(scalacOptions ++= List("-feature", "-language:implicitConversions", "-deprecation"))
       .settings(

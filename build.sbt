@@ -1,5 +1,5 @@
 import Dependencies._
-import LiftSbtHelpers._
+import OlonSbtHelpers._
 
 ThisBuild / organization := "com.talenteca"
 ThisBuild / version := "1.0.0"
@@ -74,7 +74,7 @@ lazy val actor =
     .dependsOn(common)
     .settings(
       description := "Simple Actor",
-      parallelExecution in Test := false
+      Test / parallelExecution := false
     )
     .settings(crossScalaVersions := crossUpTo213)
 
@@ -82,7 +82,7 @@ lazy val markdown =
   coreProject("markdown")
     .settings(
       description := "Markdown Parser",
-      parallelExecution in Test := false,
+      Test / parallelExecution := false,
       libraryDependencies ++= Seq(scalatest, scalatest_junit, scala_xml, scala_parser)
     )
     .settings(crossScalaVersions := crossUpTo213)
@@ -91,7 +91,7 @@ lazy val json =
   coreProject("json")
     .settings(
       description := "JSON Library",
-      parallelExecution in Test := false,
+      Test / parallelExecution := false,
       libraryDependencies ++= Seq(scalap(scalaVersion.value), paranamer,  scala_xml)
     )
     .settings(crossScalaVersions := crossUpTo213)
@@ -159,7 +159,7 @@ lazy val webkit =
     .dependsOn(util, testkit % "provided")
     .settings(
       description := "Webkit Library",
-      parallelExecution in Test := false,
+      Test / parallelExecution := false,
       libraryDependencies ++= Seq(
         commons_fileupload,
         rhino,
@@ -179,26 +179,26 @@ lazy val webkit =
           case _ => Seq.empty
         }
       },
-      initialize in Test := {
+      Test / initialize := {
         System.setProperty(
           "olon.webapptest.src.test.webapp",
-          ((sourceDirectory in Test).value / "webapp").absString
+          ((Test / sourceDirectory).value / "webapp").absString
         )
       },
-      unmanagedSourceDirectories in Compile += {
-        (sourceDirectory in Compile).value / ("scala_" + scalaBinaryVersion.value)
+      Compile / unmanagedSourceDirectories += {
+        (Compile / sourceDirectory).value / ("scala_" + scalaBinaryVersion.value)
       },
-      unmanagedSourceDirectories in Test += {
-        (sourceDirectory in Test).value / ("scala_" + scalaBinaryVersion.value)
+      Test / unmanagedSourceDirectories += {
+        (Test / sourceDirectory).value / ("scala_" + scalaBinaryVersion.value)
       },
-      compile in Compile := (compile in Compile).dependsOn(WebKeys.assets).value,
+      Compile / compile := (Compile / compile).dependsOn(WebKeys.assets).value,
       /**
         * This is to ensure that the tests in olon.webapptest run last
         * so that other tests (MenuSpec in particular) run before the SiteMap
         * is set.
         */
-      testGrouping in Test := {
-        (definedTests in Test).map { tests =>
+      Test / testGrouping := {
+        (Test / definedTests).map { tests =>
           import Tests._
 
           val (webapptests, others) = tests.partition { test =>
@@ -237,12 +237,12 @@ lazy val mapper =
     .dependsOn(db, proto)
     .settings(
       description := "Mapper Library",
-      parallelExecution in Test := false,
+      Test / parallelExecution := false,
       libraryDependencies ++= Seq(h2, derby, jbcrypt),
-      initialize in Test := {
+      Test / initialize := {
         System.setProperty(
           "derby.stream.error.file",
-          ((crossTarget in Test).value / "derby.log").absolutePath
+          ((Test / crossTarget).value / "derby.log").absolutePath
         )
       }
     )
@@ -259,12 +259,12 @@ lazy val mongodb =
     .dependsOn(json_ext, util)
     .settings(
       crossScalaVersions := crossUpTo213,
-      parallelExecution in Test := false,
+      Test / parallelExecution := false,
       libraryDependencies ++= Seq(mongo_java_driver, mongo_java_driver_async),
-      initialize in Test := {
+      Test / initialize := {
         System.setProperty(
           "java.util.logging.config.file",
-          ((resourceDirectory in Test).value / "logging.properties").absolutePath
+          ((Test / resourceDirectory).value / "logging.properties").absolutePath
         )
       }
     )
@@ -274,5 +274,5 @@ lazy val mongodb_record =
     .dependsOn(record, mongodb)
     .settings(
       crossScalaVersions := crossUpTo213,
-      parallelExecution in Test := false
+      Test / parallelExecution := false
     )
