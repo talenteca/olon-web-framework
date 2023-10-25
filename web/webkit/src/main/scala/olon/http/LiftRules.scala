@@ -485,33 +485,6 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     case _ => "text/html; charset=utf-8"
   }
 
-  lazy val liftVersion: String = {
-    val cn = """\.""".r.replaceAllIn(LiftRules.getClass.getName, "/")
-    val ret: Box[String] =
-    for{
-      url <- Box !! LiftRules.getClass.getResource("/" + cn + ".class")
-      newUrl = new java.net.URL(url.toExternalForm.split("!")(0) + "!" + "/META-INF/MANIFEST.MF")
-      str <- tryo(new String(readWholeStream(newUrl.openConnection.getInputStream), "UTF-8"))
-      ma <- """Implementation-Version: (.*)""".r.findFirstMatchIn(str)
-    } yield ma.group(1)
-
-    ret openOr "Unknown Lift Version"
-  }
-
-  lazy val liftBuildDate: Date = {
-    val cn = """\.""".r.replaceAllIn(LiftRules.getClass.getName, "/")
-    val ret: Box[Date] =
-    for{
-      url <- Box !! LiftRules.getClass.getResource("/" + cn + ".class")
-      newUrl = new java.net.URL(url.toExternalForm.split("!")(0) + "!" + "/META-INF/MANIFEST.MF")
-      str <- tryo(new String(readWholeStream(newUrl.openConnection.getInputStream), "UTF-8"))
-      ma <- """Built-Time: (.*)""".r.findFirstMatchIn(str)
-      asLong <- asLong(ma.group(1))
-    } yield new Date(asLong)
-
-    ret openOr new Date(0L)
-  }
-
   /**
    * Hooks to be run when LiftServlet.destroy is called.
    */
@@ -1784,7 +1757,6 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
    * `LiftRules.securityRules.headers`.
    */
   val supplementalHeaders: FactoryMaker[List[(String, String)]] = new FactoryMaker(() => {
-    ("X-Lift-Version", liftVersion) ::
     lockedSecurityRules.headers
   }) {}
 
@@ -2042,9 +2014,6 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         "withparam" -> WithParam,
         "WithParam" -> WithParam,
         "bind-at" -> WithParam,
-        "VersionInfo" -> VersionInfo,
-        "versioninfo" -> VersionInfo,
-        "version_info" -> VersionInfo,
         "SkipDocType" -> SkipDocType,
         "skipdoctype" -> SkipDocType,
         "skip_doc_type" -> SkipDocType,
