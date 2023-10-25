@@ -25,7 +25,7 @@ object LiftSbtHelpers {
       .settings(
         autoAPIMappings := true,
         apiMappings ++= {
-          val cp: Seq[Attributed[File]] = (fullClasspath in Compile).value
+          val cp: Seq[Attributed[File]] = (Compile / fullClasspath).value
 
           findManagedDependency(cp, "org.scala-lang.modules", "scala-xml").map {
             case (revision, file)  =>

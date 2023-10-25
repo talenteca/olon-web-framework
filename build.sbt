@@ -10,7 +10,7 @@ ThisBuild / organizationName := "Talenteca"
 
 val scala211Version = "2.11.12"
 val scala212Version = "2.12.14"
-val scala213Version = "2.13.6"
+val scala213Version = "2.13.12"
 
 val crossUpTo213 = Seq(scala213Version, scala212Version, scala211Version)
 
