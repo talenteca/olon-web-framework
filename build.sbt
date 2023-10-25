@@ -8,11 +8,10 @@ ThisBuild / homepage := Some(url("https://github.com/talenteca/olon-web-framewor
 ThisBuild / licenses += ("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 ThisBuild / organizationName := "Talenteca"
 
-val scala211Version = "2.11.12"
-val scala212Version = "2.12.14"
+val scala212Version = "2.12.18"
 val scala213Version = "2.13.12"
 
-val crossUpTo213 = Seq(scala213Version, scala212Version, scala211Version)
+val crossUpTo213 = Seq(scala213Version, scala212Version)
 
 ThisBuild / scalaVersion := scala213Version
 ThisBuild / crossScalaVersions := crossUpTo213
