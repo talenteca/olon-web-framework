@@ -1,31 +1,30 @@
 import sbt._
 import Keys._
 
-object LiftSbtHelpers {
-  def coreProject = liftProject("core") _
-  def webProject = liftProject("web") _
-  def persistenceProject = liftProject("persistence") _
-
+object OlonSbtHelpers {
+  def coreProject = olonProject("core") _
+  def webProject = olonProject("web") _
+ 
   /** Project definition helper that simplifies creation of `ProjectReference`.
     *
-    * It is a convenience method to create a Lift `ProjectReference` module by having the boilerplate for most common
+    * It is a convenience method to create a Olon `ProjectReference` module by having the boilerplate for most common
     * activities tucked in.
     *
     * @param base     the base path location of project module.
     * @param prefix   the prefix of project module.
-    * @param module   the name of the project module. Typically, a project id is of the form lift-`module`.
+    * @param module   the name of the project module. Typically, a project id is of the form olon-`module`.
     */
-  def liftProject(base: String, prefix: String = "olon-")(module: String): Project =
-    liftProject(id = if (module.startsWith(prefix)) module else prefix + module,
+  def olonProject(base: String, prefix: String = "olon-")(module: String): Project =
+    olonProject(id = if (module.startsWith(prefix)) module else prefix + module,
                 base = file(base) / module.stripPrefix(prefix))
 
-  def liftProject(id: String, base: File): Project = {
+  def olonProject(id: String, base: File): Project = {
     Project(id, base)
       .settings(scalacOptions ++= List("-feature", "-language:implicitConversions", "-deprecation"))
       .settings(
         autoAPIMappings := true,
         apiMappings ++= {
-          val cp: Seq[Attributed[File]] = (fullClasspath in Compile).value
+          val cp: Seq[Attributed[File]] = (Compile / fullClasspath).value
 
           findManagedDependency(cp, "org.scala-lang.modules", "scala-xml").map {
             case (revision, file)  =>

@@ -41,17 +41,12 @@ object Dependencies {
   lazy val jetty6     = "org.mortbay.jetty"        % "jetty"                    % "6.1.26"   % Test
   lazy val jwebunit   = "net.sourceforge.jwebunit" % "jwebunit-htmlunit-plugin" % "2.5"      % Test
 
-  lazy val specs2      = "org.specs2"        %% "specs2-core"          % "4.9.4"         % Test
+  lazy val specs2      = "org.specs2"        %% "specs2-core"          % "4.15.0"         % Test
   lazy val scalacheck  = "org.specs2"        %% "specs2-scalacheck"    % specs2.revision % Test
   lazy val specs2Prov  = "org.specs2"        %% "specs2-core"          % specs2.revision % Provided
   lazy val specs2Matchers = "org.specs2"     %% "specs2-matcher-extra" % specs2.revision % Test
   lazy val specs2MatchersProv = "org.specs2" %% "specs2-matcher-extra" % specs2.revision % Provided
   lazy val specs2Mock  = "org.specs2"        %% "specs2-mock"          % specs2.revision % Test
   lazy val json4s      = "org.json4s"        %% "json4s-native"        % "4.0.6" % Test
-
-  lazy val scalactic       = "org.scalactic"     %% "scalactic"  % "3.1.2"   % Test
-  lazy val scalatest       = "org.scalatest"     %% "scalatest"  % "3.1.2"   % Test
-  lazy val scalatest_junit = "org.scalatestplus" %% "junit-4-12" % "3.1.2.0" % Test
-  lazy val mockito_scalatest = "org.mockito" %% "mockito-scala-scalatest" % "1.14.3" % Test
 
 }
