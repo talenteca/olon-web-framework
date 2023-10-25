@@ -342,20 +342,20 @@ trait Html5Parser {
           if (capture) {
             val text = buffer.toString()
             if (text.length() > 0) {
-              hStack = hStack.appended(createText(text))
+              hStack = hStack.prepended(createText(text))
             }
           }
           buffer.setLength(0)
         }
       }
 
-      saxer.scopeStack = saxer.scopeStack.appended(TopScope)
+      saxer.scopeStack = saxer.scopeStack.prepended(TopScope)
       hp.setContentHandler(saxer)
       val is = new InputSource(in)
       is.setEncoding("UTF-8")
       hp.parse(is)
 
-      saxer.scopeStack = saxer.scopeStack.init
+      saxer.scopeStack = saxer.scopeStack.tail
 
       in.close()
       saxer.rootElem match {
