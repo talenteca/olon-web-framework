@@ -317,7 +317,7 @@ trait LiftCometActor extends TypedActor[Any, Any] with ForwardableActor[Any, Any
 
   /**
    * This is to react to comet-requests timing out.
-   * When the timeout specified in {@link LiftRules#cometProcessingTimeout} occurs one may override
+   * When the timeout specified in {@link olon.http.LiftRules#cometProcessingTimeout} occurs one may override
    * this to send a message to the user informing of the timeout.
    * <p/><p/>
    * Do NOT manipulate actor-state here. If you want to manipulate state, send the actor a new message.
@@ -333,7 +333,7 @@ trait LiftCometActor extends TypedActor[Any, Any] with ForwardableActor[Any, Any
 
   /**
    * This is to react to comet-actors timing out while initial rendering, calls to render().
-   * When the timeout specified in {@link LiftRules#cometRenderTimeout} occurs one may override
+   * When the timeout specified in {@link olon.http.LiftRules#cometRenderTimeout} occurs one may override
    * this to customise the output.
    * <p/><p/>
    * Do NOT manipulate actor-state here. If you want to manipulate state, send the actor a new message.

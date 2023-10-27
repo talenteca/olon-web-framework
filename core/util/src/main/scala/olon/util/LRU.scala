@@ -4,7 +4,7 @@ package util
 import common._
 
 /**
- * LRU Cache wrapping {@link org.apache.commons.collections.map.LRUMap}
+ * LRU Cache wrapping `org.apache.commons.collections.map.LRUMap`
  *
  * @param size the maximum number of Elements allowed in the LRU map
  * @param loadFactor the Load Factor to construct our LRU with.

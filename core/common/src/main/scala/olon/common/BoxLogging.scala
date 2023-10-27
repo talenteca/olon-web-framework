@@ -8,7 +8,7 @@ package common
  * friends for trace, debug, info, and warn levels. This allows abstracting out
  * where and what the actual logger is.
  *
- * With this mixed in, boxes will have `[[logFailure]]` methods. The first logs
+ * With this mixed in, boxes will have `logFailure` methods. The first logs
  * all `[[Failure]]`s as well as `[[Empty]]`. The second logs only `Failure`s and
  * `[[ParamFailure]]`s, treating `Empty` as a valid value. These both log their
  * respective items at ERROR level. You can also use `traceLog*`, `debugLog*`,

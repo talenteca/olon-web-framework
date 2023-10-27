@@ -459,7 +459,7 @@ object LAFuture {
     * need to occur around the given functionality. Typical example is setting up DB
     * transaction.
     *
-    * This is similar to [[olon.common.CommonLoanWrapper]], however, it decorates the
+    * This is similar to `olon.common.CommonLoanWrapper`, however, it decorates the
     * function eagerly. This way, you can access current thread's state which is essential
     * to do things like set up a HTTP session wrapper
     */

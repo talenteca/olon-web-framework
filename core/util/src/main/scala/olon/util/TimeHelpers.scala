@@ -45,7 +45,7 @@ trait TimeHelpers { self: ControlHelpers =>
 
   /**
    * The `TimeSpan` class represents a duration of time in milliseconds. In this
-   * way, it is similar to the `[[scala.concurrent.Duration]]` class. It is
+   * way, it is similar to the `scala.concurrent.Duration` class. It is
    * mostly used in Lift APIs in similar positions as the Scala `Duration`
    * class (for example, in event scheduling).
    *
@@ -101,7 +101,7 @@ trait TimeHelpers { self: ControlHelpers =>
 
     /**
      * @return The amount of milliseconds this `TimeSpan` represents.
-     * @throws UnsupportedOperationException When created by the deprecated
+     * @throws java.lang.UnsupportedOperationException When created by the deprecated
      *         months/years builder (month and year lengths in milliseconds
      *         are only defined with respect to a reference point, since the
      *         length of a month or year can vary).
@@ -110,7 +110,7 @@ trait TimeHelpers { self: ControlHelpers =>
 
     /**
      * @return The amount of milliseconds this `TimeSpan` represents.
-     * @throws UnsupportedOperationException When created by the deprecated months/years builder (
+     * @throws java.lang.UnsupportedOperationException When created by the deprecated months/years builder (
      *     month and year lengths in milliseconds are only defined with respect to a reference point,
      *     since the length of a month or year can vary).
      */
@@ -140,7 +140,7 @@ trait TimeHelpers { self: ControlHelpers =>
      *
      * @return A `TimeSpan` representing the sum of this span and `in`'s
      *         `TimeSpan` representation.
-     * @throws UnsupportedOperationException If only one of the two `TimeSpan`s
+     * @throws java.lang.UnsupportedOperationException If only one of the two `TimeSpan`s
      *         represents a `Period` and that `Period` has a year or month
      *          component (this only occurs if the deprecated `months` or
      *          `years` builders are used, as month and year lengths in
@@ -182,7 +182,7 @@ trait TimeHelpers { self: ControlHelpers =>
      *
      * @return A `TimeSpan` representing the sum of this span and `in`'s
      *         `TimeSpan` representation.
-     * @throws UnsupportedOperationException If only one of the two `TimeSpan`s
+     * @throws java.lang.UnsupportedOperationException If only one of the two `TimeSpan`s
      *         represents a `Period` and that `Period` has a year or month
      *          component (this only occurs if the deprecated `months` or
      *          `years` builders are used, as month and year lengths in

@@ -403,7 +403,7 @@ sealed abstract class Box[+A] extends Product with Serializable{
    *        guard.
    *
    * @return The contents of the `Box` if it is `Full`.
-   * @throws NullPointerException If you attempt to call it on an `EmptyBox`,
+   * @throws java.lang.NullPointerException If you attempt to call it on an `EmptyBox`,
    *         with a message that includes the provided `justification`.
    */
   def openOrThrowException(justification: => String): A

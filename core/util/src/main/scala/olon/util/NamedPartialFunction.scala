@@ -59,7 +59,7 @@ object NamedPF {
    * @param value the value to use to test each PartialFunction
    * @param lst the sequence to search for a PartialFunction defined at <code>value</code>
    * @return the result of applying any such PartialFunction to the specified value.
-   * @throws MatchError on failure to find such a PartialFunction
+   * @throws scala.MatchError on failure to find such a PartialFunction
    */
   def apply[A, B](value: A, lst: Seq[PartialFunction[A, B]]): B =
   find(value, lst) match {

@@ -92,7 +92,7 @@ class LRUMap[K, V](initMaxSize: Int, loadFactor: Box[Float], expiredFunc: ((K, V
   /**
    * Unsafe version of `[[get]]`.
    *
-   * @throws NullPointerException If the key does not exist in the map. Use `get`
+   * @throws java.lang.NullPointerException If the key does not exist in the map. Use `get`
    *         instead to get a safe `[[Box]]` result that can be checked for
    *         existence, or use `[[contains]]` before calling this.
    */
