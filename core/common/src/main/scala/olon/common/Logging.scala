@@ -288,3 +288,77 @@ trait Loggable {
 trait LazyLoggable {
   @transient protected lazy val logger = Logger(this.getClass)
 }
+
+/**
+ * Configuration helpers for the log4j logging backend.
+ */
+object Log4j {
+  import org.apache.log4j.{LogManager,PropertyConfigurator}
+  import org.apache.log4j.xml.DOMConfigurator
+  
+  /**
+   * Default configuration for log4j backend. Appends to the console with a
+   * simple layout at `INFO` level.
+   */
+  val defaultProps =
+    """<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+    <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+      <appender name="appender" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.SimpleLayout"/>
+      </appender>
+      <root>
+        <priority value ="INFO"/>
+        <appender-ref ref="appender"/>
+      </root>
+    </log4j:configuration>
+    """
+  
+  /**
+   * Configure with the contents of the file at the specified `url` (either
+   * `.xml` or `.properties`).
+   */
+  def withFile(url: java.net.URL)() = {
+    if (url.getPath.endsWith(".xml")) {
+      val domConf = new DOMConfigurator
+      domConf.doConfigure(url, LogManager.getLoggerRepository())
+    } else {
+      PropertyConfigurator.configure(url)
+    }
+  }
+  /**
+   * Configure with the specified configuration. `config` must contain a valid
+   * XML document.
+   */
+  def withConfig(config: String)() = {
+    val domConf = new DOMConfigurator
+    val is = new java.io.ByteArrayInputStream(config.getBytes("UTF-8"))
+    domConf.doConfigure(is, LogManager.getLoggerRepository())
+  }
+  
+  /**
+   * Configure with simple defaults. See [[defaultProps]].
+   */
+  def withDefault() = withConfig(defaultProps)()
+}
+
+/**
+ * Configuration helpers for the Logback logging backend.
+ */
+object Logback  {
+  import ch.qos.logback.classic.LoggerContext;
+  import ch.qos.logback.core.util.StatusPrinter;
+  import ch.qos.logback.classic.joran.JoranConfigurator;
+
+  /**
+   * Configure with the contents of the XML file at the specified `url`.
+   */
+  def withFile(url: java.net.URL)() = {
+    val lc = LoggerFactory.getILoggerFactory().asInstanceOf[LoggerContext];
+    val configurator = new JoranConfigurator();
+    configurator.setContext(lc);
+    // the context was probably already configured by default configuration rules
+    lc.reset(); 
+    configurator.doConfigure(url);
+  }
+}

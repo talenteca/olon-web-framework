@@ -1,6 +1,8 @@
 import Dependencies._
 import OlonSbtHelpers._
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 ThisBuild / organization := "com.talenteca"
 ThisBuild / version := "2.0.0-SNAPSHOT"
 ThisBuild / description := "Olon is a modern web framework based on the view first strategy (based on the Lift web framework)"
@@ -55,16 +57,14 @@ lazy val root =
   )
   .aggregate(olonProjects: _*)
 
-// Core Projects
-// -------------
 lazy val core: Seq[ProjectReference] =
   Seq(common, actor, json, json_scalaz7, json_ext, util)
 
 lazy val common =
   coreProject("common")
     .settings(
-      description := "Common Libraties and Utilities",
-      libraryDependencies ++= Seq(slf4j_api, logback, scala_xml, scala_parser)
+      description := "Common Libraries and Utilities",
+      libraryDependencies ++= Seq(slf4j_api, logback, log4j, scala_xml, scala_parser)
     )
     .settings(crossScalaVersions := crossUpVersions)
 
@@ -84,12 +84,6 @@ lazy val json =
       Test / parallelExecution := false,
       libraryDependencies ++= Seq(scalap(scalaVersion.value), paranamer,  scala_xml, json4s)
     )
-    .settings(crossScalaVersions := crossUpVersions)
-
-lazy val documentationHelpers =
-  coreProject("documentation-helpers")
-    .settings(description := "Documentation Helpers")
-    .dependsOn(util)
     .settings(crossScalaVersions := crossUpVersions)
 
 lazy val json_scalaz7 =
@@ -128,8 +122,6 @@ lazy val util =
     )
     .settings(crossScalaVersions := crossUpVersions)
 
-// Web Projects
-// ------------
 lazy val web: Seq[ProjectReference] =
   Seq(testkit, webkit)
 
