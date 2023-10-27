@@ -38,8 +38,6 @@ trait CssSel extends Function1[NodeSeq, NodeSeq] {
 
 /**
  * A passthrough function that does not change the nodes
- *
- * @tag CssFunction
  */
 object PassThru extends Function1[NodeSeq, NodeSeq] {
   def apply(in: NodeSeq): NodeSeq = in
@@ -48,8 +46,6 @@ object PassThru extends Function1[NodeSeq, NodeSeq] {
 /**
  * Replaces the nodes with an Empty NodeSeq.  Useful
  * for removing unused nodes
- *
- * @tag CssFunction
  */
 object ClearNodes extends Function1[NodeSeq, NodeSeq] {
   def apply(in: NodeSeq): NodeSeq = NodeSeq.Empty
