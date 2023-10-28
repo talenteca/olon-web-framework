@@ -45,7 +45,8 @@ ThisBuild / publishTo := {
   else Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 ThisBuild / publishMavenStyle := true
-
+ThisBuild / versionScheme := Some("semver-spec")
+ThisBuild / credentials += Credentials(file(".credentials"))
 
 lazy val olonProjects = core ++ web
 
