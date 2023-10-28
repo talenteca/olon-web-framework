@@ -8,8 +8,12 @@ Global / pgpSigningKey := Some("csaltos@talenteca.io")
 ThisBuild / organization := "com.talenteca"
 ThisBuild / version := "2.0.0"
 ThisBuild / description := "Olon is a modern web framework based on the view first strategy (based on the Lift web framework)"
-ThisBuild / homepage := Some(url("https://github.com/talenteca/olon-web-framework"))
-ThisBuild / licenses += ("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+ThisBuild / homepage := Some(
+  url("https://github.com/talenteca/olon-web-framework")
+)
+ThisBuild / licenses += ("Apache License, Version 2.0", url(
+  "http://www.apache.org/licenses/LICENSE-2.0.txt"
+))
 ThisBuild / organizationName := "Talenteca"
 
 val scala3Version = "3.1.3"
@@ -20,9 +24,19 @@ val crossUpVersions = Seq(scala2Version, scala3Version)
 ThisBuild / scalaVersion := scala2Version
 ThisBuild / crossScalaVersions := crossUpVersions
 
-ThisBuild / libraryDependencies ++= Seq(specs2, specs2Matchers, specs2Mock, scalacheck)
+ThisBuild / libraryDependencies ++= Seq(
+  specs2,
+  specs2Matchers,
+  specs2Mock,
+  scalacheck
+)
 
-ThisBuild / scalacOptions ++= Seq("-deprecation", "-Ypatmat-exhaust-depth", "80", "-Ywarn-unused")
+ThisBuild / scalacOptions ++= Seq(
+  "-deprecation",
+  "-Ypatmat-exhaust-depth",
+  "80",
+  "-Ywarn-unused"
+)
 
 ThisBuild / scalafmtOnCompile := true
 
@@ -38,10 +52,10 @@ ThisBuild / scmInfo := Some(
 )
 ThisBuild / developers := List(
   Developer(
-    id    = "csaltos",
-    name  = "Carlos Saltos",
+    id = "csaltos",
+    name = "Carlos Saltos",
     email = "csaltos@talenteca.io",
-    url   = url("https://csaltos.com/")
+    url = url("https://csaltos.com/")
   )
 )
 
@@ -49,7 +63,8 @@ ThisBuild / developers := List(
 ThisBuild / pomIncludeRepository := { _ => false }
 ThisBuild / publishTo := {
   val nexus = "https://s01.oss.sonatype.org/"
-  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
   else Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 ThisBuild / publishMavenStyle := true
@@ -60,11 +75,11 @@ lazy val olonProjects = core ++ web
 
 lazy val root =
   (project in file("."))
-  .settings(
-    publish := false,
-    publishLocal := false
-  )
-  .aggregate(olonProjects: _*)
+    .settings(
+      publish := false,
+      publishLocal := false
+    )
+    .aggregate(olonProjects: _*)
 
 lazy val core: Seq[ProjectReference] =
   Seq(common, actor, json, json_ext, util)
@@ -73,7 +88,13 @@ lazy val common =
   coreProject("common")
     .settings(
       description := "Common Libraries and Utilities",
-      libraryDependencies ++= Seq(slf4j_api, logback, log4j, scala_xml, scala_parser)
+      libraryDependencies ++= Seq(
+        slf4j_api,
+        logback,
+        log4j,
+        scala_xml,
+        scala_parser
+      )
     )
     .settings(crossScalaVersions := crossUpVersions)
 
@@ -91,7 +112,12 @@ lazy val json =
     .settings(
       description := "JSON Library",
       Test / parallelExecution := false,
-      libraryDependencies ++= Seq(scalap(scalaVersion.value), paranamer,  scala_xml, json4s)
+      libraryDependencies ++= Seq(
+        scalap(scalaVersion.value),
+        paranamer,
+        scala_xml,
+        json4s
+      )
     )
     .settings(crossScalaVersions := crossUpVersions)
 
@@ -154,7 +180,8 @@ lazy val webkit =
       ),
       libraryDependencies ++= {
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, scalaMajor)) if scalaMajor >= 13 => Seq(scala_parallel_collections)
+          case Some((2, scalaMajor)) if scalaMajor >= 13 =>
+            Seq(scala_parallel_collections)
           case _ => Seq.empty
         }
       },
@@ -171,10 +198,8 @@ lazy val webkit =
         (Test / sourceDirectory).value / ("scala_" + scalaBinaryVersion.value)
       },
       Compile / compile := (Compile / compile).dependsOn(WebKeys.assets).value,
-      /**
-        * This is to ensure that the tests in olon.webapptest run last
-        * so that other tests (MenuSpec in particular) run before the SiteMap
-        * is set.
+      /** This is to ensure that the tests in olon.webapptest run last so that
+        * other tests (MenuSpec in particular) run before the SiteMap is set.
         */
       Test / testGrouping := {
         (Test / definedTests).map { tests =>
@@ -189,8 +214,7 @@ lazy val webkit =
             new Group("webapptests", webapptests, InProcess)
           )
         }.value
-      },
-
+      }
     )
     .enablePlugins(SbtWeb)
     .settings(crossScalaVersions := crossUpVersions)
