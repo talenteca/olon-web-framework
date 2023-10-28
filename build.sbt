@@ -22,7 +22,13 @@ ThisBuild / crossScalaVersions := crossUpVersions
 
 ThisBuild / libraryDependencies ++= Seq(specs2, specs2Matchers, specs2Mock, scalacheck)
 
-ThisBuild / scalacOptions ++= Seq("-deprecation", "-Ypatmat-exhaust-depth", "80")
+ThisBuild / scalacOptions ++= Seq("-deprecation", "-Ypatmat-exhaust-depth", "80", "-Ywarn-unused")
+
+ThisBuild / scalafmtOnCompile := true
+
+ThisBuild / scalafixOnCompile := true
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
