@@ -32,7 +32,7 @@ class KeyedCache[K, T](size: Int, loadFactor: Box[Float], cons: K => Box[T]) {
     */
   def update(key: K, value: T) = cache.update(key, value)
 
-  /** If the cache contains a value mapped to {@@@codekey} then return it,
+  /** If the cache contains a value mapped to {{@code key}} then return it,
     * otherwise run cons and add that value to the cache and return it.
     */
   def apply(key: K): Box[T] = if (cache.contains(key)) {

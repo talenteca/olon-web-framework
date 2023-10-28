@@ -3114,7 +3114,7 @@ trait SHtml extends Loggable {
     checkbox_id(settable.get, s => settable.set(s), Empty, attrs: _*)
   }
 
-  /** Defines a new checkbox set to {@@@@codevalue} and running {@@@@codefunc}
+  /** Defines a new checkbox set to {{@code value}} and running {{@code func}}
     * when the checkbox is submitted.
     */
   def checkbox(
@@ -3145,8 +3145,8 @@ trait SHtml extends Loggable {
     )
   }
 
-  /** Defines a new checkbox set to {@@@@codevalue} and running {@@@@codefunc}
-    * when the checkbox is submitted. Has an id of {@@@@codeid} .
+  /** Defines a new checkbox set to {{@code value}} and running {{@code func}}
+    * when the checkbox is submitted. Has an id of {{@code id}}.
     */
   def checkbox_id(
       value: Boolean,

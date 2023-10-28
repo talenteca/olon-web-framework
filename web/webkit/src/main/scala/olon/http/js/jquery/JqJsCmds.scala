@@ -441,7 +441,7 @@ object JqJsCmds {
       JqJE.JqId(JE.Str(uid)) ~> JqJE.JqPrepend(content)
   }
 
-  /** Replaces the children of the node at {@@@@codeuid} with {@@@@codecontent}
+  /** Replaces the children of the node at {{@code uid}} with {{@code content}}.
     */
   object EmptyAfter {
     def apply(uid: String, content: NodeSeq): JsCmd =

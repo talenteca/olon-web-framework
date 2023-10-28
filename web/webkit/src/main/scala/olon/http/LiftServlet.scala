@@ -1082,8 +1082,8 @@ class LiftServlet extends Loggable {
     }
   }
 
-  /** Sends the {@@@@codeHTTPResponse} to the browser using data from the
-    * {@@@@linkResponse} and {@@@@linkReq} .
+  /** Sends the {{@code HTTPResponse}} to the browser using data from the
+    * {{@link Response}} and {{@link Req}}.
     */
   private[http] def sendResponse(
       liftResp: LiftResponse,

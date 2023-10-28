@@ -301,7 +301,7 @@ trait SortedPaginatorSnippet[T, C]
     * configuration. You can reference this as a snippet method directly in your
     * template; or you can call it directly as part of your binding code.
     *
-    * In addition to the classes bound in {@@@@linkPaginatorSnippet} , for each
+    * In addition to the classes bound in {{@link PaginatorSnippet}}, for each
     * header in the `headers` list, this will bind elements with that class name
     * and put a link in them with their contents.
     *

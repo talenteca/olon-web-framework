@@ -670,7 +670,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   val liftTagProcessing = RulesSeq[LiftTagPF]
 
   /** If you don't want lift to send the application/xhtml+xml mime type to
-    * those browsers that understand it, then set this to {@@@@codefalse}
+    * those browsers that understand it, then set this to {{@code false}}
     */
   @volatile var useXhtmlMimeType: Boolean = true
 
