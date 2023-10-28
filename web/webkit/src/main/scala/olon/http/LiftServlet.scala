@@ -187,24 +187,7 @@ class LiftServlet extends Loggable {
     case Full(x: AnyRef) :: xs    => x :: flatten(xs)
     case (lst: Iterable[_]) :: xs => lst.toList ::: flatten(xs)
     case (x: AnyRef) :: xs        => x :: flatten(xs)
-    case x :: xs                  => flatten(xs)
-  }
-
-  private def authPassed_?(req: Req): Boolean = {
-
-    val checkRoles: (Role, List[Role]) => Boolean = { case (resRole, roles) =>
-      (roles foldLeft false)((l, r) => l || resRole.isChildOf(r.name))
-    }
-
-    val role = NamedPF.applyBox(req, LiftRules.httpAuthProtectedResource.toList)
-    role.map(_ match {
-      case Full(r) =>
-        LiftRules.authentication.verified_?(req) match {
-          case true => checkRoles(r, userRoles.get)
-          case _    => false
-        }
-      case _ => LiftRules.authentication.verified_?(req)
-    }) openOr true
+    case _ :: xs                  => flatten(xs)
   }
 
   private val recent: LRUMap[String, Int] = new LRUMap(2000)
@@ -579,8 +562,6 @@ class LiftServlet extends Loggable {
         case _ => (false, Empty)
       }
 
-    val wp = req.path.wholePath
-
     if (LiftRules.enableContainerSessions && !req.stateless_?) {
       req.request.session
     }
@@ -698,7 +679,7 @@ class LiftServlet extends Loggable {
               case n: NodeSeq      => List(n)
               case js: JsCommands  => List(js)
               case r: LiftResponse => List(r)
-              case s               => Nil
+              case _               => Nil
             }
 
             val ret: LiftResponse = what2 match {
@@ -1102,7 +1083,7 @@ class LiftServlet extends Loggable {
                   (if (!LiftRules.excludePathFromContextPathRewriting.vend(uri))
                      u.contextPath
                    else "") + uri
-                ).filter(ignore => uri.startsWith("/"));
+                ).filter(_ => uri.startsWith("/"));
                 rwf <- URLRewriter.rewriteFunc
               ) yield rwf(updated)) openOr uri
             )
@@ -1110,16 +1091,6 @@ class LiftServlet extends Loggable {
         case _ => v
       }
     )
-
-    def pairFromRequest(req: Req): (Box[Req], Box[String]) = {
-      val acceptHeader =
-        for (
-          innerReq <- Box.legacyNullTest(req.request);
-          accept <- innerReq.header("Accept")
-        ) yield accept
-
-      (Full(req), acceptHeader)
-    }
 
     val resp = liftResp.toResponse
 
@@ -1211,7 +1182,7 @@ class LiftServlet extends Loggable {
           response.outputStream.flush()
       }
     } catch {
-      case e: java.io.IOException => // ignore IO exceptions... they happen
+      case _: java.io.IOException => // ignore IO exceptions... they happen
     }
 
     LiftRules.afterSend.toList.foreach(f =>

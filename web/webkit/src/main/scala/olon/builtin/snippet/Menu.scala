@@ -122,11 +122,11 @@ object Menu extends DispatchSnippet {
         def buildANavItem(i: MenuItem) = {
           i match {
             // Per Loc.PlaceHolder, placeholder implies HideIfNoKids
-            case m @ MenuItem(text, uri, kids, _, _, _)
+            case m @ MenuItem(_, _, kids, _, _, _)
                 if m.placeholder_? && kids.isEmpty =>
               NodeSeq.Empty
 
-            case m @ MenuItem(text, uri, kids, _, _, _) if m.placeholder_? =>
+            case m @ MenuItem(text, _, kids, _, _, _) if m.placeholder_? =>
               Helpers.addCssClass(
                 i.cssClass,
                 Elem(
@@ -160,7 +160,7 @@ object Menu extends DispatchSnippet {
                   S.prefixedAttrsToMetaData("li_item", liMap)
               )
 
-            case MenuItem(text, uri, kids, true, _, _) =>
+            case MenuItem(text, _, kids, true, _, _) =>
               Helpers.addCssClass(
                 i.cssClass,
                 Elem(

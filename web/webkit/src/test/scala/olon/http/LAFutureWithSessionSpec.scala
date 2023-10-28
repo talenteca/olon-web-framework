@@ -317,19 +317,19 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
 
       S.initIfUninitted(session2) {
-        future.map(v => SessionVar1.is).get(timeout) must eventually(
+        future.map(_ => SessionVar1.is).get(timeout) must eventually(
           beEqualTo("two")
         )
       }
 
       S.initIfUninitted(session3) {
-        future.map(v => SessionVar1.is).get(timeout) must eventually(
+        future.map(_ => SessionVar1.is).get(timeout) must eventually(
           beEqualTo("three")
         )
       }
 
       S.initIfUninitted(session1) {
-        future.map(v => SessionVar1.is).get(timeout) must eventually(
+        future.map(_ => SessionVar1.is).get(timeout) must eventually(
           beEqualTo("one")
         )
       }

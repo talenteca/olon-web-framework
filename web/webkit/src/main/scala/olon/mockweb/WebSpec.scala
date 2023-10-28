@@ -94,9 +94,10 @@ abstract class WebSpec(boot: () => Any = () => {})
   /** Converts a String description into a WebSpecBridge that can then be used
     * to set up either an S or Req instance.
     */
-  implicit def strToWebSpecBridge(description: String) = new WebSpecBridge(
-    description
-  )
+  implicit def strToWebSpecBridge(description: String): WebSpecBridge =
+    new WebSpecBridge(
+      description
+    )
 
   /** A comon trait to provide utility methods for mutating the underlying
     * HttpServletRequest.

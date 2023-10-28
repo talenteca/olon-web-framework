@@ -143,12 +143,12 @@ trait JsObj extends JsExp {
     */
   def extend(other: JsObj) = {
     // existing, non-existing props
-    val (ep, nep) = other.props.partition { case (key, exp) =>
-      props.exists { case (k, e) => k == key }
+    val (ep, nep) = other.props.partition { case (key, _) =>
+      props.exists { case (k, _) => k == key }
     }
     // replaced props
     val rp = props.map { case (key, exp) =>
-      ep.find { case (k, e) => k == key }.getOrElse(key -> exp)
+      ep.find { case (k, _) => k == key }.getOrElse(key -> exp)
     }
 
     new JsObj {
@@ -679,7 +679,7 @@ trait HtmlFixer {
 
     val revised = ("script" #> nsFunc(ns => {
       ns match {
-        case FindScript(e) => {
+        case FindScript(_) => {
           lb += JE.JsRaw(ns.text).cmd
           NodeSeq.Empty
         }
@@ -696,7 +696,7 @@ trait HtmlFixer {
     def unapply(in: NodeSeq): Option[Elem] = in match {
       case e: Elem => {
         e.attribute("type").map(_.text).filter(_ == "text/javascript").flatMap {
-          a =>
+          _ =>
             if (e.attribute("src").isEmpty) Some(e) else None
         }
       }
@@ -869,7 +869,7 @@ object JsCmds {
       ) + " = " + right.toJsCmd + ";};"
   }
 
-  implicit def jsExpToJsCmd(in: JsExp) = in.cmd
+  implicit def jsExpToJsCmd(in: JsExp): JsCmd = in.cmd
 
   case class CmdPair(left: JsCmd, right: JsCmd) extends JsCmd {
     import scala.collection.mutable.ListBuffer

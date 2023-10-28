@@ -37,10 +37,10 @@ class LocSpec extends Specification {
       val testMenu = Menu.param[Param](
         "Test",
         "Test",
-        s => Empty,
-        p => "bacon"
+        _ => Empty,
+        _ => "bacon"
       ) / "foo" / "bar" / *
-      val testSiteMap = SiteMap(testMenu)
+      SiteMap(testMenu)
 
       val testLoc = testMenu.toLoc
       val mockReq = new MockHttpServletRequest("http://test/foo/bar/123")
@@ -56,10 +56,10 @@ class LocSpec extends Specification {
       val testMenu = Menu.param[Param](
         "Test",
         "Test",
-        s => Empty,
-        p => "bacon"
+        _ => Empty,
+        _ => "bacon"
       ) / "foo" / "bar" / * >> Loc.MatchWithoutCurrentValue
-      val testSiteMap = SiteMap(testMenu)
+      SiteMap(testMenu)
 
       val testLoc = testMenu.toLoc
       val mockReq = new MockHttpServletRequest("http://test/foo/bar/123")
@@ -75,10 +75,10 @@ class LocSpec extends Specification {
       val testMenu = Menu.param[Param](
         "Test",
         "Test",
-        s => Empty,
-        p => "bacon"
+        _ => Empty,
+        _ => "bacon"
       ) / "foo" / "bar" >> Loc.MatchWithoutCurrentValue
-      val testSiteMap = SiteMap(testMenu)
+      SiteMap(testMenu)
 
       val testLoc = testMenu.toLoc
       val mockReq = new MockHttpServletRequest("http://test/foo/bar/123")
@@ -99,8 +99,8 @@ class LocSpec extends Specification {
       val testMenu = Menu.param[Param](
         "Test",
         "Test",
-        s => Empty,
-        p => "bacon"
+        _ => Empty,
+        _ => "bacon"
       ) / "foo" / "bar" >> Loc.MatchWithoutCurrentValue
       val testLoc = testMenu.toLoc
 

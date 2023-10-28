@@ -102,10 +102,10 @@ private[http] final object HtmlNormalizer {
         )
 
       attributes match {
-        case attribute @ UnprefixedAttribute(
+        case UnprefixedAttribute(
               EventAttribute.EventForAttribute(eventName),
               attributeValue,
-              remainingAttributes
+              _
             )
             if attributeValue.text.startsWith(
               "javascript:"

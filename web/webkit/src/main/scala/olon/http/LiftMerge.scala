@@ -114,7 +114,6 @@ private[http] trait LiftMerge {
     addlHead ++= S.forHead()
     val addlTail = new ListBuffer[Node]
     addlTail ++= S.atEndOfBody()
-    val rewrite = URLRewriter.rewriteFunc
 
     val contextPath: String = S.contextPath
 

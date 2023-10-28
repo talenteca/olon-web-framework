@@ -605,7 +605,9 @@ case class RedirectState(
 )
 
 object MessageState {
-  implicit def tuple2MessageState(msg: (String, NoticeType.Value)) =
+  implicit def tuple2MessageState(
+      msg: (String, NoticeType.Value)
+  ): MessageState =
     MessageState(msg)
 
   def apply(msgs: (String, NoticeType.Value)*): MessageState =

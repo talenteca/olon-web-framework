@@ -18,5 +18,5 @@ class Meower {
 }
 
 class Splunker {
-  def render = SHtml.onSubmit(s => ())
+  def render = SHtml.onSubmit(_ => ())
 }

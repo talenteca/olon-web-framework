@@ -112,7 +112,7 @@ object OneShot extends Specification with RequestKit with XmlMatchers {
           for {
             resp <- get("/cv_int/33")
             resp2 <- resp.get("/cv_int")
-            respx <- resp.get("/cv_str/meow")
+            _ <- resp.get("/cv_str/meow")
             resp3 <- resp.get("/cv_str")
             xml <- resp2.xml
             xml2 <- resp3.xml

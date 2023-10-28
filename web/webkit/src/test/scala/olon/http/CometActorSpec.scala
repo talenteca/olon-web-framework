@@ -84,7 +84,7 @@ class CometActorSpec extends Specification {
             didRun = true
             S.session.foreach(_.destroySession())
           } catch {
-            case e: Exception =>
+            case _: Exception =>
               didThrow = true
           }
         }

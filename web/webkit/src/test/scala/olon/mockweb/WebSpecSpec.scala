@@ -42,7 +42,7 @@ object WebSpecSpecBoot {
   */
 object WebSpecSpecRest extends RestHelper {
   serve {
-    case "api" :: "info" :: Nil JsonGet req => {
+    case "api" :: "info" :: Nil JsonGet _ => {
       ("version" -> "1.0") ~ ("name" -> "WebSpec")
     }
   }

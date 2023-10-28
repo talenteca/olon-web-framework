@@ -444,7 +444,7 @@ trait SHtml extends Loggable {
             latestElem = fixElem(e);
             latestKids = e.child; Full(e)
           }
-          .map(ignore => applyAgain())
+          .map(_ => applyAgain())
           .openOr(NodeSeq.Empty)
 
       def applyAgain(): NodeSeq =
@@ -668,7 +668,7 @@ trait SHtml extends Loggable {
       (SHtml
         .ajaxCall(
           Str("ignore"),
-          { ignore: String => SetHtml(show, showContents) }
+          { _: String => SetHtml(show, showContents) }
         )
         ._2
         .cmd & swapJsCmd(show, hide))
@@ -1490,7 +1490,7 @@ trait SHtml extends Loggable {
   private def dealWithBlur(elem: Elem, blurCmd: String): Elem = {
     (elem \ "@onblur").toList match {
       case Nil => elem % ("onblur" -> blurCmd)
-      case x :: xs =>
+      case x :: _ =>
         val attrs = elem.attributes.filter(_.key != "onblur")
         elem.copy(attributes =
           new UnprefixedAttribute("onblur", Text(blurCmd + x.text), attrs)
@@ -1515,7 +1515,7 @@ trait SHtml extends Loggable {
       body: NodeSeq,
       attrs: ElemAttr*
   ): Elem = {
-    fmapFunc((a: List[String]) => { func(); true })(key =>
+    fmapFunc((_: List[String]) => { func(); true })(key =>
       attrs.foldLeft(<a href={Helpers.appendFuncToURL(to, key + "=_")}>{
         body
       }</a>)(_ % _)
@@ -2710,8 +2710,6 @@ trait SHtml extends Loggable {
         "'" + funcName + "=' + this.options[" + value + ".selectedIndex].value"
       )
     val key = formFuncName
-
-    val vals = opts.map(_.value)
 
     val testFunc = LFuncHolder(
       in =>

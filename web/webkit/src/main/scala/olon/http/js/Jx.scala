@@ -63,7 +63,7 @@ trait JxBase {
   private def fixText(in: String): String = (in, in.trim) match {
     case (x, y) if x == y         => x
     case (x, y) if x startsWith y => y + " "
-    case (x, y) if y.length == 0  => " "
+    case (_, y) if y.length == 0  => " "
     case (x, y) if x endsWith y   => " " + y
     case (_, y)                   => " " + y + " "
   }

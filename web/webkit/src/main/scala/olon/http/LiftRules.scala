@@ -245,7 +245,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val noticesAutoFadeOut =
     new FactoryMaker[(NoticeType.Value) => Box[(TimeSpan, TimeSpan)]](
-      (notice: NoticeType.Value) => Empty
+      (_: NoticeType.Value) => Empty
     ) {}
 
   /** Use this to apply various effects to the notices. The user function

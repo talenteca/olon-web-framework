@@ -358,7 +358,7 @@ class SnippetSpec extends Specification with XmlMatchers {
       val session = new LiftSession("", "hello", Empty)
 
       S.init(makeReq, session) {
-        val ret = SHtml.onSubmit(s => ())(<input/>)
+        val ret = SHtml.onSubmit(_ => ())(<input/>)
 
         ret.size must_== 1
         (ret \ "@name").text.length must be > 0
@@ -369,7 +369,7 @@ class SnippetSpec extends Specification with XmlMatchers {
       val session = new LiftSession("", "hello", Empty)
 
       S.init(makeReq, session) {
-        val ret = SHtml.onSubmitBoolean(s => ())(<input type="checkbox"/>)
+        val ret = SHtml.onSubmitBoolean(_ => ())(<input type="checkbox"/>)
 
         ret.size must_== 2
         (ret \\ "input")

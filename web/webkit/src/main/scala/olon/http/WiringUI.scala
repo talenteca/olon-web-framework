@@ -124,7 +124,7 @@ object WiringUI {
     */
   def toNode[T](in: NodeSeq, cell: Cell[T])(
       f: (T, NodeSeq) => NodeSeq
-  ): NodeSeq = toNode(in, cell, (id, first, js) => js)(f)
+  ): NodeSeq = toNode(in, cell, (_, _, js) => js)(f)
 
   def history[T](
       cell: Cell[T]
@@ -132,7 +132,7 @@ object WiringUI {
     in => {
       val myElem: Elem = in
         .find {
-          case e: Elem => true
+          case _: Elem => true
           case _       => false
         }
         .map(_.asInstanceOf[Elem])
@@ -165,7 +165,7 @@ object WiringUI {
     *   already defined)
     */
   def toNode[T](cell: Cell[T])(f: (T, NodeSeq) => NodeSeq): NodeSeq => NodeSeq =
-    in => toNode(in, cell, (id, first, js) => js)(f)
+    in => toNode(in, cell, (_, _, js) => js)(f)
 
   /** Given a NodeSeq, a Cell register the postPageJavaScript that will update
     * the element with a new value.
@@ -180,7 +180,7 @@ object WiringUI {
     *   already defined)
     */
   def asText[T](in: NodeSeq, cell: Cell[T]): NodeSeq =
-    toNode(in, cell, (id, first, js) => js)((t, ns) => Text(t.toString))
+    toNode(in, cell, (_, _, js) => js)((t, _) => Text(t.toString))
 
   /** Given a Cell register the postPageJavaScript that will update the element
     * with a new value.
@@ -193,7 +193,7 @@ object WiringUI {
     *   there's none already defined)
     */
   def asText[T](cell: Cell[T]): NodeSeq => NodeSeq =
-    in => toNode(in, cell, (id, first, js) => js)((t, ns) => Text(t.toString))
+    in => toNode(in, cell, (_, _, js) => js)((t, _) => Text(t.toString))
 
   /** Given a NodeSeq, a Cell register the postPageJavaScript that will update
     * the element with a new value.
@@ -220,7 +220,7 @@ object WiringUI {
       cell: Cell[T],
       jsEffect: (String, Boolean, JsCmd) => JsCmd
   ): NodeSeq =
-    toNode(in, cell, jsEffect)((t, ns) => Text(t.toString))
+    toNode(in, cell, jsEffect)((t, _) => Text(t.toString))
 
   /** Given a NodeSeq, a Cell register the postPageJavaScript that will update
     * the element with a new value.
@@ -246,7 +246,7 @@ object WiringUI {
       cell: Cell[T],
       jsEffect: (String, Boolean, JsCmd) => JsCmd
   ): NodeSeq => NodeSeq =
-    in => toNode(in, cell, jsEffect)((t, ns) => Text(t.toString))
+    in => toNode(in, cell, jsEffect)((t, _) => Text(t.toString))
 
   /** Given a NodeSeq, a Cell and a function that can generate a NodeSeq from
     * the cell's value and the template value, register the postPageJavaScript
@@ -279,7 +279,7 @@ object WiringUI {
   )(f: (T, NodeSeq) => NodeSeq): NodeSeq = {
     val myElem: Elem = in
       .find {
-        case e: Elem => true
+        case _: Elem => true
         case _       => false
       }
       .map(_.asInstanceOf[Elem])
@@ -323,7 +323,7 @@ object WiringUI {
     in => {
       val myElem: Elem = in
         .find {
-          case e: Elem => true
+          case _: Elem => true
           case _       => false
         }
         .map(_.asInstanceOf[Elem])

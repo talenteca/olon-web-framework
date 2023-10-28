@@ -38,14 +38,14 @@ trait PValueHolder[T] extends ValueHolder {
 
 object PValueHolder {
   implicit def tToVHT[T](in: T): PValueHolder[T] = new PValueHolder[T] {
-    def get = in; def is = get
+    def get = in
   }
   def apply[T](in: T) = tToVHT(in)
 }
 
 object ValueHolder {
   implicit def tToVHT[T](in: T): ValueHolder = new PValueHolder[T] {
-    def get = in; def is = get
+    def get = in
   }
   def apply[T](in: T) = tToVHT(in)
 }

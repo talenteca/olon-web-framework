@@ -86,7 +86,7 @@ class BindingsSpec extends Specification with XmlMatchers {
       S.initIfUninitted(session) {
         val org = <span><input id="frog" class="dog cat"/></span>
 
-        val res = ("#frog" #> SHtml.text("", s => ())).apply(org)
+        val res = ("#frog" #> SHtml.text("", _ => ())).apply(org)
 
         (res \ "input" \ "@id").text must_== "frog"
 

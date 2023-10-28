@@ -101,7 +101,7 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
     val parserC = elem("c", (c: Char) => c == 'c')
     val parserD = elem("d", (c: Char) => c == 'd')
     def shouldSucceed[T](r: ParseResult[T]) = r match {
-      case Success(x, y) => true
+      case Success(_, _) => true
       case _             => false
     }
     "provide a permute parser succeeding if any permutation of given parsers succeeds" in {
@@ -136,7 +136,7 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
 }
 
 object AbcdStringGen {
-  implicit def abcdString =
+  implicit def abcdString: Gen[String] =
     for (
       len <- choose(4, 4);
       string <- pick(len, List("a", "b", "c", "d"))

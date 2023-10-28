@@ -118,12 +118,12 @@ class LiftSessionSpec extends Specification with BeforeEach {
         result match {
           case Failure(
                 _,
-                Full(ex: java.lang.reflect.InvocationTargetException),
+                Full(_: java.lang.reflect.InvocationTargetException),
                 _
               ) =>
             success
 
-          case other =>
+          case _ =>
             failure(
               "Comet did not fail with an InvocationTargetException. Please check to ensure error handling in no-arg comet constructors wasn't broken."
             )

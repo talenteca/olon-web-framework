@@ -27,7 +27,7 @@ object LiftJavaScript {
           RenderVersion.doWith(version) {
             pageScript.is.toOption
           }
-        case other =>
+        case _ =>
           None
       }
     }
