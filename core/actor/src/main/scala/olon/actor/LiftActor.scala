@@ -147,7 +147,7 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
       f: MailboxItem => Boolean
   ): Box[MailboxItem] =
     start match {
-      case x: SpecialMailbox => Empty
+      case _: SpecialMailbox => Empty
       case x if f(x)         => Full(x)
       case x                 => findMailboxItem(x.next, f)
     }

@@ -587,12 +587,11 @@ class BoxLoggingSpec extends Specification with Mockito {
       }
 
       "log to the Lift logger" in {
-        val result =
-          new MyLoggable {
-            Failure("Failed").logFailure("Second")
-            Failure("Excepted", Full(new Exception("uh-oh")), Empty)
-              .logFailure("Third")
-          }
+        new MyLoggable {
+          Failure("Failed").logFailure("Second")
+          Failure("Excepted", Full(new Exception("uh-oh")), Empty)
+            .logFailure("Third")
+        }
 
         (there was one(mockLogger).error(any[String])) and
           (there was one(mockLogger).error(any[String], any[Exception]))

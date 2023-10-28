@@ -258,7 +258,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val noticesEffects =
     new FactoryMaker[(Box[NoticeType.Value], String) => Box[JsCmd]](
-      (notice: Box[NoticeType.Value], id: String) => Empty
+      (_: Box[NoticeType.Value], _: String) => Empty
     ) {}
 
   /** Holds user functions that will be executed very early in the request
@@ -405,10 +405,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         ) - 2 // this request and any open comet requests
 
       // dump the oldest requests
-      which.drop(max).foreach { case (actor, req) =>
+      which.drop(max).foreach { case (actor, _) =>
         actor ! BreakOut()
       }
-      invalid.foreach { case (actor, req) =>
+      invalid.foreach { case (actor, _) =>
         actor ! BreakOut()
       }
     }
@@ -772,7 +772,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * computations that bar it from re-establishing the long polling connection
     */
   val clientActorLifespan = new FactoryMaker[LiftActor => Long](() =>
-    (actor: LiftActor) => (30.minutes): Long
+    (_: LiftActor) => (30.minutes): Long
   ) {}
 
   /** Put a function that will calculate the request timeout based on the
@@ -955,7 +955,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   @volatile var calculateXmlHeader
       : (NodeResponse, Node, Box[String]) => String = {
     case _ if S.skipXmlHeader => ""
-    case (_, up: Unparsed, _) => ""
+    case (_, _: Unparsed, _)  => ""
 
     case (_, _, Empty) | (_, _, Failure(_, _, _)) =>
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -1005,7 +1005,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   val dataAttributeProcessor: RulesSeq[DataAttributeProcessor] = new RulesSeq()
 
   dataAttributeProcessor.append {
-    case ("lift", snippetInvocation, element, liftSession) =>
+    case ("lift", snippetInvocation, element, _) =>
       snippetInvocation.charSplit('?') match {
         case Nil =>
           // This shouldn't ever happen.
@@ -1215,7 +1215,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * context path rewriting
     */
   val excludePathFromContextPathRewriting: FactoryMaker[String => Boolean] =
-    new FactoryMaker(() => ((s: String) => false)) {}
+    new FactoryMaker(() => ((_: String) => false)) {}
 
   /** If a deferred snippet has a failure during render, what should we display?
     */
@@ -1624,7 +1624,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
     case (Some(o), headers, cookies, req) =>
       convertResponse((o, headers, cookies, req))
-    case (bad, _, _, req) => req.createNotFound
+    case (_, _, _, req) => req.createNotFound
   }
 
   /** Set a snippet failure handler here. The class and method for the snippet
@@ -1700,7 +1700,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * when URI is invalid and you're not using a site map
     */
   val uriNotFound = RulesSeq[URINotFoundPF].prepend(NamedPF("default") {
-    case (r, _) => DefaultNotFound
+    case (_, _) => DefaultNotFound
   })
 
   /** If you use the form attribute in a snippet invocation, what attributes
@@ -1748,7 +1748,6 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   def fixCSS(path: List[String], prefix: Box[String]): Unit = {
 
     val liftReq: LiftRules.LiftRequestPF = new LiftRules.LiftRequestPF {
-      def functionName = "Default CSS Fixer"
 
       def isDefinedAt(r: Req): Boolean = {
         r.path.partPath == path
@@ -1760,7 +1759,6 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     }
 
     val cssFixer: LiftRules.DispatchPF = new LiftRules.DispatchPF {
-      def functionName = "default css fixer"
 
       def isDefinedAt(r: Req): Boolean = {
         r.path.partPath == path
@@ -1813,7 +1811,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   /** Tells Lift if the Comet JavaScript should be included. By default it is
     * set to true.
     */
-  @volatile var autoIncludeComet: LiftSession => Boolean = session => true
+  @volatile var autoIncludeComet: LiftSession => Boolean = _ => true
 
   val autoIncludeAjaxCalc: FactoryMaker[() => LiftSession => Boolean] =
     new FactoryMaker(() =>
@@ -1826,7 +1824,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   val javaScriptSettings: FactoryMaker[() => Box[LiftSession => JsObj]] =
     new FactoryMaker(() =>
       () =>
-        (Full((session: LiftSession) => LiftJavaScript.settings): Box[
+        (Full((_: LiftSession) => LiftJavaScript.settings): Box[
           LiftSession => JsObj
         ])
     ) {}
@@ -1933,7 +1931,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * return HTTP 304 status indicating the client to used the cached
     * information.
     */
-  @volatile var ajaxScriptUpdateTime: LiftSession => Long = session => {
+  @volatile var ajaxScriptUpdateTime: LiftSession => Long = _ => {
     object when extends SessionVar[Long](millis)
     when.is
   }

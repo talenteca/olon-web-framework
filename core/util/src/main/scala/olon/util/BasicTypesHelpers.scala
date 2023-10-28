@@ -217,7 +217,7 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
       case Empty | Failure(_, _, _) => false
       case Full(n)                  => toBoolean(n)
       case Some(n)                  => toBoolean(n)
-      case x :: xs                  => toBoolean(x)
+      case x :: _                   => toBoolean(x)
       case o                        => toBoolean(o.toString)
     }
   }
@@ -284,7 +284,7 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
       case Full(n)                         => asLong(n)
       case None | Empty | Failure(_, _, _) => Empty
       case s: String                       => asLong(s)
-      case x :: xs                         => asLong(x)
+      case x :: _                          => asLong(x)
       case o                               => asLong(o.toString)
     }
   }
@@ -303,7 +303,7 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
       case None | Empty | Failure(_, _, _) => 0
       case s: String                       => parseNumber(s).toInt
       case d: java.util.Date               => (d.getTime / 1000L).toInt
-      case x :: xs                         => toInt(x)
+      case x :: _                          => toInt(x)
       case o                               => toInt(o.toString)
     }
   }
@@ -322,7 +322,7 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
       case Full(n)                         => toLong(n)
       case None | Empty | Failure(_, _, _) => 0L
       case s: String                       => parseNumber(s)
-      case x :: xs                         => toLong(x)
+      case x :: _                          => toLong(x)
       case o                               => toLong(o.toString)
     }
   }

@@ -19,6 +19,12 @@ case class SiteMap(
 
   lazy val kids: Seq[Menu] = convertablekids.map(_.toMenu)
 
+  override def buildUpperLines(
+      pathAt: HasKids,
+      actual: Menu,
+      populate: List[MenuItem]
+  ): List[MenuItem] = populate
+
   private var locs: Map[String, Loc[_]] = Map.empty
 
   private var locPath: Set[List[String]] = Set()
@@ -204,7 +210,7 @@ sealed class SiteMapSingleton {
       matchFunc: Loc.LocParam[_] => Boolean
   ): UnapplyLocMatcher = new UnapplyLocMatcher {
     def unapply(menu: Menu): Option[Menu] =
-      menu.loc.params.find(matchFunc).map(ignore => menu)
+      menu.loc.params.find(matchFunc).map(_ => menu)
   }
 
   def findAndTestLoc(name: String): Box[Loc[_]] =
@@ -247,12 +253,14 @@ sealed class SiteMapSingleton {
 }
 
 trait HasKids {
+
   def kids: Seq[Menu]
+
   def buildUpperLines(
       pathAt: HasKids,
       actual: Menu,
       populate: List[MenuItem]
-  ): List[MenuItem] = populate
+  ): List[MenuItem]
 
   def isRoot_? = false
 

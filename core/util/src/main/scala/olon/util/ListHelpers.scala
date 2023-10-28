@@ -43,7 +43,6 @@ trait ListHelpers {
     import scala.collection.mutable.ListBuffer
     import scala.annotation._
 
-    val newSet = Set(newList: _*)
     val ret: ListBuffer[Res] = new ListBuffer()
     var insertAfter: Box[T] = Empty
 
@@ -140,9 +139,9 @@ trait ListHelpers {
       val what = swhat.toLowerCase
       def tGet(in: Seq[(String, String)]): Box[String] =
         in match {
-          case Nil                                   => Empty
-          case x :: xs if (x._1.toLowerCase == what) => Full(x._2)
-          case x :: xs                               => tGet(xs)
+          case Nil                                  => Empty
+          case x :: _ if (x._1.toLowerCase == what) => Full(x._2)
+          case _ :: xs                              => tGet(xs)
         }
       tGet(theList)
     }
@@ -232,7 +231,7 @@ trait ListHelpers {
           (z: @unchecked) match { case x :: xs => permuteList(xs).map(x :: _) }
         )
         ret ::: rot
-          .map(z => (z: @unchecked) match { case x :: xs => xs })
+          .map(z => (z: @unchecked) match { case _ :: xs => xs })
           .flatMap(internal(_))
     }
     internal(in.toList).distinct.sortWith(_.length > _.length)
@@ -275,7 +274,7 @@ trait ListHelpers {
     def replace(pos: Int, withWhat: T): List[T] = {
       def repl(pos: Int, withWhat: T, rest: List[T]): List[T] = rest match {
         case Nil                 => Nil
-        case x :: xs if pos <= 0 => withWhat :: xs
+        case _ :: xs if pos <= 0 => withWhat :: xs
         case x :: xs             => x :: repl(pos - 1, withWhat, xs)
       }
       repl(pos, withWhat, what)

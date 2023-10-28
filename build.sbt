@@ -6,7 +6,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / pgpSigningKey := Some("csaltos@talenteca.io")
 
 ThisBuild / organization := "com.talenteca"
-ThisBuild / version := "2.0.0"
+ThisBuild / version := "3.0.0-SNAPSHOT"
 ThisBuild / description := "Olon is a modern web framework based on the view first strategy (based on the Lift web framework)"
 ThisBuild / homepage := Some(
   url("https://github.com/talenteca/olon-web-framework")

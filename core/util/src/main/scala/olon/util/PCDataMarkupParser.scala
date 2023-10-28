@@ -297,7 +297,6 @@ trait PCDataMarkupParser[PCM <: MarkupParser with MarkupHandler]
     */
   override def xCharData: NodeSeq = {
     xToken("[CDATA[")
-    val pos1 = pos
     val sb: StringBuilder = new StringBuilder()
     while (true) {
       if (
@@ -332,7 +331,6 @@ class PCDataXmlParser(val input: Source)
     var scope: NamespaceBinding = pscope
     var aMap: MetaData = Null
     while (isNameStart(ch)) {
-      val pos = this.pos
 
       val qname = xName
       val _ = xEQ()
@@ -392,7 +390,7 @@ class PCDataXmlParser(val input: Source)
     try {
       System.err.println(curInput.getLines().toIndexedSeq(line))
     } catch {
-      case e: Exception => // ignore
+      case _: Exception => // ignore
     }
     var i = 1
     while (i < col) {

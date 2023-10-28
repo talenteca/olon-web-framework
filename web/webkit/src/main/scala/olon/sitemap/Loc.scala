@@ -123,7 +123,7 @@ trait Loc[T] {
         menu._parent match {
           case Full(parentMenu: Menu) =>
             if (
-              !params.collect { case i: Loc.UseParentParams => true }.isEmpty
+              !params.collect { case _: Loc.UseParentParams => true }.isEmpty
             ) {
               parentMenu.loc.allParams.asInstanceOf[List[Loc.LocParam[Any]]]
             } else {
@@ -292,7 +292,7 @@ trait Loc[T] {
           case _          => testParams(xs)
         }
 
-      case x :: xs => testParams(xs)
+      case _ :: xs => testParams(xs)
     }
 
     testParams(allParams) match {
@@ -750,7 +750,7 @@ object Loc {
       with ValueSnippets[Any]
       with AnyLocParam {
     def snippets = {
-      case (s, _) if isDefinedAt(s) => apply(s)
+      case (s, _) if isDefinedAt(s) => this.apply(s)
     }
   }
 

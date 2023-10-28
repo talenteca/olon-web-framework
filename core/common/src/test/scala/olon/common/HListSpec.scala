@@ -14,9 +14,6 @@ class HListSpec extends Specification {
 
       val x = 1 :+: "Foo" :+: HNil
 
-      val head: Int = x.head
-      val head2: String = x.tail.head
-
       x.head must_== 1
       x.tail.head must_== "Foo"
     }
@@ -55,13 +52,11 @@ class HListSpec extends Specification {
       // result in a failure
       x match {
         case Right(a :+: one :+: lst :+: HNil) => {
-          // val a2: Int = a  fails... not type safe
-
           val as: String = a
           val onei: Int = one
           val lstl: List[Int] = lst
 
-          success
+          success("result: " + as + " " + onei + " " + lstl)
         }
 
         case Right(_) => failure

@@ -28,8 +28,7 @@ object JavaScriptContext {
   def install(): Unit = {
     LiftRules.allAround.append(JSWrapper)
     LiftRules.tagProcessor.prepend {
-      case ("script", e, session)
-          if e.attribute("data-lift-server").isDefined =>
+      case ("script", e, _) if e.attribute("data-lift-server").isDefined =>
         exec(e.text)
         NodeSeq.Empty
     }
@@ -75,7 +74,7 @@ object JavaScriptContext {
 
   private object currentScript
       extends TransientRequestVar[JSScope](new JSScope) {
-    registerCleanupFunc(in => get.bye())
+    registerCleanupFunc(_ => get.bye())
   }
 
   private object JSWrapper extends LoanWrapper {
@@ -101,6 +100,7 @@ object JavaScriptContext {
     def init(): Unit = {
       context = Context.enter()
       scope = context.initStandardObjects()
+      initted = true
     }
 
     def bye(): Unit = {

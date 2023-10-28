@@ -24,7 +24,7 @@ trait JodaHelpers {
         case Nil | Empty | None | Failure(_, _, _) => Empty
         case Full(v)                               => toDateTime(v)
         case Some(v)                               => toDateTime(v)
-        case v :: vs                               => toDateTime(v)
+        case v :: _                                => toDateTime(v)
         case s: String => tryo(DateTime.parse(s, dateTimeFormatter))
         case o         => toDateTime(o.toString)
       }

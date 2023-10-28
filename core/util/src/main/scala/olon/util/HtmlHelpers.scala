@@ -121,7 +121,7 @@ trait HtmlHelpers extends CssBindImplicits {
     */
   def findId(nodes: Seq[Node], id: String): Option[Elem] = {
     findOption(nodes) { e =>
-      e.attribute("id").filter(_.text == id).map(i => e)
+      e.attribute("id").filter(_.text == id).map(_ => e)
     }
   }
 

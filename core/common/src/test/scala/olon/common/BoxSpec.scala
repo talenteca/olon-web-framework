@@ -263,7 +263,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       try {
         Full("hi mom").openOrThrowException(sideEffecting)
       } catch {
-        case e: Exception =>
+        case _: Exception =>
       }
 
       sideEffect must_== false
@@ -324,7 +324,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       Empty map { _.toString } must beEmpty
     }
     "define a 'flatMap' method returning Empty" in {
-      Empty flatMap { x: Int => Full("full") } must beEmpty
+      Empty flatMap { _: Int => Full("full") } must beEmpty
     }
     "define a 'flatten' method returning Empty" in {
       Empty.flatten must beEmpty
@@ -383,7 +383,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       try {
         Empty.openOrThrowException(sideEffecting)
       } catch {
-        case e: Exception =>
+        case _: Exception =>
       }
 
       sideEffect must_== true

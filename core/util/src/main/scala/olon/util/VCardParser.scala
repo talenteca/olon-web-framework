@@ -42,7 +42,7 @@ object VCardParser extends Parsers {
   }) +
 
   def parse(in: String): Either[List[VCardEntry], String] = expr(in) match {
-    case Success(v, r) => Left(v)
+    case Success(v, _) => Left(v)
     case err @ _       => Right(err toString)
   }
 }

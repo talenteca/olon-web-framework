@@ -17,7 +17,7 @@ object JodaTimeSerializers {
 }
 
 case object PeriodSerializer
-    extends CustomSerializer[Period](format =>
+    extends CustomSerializer[Period](_ =>
       (
         {
           case JString(p) => new Period(p)
@@ -30,7 +30,7 @@ case object PeriodSerializer
     )
 
 case object DurationSerializer
-    extends CustomSerializer[Duration](format =>
+    extends CustomSerializer[Duration](_ =>
       (
         {
           case JInt(d) => new Duration(d.longValue)
@@ -43,7 +43,7 @@ case object DurationSerializer
     )
 
 case object InstantSerializer
-    extends CustomSerializer[Instant](format =>
+    extends CustomSerializer[Instant](_ =>
       (
         {
           case JInt(i) => new Instant(i.longValue)

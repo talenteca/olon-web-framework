@@ -210,10 +210,10 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
     ElemSelector(elem, Empty)
   }
 
-  private lazy val _starMatch: Parser[CssSelector] = ('*' ^^ { case sn =>
+  private lazy val _starMatch: Parser[CssSelector] = ('*' ^^ { case _ =>
     StarSelector(Empty, false)
   }) | (
-    '^' ^^ { case sn =>
+    '^' ^^ { case _ =>
       StarSelector(Empty, true)
     }
   )
@@ -256,15 +256,15 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
         AttrSubNode(name)
       }) |
 
-      ('!' ~ '!' ^^ (a => DontMergeClass)) |
-      ('<' ~ '*' ~ '>') ^^ (a => SurroundKids()) |
-      ('-' ~ '*' ^^ (a => PrependKidsSubNode())) |
-      ('>' ~ '*' ^^ (a => PrependKidsSubNode())) |
-      ('*' ~ '+' ^^ (a => AppendKidsSubNode())) |
-      ('*' ~ '<' ^^ (a => AppendKidsSubNode())) |
-      '*' ^^ (a => KidsSubNode()) |
-      '^' ~ '*' ^^ (a => SelectThisNode(true)) |
-      '^' ~ '^' ^^ (a => SelectThisNode(false)))
+      ('!' ~ '!' ^^ (_ => DontMergeClass)) |
+      ('<' ~ '*' ~ '>') ^^ (_ => SurroundKids()) |
+      ('-' ~ '*' ^^ (_ => PrependKidsSubNode())) |
+      ('>' ~ '*' ^^ (_ => PrependKidsSubNode())) |
+      ('*' ~ '+' ^^ (_ => AppendKidsSubNode())) |
+      ('*' ~ '<' ^^ (_ => AppendKidsSubNode())) |
+      '*' ^^ (_ => KidsSubNode()) |
+      '^' ~ '*' ^^ (_ => SelectThisNode(true)) |
+      '^' ~ '^' ^^ (_ => SelectThisNode(false)))
 
   private lazy val attrName: Parser[String] = (letter | '_' | ':') ~
     rep(letter | number | '-' | '_' | ':' | '.') ^^ { case first ~ rest =>

@@ -255,7 +255,7 @@ class LAFuture[T](
 /** Thrown if an LAFuture is aborted during a get
   */
 final class AbortedFutureException(why: Box[Nothing])
-    extends Exception("Aborted Future")
+    extends Exception("Aborted Future " + why)
 
 object LAFuture {
 
@@ -429,10 +429,10 @@ object LAFuture {
     */
   def collect[T](future: LAFuture[T]*): LAFuture[List[T]] = {
     collect[T, List[T]](
-      onFutureSucceeded = { (value, result, values, index) =>
+      onFutureSucceeded = { (value, _, values, index) =>
         values.insert(index, Full(value))
       },
-      onFutureFailed = { (valueBox, result, values, index) =>
+      onFutureFailed = { (valueBox, result, _, _) =>
         result.fail(valueBox)
       },
       onAllFuturesCompleted = { (result, values) =>
@@ -457,7 +457,7 @@ object LAFuture {
             result.satisfy(other)
         }
       },
-      onFutureFailed = { (valueBox, result, values, index) =>
+      onFutureFailed = { (valueBox, result, _, _) =>
         result.fail(valueBox)
       },
       onAllFuturesCompleted = {

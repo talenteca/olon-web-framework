@@ -412,7 +412,6 @@ object Menu extends MenuSingleton {
 
       def listToFrom(in: List[String]): Box[List[String]] = Full(in)
 
-      val pathLen = ParamsMenuable.this.path.length
     }
   }
 
@@ -634,7 +633,7 @@ object Menu extends MenuSingleton {
       Menu(
         Loc(
           able.name,
-          new ParamLocLink[Unit](able.path, able.headMatch, ignore => Nil),
+          new ParamLocLink[Unit](able.path, able.headMatch, _ => Nil),
           able.linkText,
           able.params
         ),
@@ -780,9 +779,9 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
     else Empty
 
   private def _inPath(in: List[Loc[_]]): Boolean = in match {
-    case Nil                 => false
-    case x :: xs if x eq loc => true
-    case x :: xs             => _inPath(xs)
+    case Nil                => false
+    case x :: _ if x eq loc => true
+    case _ :: xs            => _inPath(xs)
   }
 
   private def _lastInPath(path: List[Loc[_]]): Boolean = path match {

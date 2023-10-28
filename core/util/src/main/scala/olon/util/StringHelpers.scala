@@ -375,11 +375,11 @@ trait StringHelpers {
       val toDo = what.toList.reverse
 
       def commaIt(in: List[Char]): List[Char] = in match {
-        case Nil                   => in
-        case x :: Nil              => in
-        case x1 :: x2 :: Nil       => in
-        case x1 :: x2 :: x3 :: Nil => in
-        case x1 :: x2 :: x3 :: xs  => x1 :: x2 :: x3 :: ',' :: commaIt(xs)
+        case Nil                  => in
+        case _ :: Nil             => in
+        case _ :: _ :: Nil        => in
+        case _ :: _ :: _ :: Nil   => in
+        case x1 :: x2 :: x3 :: xs => x1 :: x2 :: x3 :: ',' :: commaIt(xs)
       }
       commaIt(toDo).reverse.mkString("")
     }

@@ -477,7 +477,7 @@ trait BaseCometActor
   private val notices = new ListBuffer[(NoticeType.Value, NodeSeq, Box[String])]
 
   private var _deltaPruner: (BaseCometActor, List[Delta]) => List[Delta] =
-    (actor, d) => {
+    (_, d) => {
       val m = Helpers.millis
       d.filter(d => (m - d.timestamp) < 120000L)
     }
@@ -788,7 +788,7 @@ trait BaseCometActor
             deltas.filter(_.when > when) match {
               case Nil => listeners = (seqId, toDo) :: listeners
 
-              case all @ (hd :: xs) => {
+              case all @ (hd :: _) => {
                 toDo(
                   AnswerRender(
                     new XmlOrJsCmd(

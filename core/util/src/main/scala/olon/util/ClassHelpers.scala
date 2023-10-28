@@ -408,8 +408,8 @@ trait ClassHelpers { self: ControlHelpers =>
                 ptypes openOr params.map(_.getClass)
               List(clz.getMethod(meth, classes: _*))
             } catch {
-              case e: NullPointerException  => Nil
-              case e: NoSuchMethodException => alternateMethods
+              case _: NullPointerException  => Nil
+              case _: NoSuchMethodException => alternateMethods
             }
           if (Props.productionMode) {
             methCacheLock.upgrade(methodCache(key) = ret)

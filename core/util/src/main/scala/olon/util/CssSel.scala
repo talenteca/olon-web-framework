@@ -82,8 +82,8 @@ private class SelectorMap(binds: List[CssBind])
   // transform to the whole shooting match
   private def sortBinds(lst: List[CssBind]): List[CssBind] = {
     lst.sortWith {
-      case (SubNode(me: EmptyBox), SubNode(_))               => true
-      case (SubNode(_), SubNode(them: EmptyBox))             => false
+      case (SubNode(_: EmptyBox), SubNode(_))                => true
+      case (SubNode(_), SubNode(_: EmptyBox))                => false
       case (SubNode(Full(KidsSubNode())), SubNode(_))        => false
       case (SubNode(Full(PrependKidsSubNode())), SubNode(_)) => false
       case (SubNode(Full(AppendKidsSubNode())), SubNode(_))  => false

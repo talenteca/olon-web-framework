@@ -64,7 +64,7 @@ object BundleBuilder {
 
           val map =
             all.foldLeft[Map[String, List[(EntryInfo, NodeSeq)]]](Map()) {
-              case (map, pair @ (info, ns)) =>
+              case (map, pair @ (info, _)) =>
                 map + (info.name -> (pair :: map.getOrElse(info.name, Nil)))
             }
 
