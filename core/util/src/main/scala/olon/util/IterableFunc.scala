@@ -1,8 +1,8 @@
 package olon
 package util
 
-import scala.language.implicitConversions
-import scala.xml.{Text, NodeSeq}
+import scala.xml.NodeSeq
+import scala.xml.Text
 
 import common._
 
@@ -11,7 +11,9 @@ sealed trait IterableFunc extends Function1[NodeSeq, Seq[NodeSeq]] {
 }
 
 object IterableFunc {
-  implicit def itNodeSeq[C](it: NodeSeq => C)(implicit ev: C => Iterable[NodeSeq]): IterableFunc =
+  implicit def itNodeSeq[C](
+      it: NodeSeq => C
+  )(implicit ev: C => Iterable[NodeSeq]): IterableFunc =
     new IterableFunc {
       def apply(in: NodeSeq): Seq[NodeSeq] = it(in).toSeq
     }
@@ -21,29 +23,31 @@ object IterableFunc {
       def apply(in: NodeSeq): Seq[NodeSeq] = List(it(in))
     }
 
-
   implicit def itStringFuncPromotable(it: NodeSeq => String): IterableFunc =
     new IterableFunc {
       def apply(in: NodeSeq): Seq[NodeSeq] = it(in) match {
         case null => List(NodeSeq.Empty)
-        case str => List(Text(str))}
+        case str  => List(Text(str))
+      }
     }
-
 
   implicit def itStringPromotable(it: NodeSeq => Seq[String]): IterableFunc =
     new IterableFunc {
-      def apply(in: NodeSeq): Seq[NodeSeq] = it(in).filter(_ ne null).map(a => Text(a))
+      def apply(in: NodeSeq): Seq[NodeSeq] =
+        it(in).filter(_ ne null).map(a => Text(a))
     }
 
   implicit def boxStringPromotable(it: NodeSeq => Box[String]): IterableFunc =
     new IterableFunc {
-      def apply(in: NodeSeq): Seq[NodeSeq] = it(in).filter(_ ne null).toList.map(a => Text(a))
+      def apply(in: NodeSeq): Seq[NodeSeq] =
+        it(in).filter(_ ne null).toList.map(a => Text(a))
     }
 
-
-  implicit def optionStringPromotable(it: NodeSeq => Option[String]): IterableFunc =
+  implicit def optionStringPromotable(
+      it: NodeSeq => Option[String]
+  ): IterableFunc =
     new IterableFunc {
-      def apply(in: NodeSeq): Seq[NodeSeq] = it(in).filter(_ ne null).toList.map(a => Text(a))
+      def apply(in: NodeSeq): Seq[NodeSeq] =
+        it(in).filter(_ ne null).toList.map(a => Text(a))
     }
 }
-

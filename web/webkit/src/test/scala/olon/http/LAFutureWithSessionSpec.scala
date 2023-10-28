@@ -1,7 +1,9 @@
 package olon.http
 
 import olon.actor.LAFuture
-import olon.common.{Empty, Failure, Full}
+import olon.common.Empty
+import olon.common.Failure
+import olon.common.Full
 import olon.mockweb.WebSpec
 import org.specs2.matcher.ThrownMessages
 
@@ -22,7 +24,11 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
     "fail if session is not available" in {
       val future = LAFutureWithSession.withCurrentSession("kaboom")
 
-      future.get(timeout) must_== Failure("LiftSession not available in this thread context", Empty, Empty)
+      future.get(timeout) must_== Failure(
+        "LiftSession not available in this thread context",
+        Empty,
+        Empty
+      )
     }
 
     "succeed with original value if session is available" withSFor "/" in {
@@ -99,7 +105,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
 
       future.onFail {
         case f: Failure => SessionVar1(f.msg)
-        case _ => fail("The Future should have failed")
+        case _          => fail("The Future should have failed")
       }
 
       future.fail(new Exception("kaboom!"))
@@ -119,7 +125,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
 
       future.onFail {
         case f: Failure => ReqVar1(f.msg)
-        case _ => fail("The Future should have failed")
+        case _          => fail("The Future should have failed")
       }
 
       future.fail(new Exception("nope!"))
@@ -170,7 +176,9 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
         .filter(_.contains(SessionVar1.is))
         .filter(_.contains(SessionVar2.is))
 
-      filtered.get(timeout) must eventually(beEqualTo(Full("they see me rollin")))
+      filtered.get(timeout) must eventually(
+        beEqualTo(Full("they see me rollin"))
+      )
     }
 
     "have access to request variables in chains of filter()" withSFor "/" in {
@@ -189,24 +197,32 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       SessionVar1("come")
       SessionVar2("prey")
 
-      val future = LAFutureWithSession.withCurrentSession("do not come between the nazgul and his prey")
+      val future = LAFutureWithSession.withCurrentSession(
+        "do not come between the nazgul and his prey"
+      )
       val filtered = future
         .withFilter(_.contains(SessionVar1.is))
         .withFilter(_.contains(SessionVar2.is))
 
-      filtered.get(timeout) must eventually(beEqualTo("do not come between the nazgul and his prey"))
+      filtered.get(timeout) must eventually(
+        beEqualTo("do not come between the nazgul and his prey")
+      )
     }
 
     "have access to request variables in chains of withFilter()" withSFor "/" in {
       ReqVar1("hurt")
       ReqVar2("precious")
 
-      val future = LAFutureWithSession.withCurrentSession("mustn't go that way, mustn't hurt the precious!")
+      val future = LAFutureWithSession.withCurrentSession(
+        "mustn't go that way, mustn't hurt the precious!"
+      )
       val filtered = future
         .withFilter(_.contains(ReqVar1.is))
         .withFilter(_.contains(ReqVar2.is))
 
-      filtered.get(timeout) must eventually(beEqualTo("mustn't go that way, mustn't hurt the precious!"))
+      filtered.get(timeout) must eventually(
+        beEqualTo("mustn't go that way, mustn't hurt the precious!")
+      )
     }
 
     "have access to session variables in chains of map()" withSFor "/" in {
@@ -296,18 +312,26 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       S.initIfUninitted(session2)(SessionVar1("two"))
       S.initIfUninitted(session3)(SessionVar1("three"))
 
-      val future = S.initIfUninitted(session1)(LAFutureWithSession.withCurrentSession("zero"))
+      val future = S.initIfUninitted(session1)(
+        LAFutureWithSession.withCurrentSession("zero")
+      )
 
       S.initIfUninitted(session2) {
-        future.map(v => SessionVar1.is).get(timeout) must eventually(beEqualTo("two"))
+        future.map(v => SessionVar1.is).get(timeout) must eventually(
+          beEqualTo("two")
+        )
       }
 
       S.initIfUninitted(session3) {
-        future.map(v => SessionVar1.is).get(timeout) must eventually(beEqualTo("three"))
+        future.map(v => SessionVar1.is).get(timeout) must eventually(
+          beEqualTo("three")
+        )
       }
 
       S.initIfUninitted(session1) {
-        future.map(v => SessionVar1.is).get(timeout) must eventually(beEqualTo("one"))
+        future.map(v => SessionVar1.is).get(timeout) must eventually(
+          beEqualTo("one")
+        )
       }
     }
   }

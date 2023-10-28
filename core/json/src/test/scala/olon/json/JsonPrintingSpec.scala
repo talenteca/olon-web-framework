@@ -1,23 +1,22 @@
 package olon
 package json
 
-import scala.util.Random
-
-import org.specs2.mutable.Specification
-import org.specs2.ScalaCheck
+import org.json4s.native.JsonMethods
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
+import org.specs2.ScalaCheck
+import org.specs2.mutable.Specification
 
-import org.json4s.native.JsonMethods
+import scala.util.Random
 
-/**
- * System under specification for JSON Printing.
- */
-class JsonPrintingSpec extends Specification  with JValueGen with ScalaCheck {
+/** System under specification for JSON Printing.
+  */
+class JsonPrintingSpec extends Specification with JValueGen with ScalaCheck {
   "JSON Printing Specification".title
 
   "rendering does not change semantics" in {
-    val rendering = (json: JValue) => parse(JsonAST.prettyRender(json)) == parse(JsonAST.compactRender(json))
+    val rendering = (json: JValue) =>
+      parse(JsonAST.prettyRender(json)) == parse(JsonAST.compactRender(json))
     forAll(rendering)
   }
 
@@ -44,7 +43,10 @@ class JsonPrintingSpec extends Specification  with JValueGen with ScalaCheck {
     def render(json: JValue) = {
       JsonAST.render(
         json,
-        JsonAST.RenderSettings(0, doubleRenderer = JsonAST.RenderSpecialDoubleValuesAsIs)
+        JsonAST.RenderSettings(
+          0,
+          doubleRenderer = JsonAST.RenderSpecialDoubleValuesAsIs
+        )
       )
     }
 
@@ -70,7 +72,10 @@ class JsonPrintingSpec extends Specification  with JValueGen with ScalaCheck {
     def render(json: JValue) = {
       JsonAST.render(
         json,
-        JsonAST.RenderSettings(0, doubleRenderer = JsonAST.FailToRenderSpecialDoubleValues)
+        JsonAST.RenderSettings(
+          0,
+          doubleRenderer = JsonAST.FailToRenderSpecialDoubleValues
+        )
       )
     }
 
@@ -80,11 +85,15 @@ class JsonPrintingSpec extends Specification  with JValueGen with ScalaCheck {
     }
 
     "throw an exception when attempting to render positive infinity" in {
-      render(JDouble(Double.PositiveInfinity)) must throwAn[IllegalArgumentException]
+      render(JDouble(Double.PositiveInfinity)) must throwAn[
+        IllegalArgumentException
+      ]
     }
 
     "throw an exception when attempting to render negative infinity" in {
-      render(JDouble(Double.NegativeInfinity)) must throwAn[IllegalArgumentException]
+      render(JDouble(Double.NegativeInfinity)) must throwAn[
+        IllegalArgumentException
+      ]
     }
 
     "throw an exception when attempting to render NaN" in {

@@ -1,37 +1,37 @@
 package olon
 package common
 
-import java.util.{List => JavaList, Iterator => JavaIterator, ArrayList,
-                ListIterator, Collection => JavaCollection}
+import java.util.ArrayList
+import java.util.ListIterator
+import java.util.{Collection => JavaCollection}
+import java.util.{Iterator => JavaIterator}
+import java.util.{List => JavaList}
 
-/**
- * An immutable singly linked list that uses the Scala List class as backing
- * store, but is Java-friendly as a `java.util.List`. Note however that since it
- * is immutable, you have to capture the results of addition/removal operations.
- *
- * The typical mutating methods like `add`, `set`, `clear`, and `remove` are all
- * unsupported, as are mutating methods on its iterators, since this collection
- * is immutable.
- */
+/** An immutable singly linked list that uses the Scala List class as backing
+  * store, but is Java-friendly as a `java.util.List`. Note however that since
+  * it is immutable, you have to capture the results of addition/removal
+  * operations.
+  *
+  * The typical mutating methods like `add`, `set`, `clear`, and `remove` are
+  * all unsupported, as are mutating methods on its iterators, since this
+  * collection is immutable.
+  */
 final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
 
-  /**
-   * Construct an empty list.
-   */
+  /** Construct an empty list.
+    */
   def this() = this(Nil)
 
   def this(jl: JavaList[T]) = this(jl.toArray().toList.asInstanceOf[List[T]])
 
-  /**
-   * Append an item to this list. This operation is O(n) where `n` is the number
-   * of items in the underlying `List`, and returns the updated list.
-   */
+  /** Append an item to this list. This operation is O(n) where `n` is the
+    * number of items in the underlying `List`, and returns the updated list.
+    */
   def append(item: T): SimpleList[T] = SimpleList(underlying :+ item)
 
-  /**
-   * Prepends an item to this list.  This operation is O(1) and returns the
-   * updated list.
-   */
+  /** Prepends an item to this list. This operation is O(1) and returns the
+    * updated list.
+    */
   def prepend(item: T): SimpleList[T] = SimpleList(item :: underlying)
 
   def take(n: Int): SimpleList[T] = SimpleList(underlying.take(n))
@@ -50,9 +50,8 @@ final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
 
   def isEmpty(): Boolean = underlying.isEmpty
 
-  /**
-   * Returns true if this list contains the given `obj`.
-   */
+  /** Returns true if this list contains the given `obj`.
+    */
   def contains(obj: Object): Boolean = underlying.contains(obj)
 
   def iterator(): JavaIterator[T] = {
@@ -95,7 +94,9 @@ final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
 
   def toArray(): Array[Object] = {
     val len = underlying.length
-    val ret = java.lang.reflect.Array.newInstance(classOf[Object], len).asInstanceOf[Array[Object]]
+    val ret = java.lang.reflect.Array
+      .newInstance(classOf[Object], len)
+      .asInstanceOf[Array[Object]]
 
     var pos = 0
     var hd = underlying
@@ -106,13 +107,14 @@ final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
     }
 
     ret
-    }
-
+  }
 
   def toArray[X](in: Array[X with Object]): Array[X with Object] = {
     val clz = in.getClass.getComponentType()
     val len = underlying.length
-    val ret = java.lang.reflect.Array.newInstance(clz, len).asInstanceOf[Array[X with Object]]
+    val ret = java.lang.reflect.Array
+      .newInstance(clz, len)
+      .asInstanceOf[Array[X with Object]]
 
     var pos = 0
     var hd = underlying
@@ -122,17 +124,20 @@ final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
       pos += 1
     }
 
-
     ret
   }
 
-  def retainAll(jc: JavaCollection[_]): Boolean = throw new UnsupportedOperationException()
+  def retainAll(jc: JavaCollection[_]): Boolean =
+    throw new UnsupportedOperationException()
 
-  def removeAll(jc: JavaCollection[_]): Boolean = throw new UnsupportedOperationException()
+  def removeAll(jc: JavaCollection[_]): Boolean =
+    throw new UnsupportedOperationException()
 
-  def addAll(jc: JavaCollection[_ <: T]): Boolean = throw new UnsupportedOperationException()
+  def addAll(jc: JavaCollection[_ <: T]): Boolean =
+    throw new UnsupportedOperationException()
 
-  def addAll(index: Int, jc: JavaCollection[_ <: T]): Boolean = throw new UnsupportedOperationException()
+  def addAll(index: Int, jc: JavaCollection[_ <: T]): Boolean =
+    throw new UnsupportedOperationException()
 
   def containsAll(jc: JavaCollection[_]): Boolean = {
     val it = jc.iterator()
@@ -141,50 +146,48 @@ final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
 
     @tailrec def check(): Boolean = it.hasNext() match {
       case false => true
-      case _ => contains(it.next().asInstanceOf[Object]) match {
-        case false => false
-        case _ => check()
-      }
+      case _ =>
+        contains(it.next().asInstanceOf[Object]) match {
+          case false => false
+          case _     => check()
+        }
     }
 
     check()
   }
 
-
 }
 
-/**
- * An immutable vector that uses the Scala `[[scala.collection.immutable.Vector Vector]]`
- * class as backing store, but is Java-friendly as a `java.util.List`. Note however that
- * since it is immutable, you have to capture the results of addition/removal
- * operations.
- *
- * The typical mutating methods like `add`, `set`, `clear`, and `remove` are all
- * unsupported, as are mutating methods on its iterators, since this collection
- * is immutable.
- *
- * @see [[http://docs.scala-lang.org/overviews/collections/concrete-immutable-collection-classes.html#vectors "Scala's Collection Library overview"]]
- *      section on Vectors for more information.
- */
+/** An immutable vector that uses the Scala `[[scala.collection.immutable.Vector
+  * Vector]]` class as backing store, but is Java-friendly as a
+  * `java.util.List`. Note however that since it is immutable, you have to
+  * capture the results of addition/removal operations.
+  *
+  * The typical mutating methods like `add`, `set`, `clear`, and `remove` are
+  * all unsupported, as are mutating methods on its iterators, since this
+  * collection is immutable.
+  *
+  * @see
+  *   [[http://docs.scala-lang.org/overviews/collections/concrete-immutable-collection-classes.html#vectors "Scala's Collection Library overview"]]
+  *   section on Vectors for more information.
+  */
 final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
 
-  /**
-   * Construct an empty vector.
-   */
+  /** Construct an empty vector.
+    */
   def this() = this(Vector())
 
-  def this(jl: JavaList[T]) = this(Vector(jl.toArray().toList.asInstanceOf[List[T]] :_*))
+  def this(jl: JavaList[T]) =
+    this(Vector(jl.toArray().toList.asInstanceOf[List[T]]: _*))
 
-  /**
-   * Append an item to this vector. This operation is effectively O(1) and
-   * returns the updated vector.
-   */
+  /** Append an item to this vector. This operation is effectively O(1) and
+    * returns the updated vector.
+    */
   def append(item: T): SimpleVector[T] = SimpleVector(underlying :+ item)
 
-  /**
-   * Prepends an item to this vector.  This operation is effectively O(1) and
-   * returns the updated vector.
-   */
+  /** Prepends an item to this vector. This operation is effectively O(1) and
+    * returns the updated vector.
+    */
   def prepend(item: T): SimpleVector[T] = SimpleVector(item +: underlying)
 
   def take(n: Int): SimpleVector[T] = SimpleVector(underlying.take(n))
@@ -203,9 +206,8 @@ final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
 
   def isEmpty(): Boolean = underlying.isEmpty
 
-  /**
-   * Returns `true` if this vector contains the given `obj`.
-   */
+  /** Returns `true` if this vector contains the given `obj`.
+    */
   def contains(obj: Object): Boolean = underlying.contains(obj)
 
   def iterator(): JavaIterator[T] = {
@@ -248,11 +250,12 @@ final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
 
   def toArray(): Array[Object] = {
     val len = underlying.length
-    val ret = java.lang.reflect.Array.newInstance(classOf[Object], len).asInstanceOf[Array[Object]]
+    val ret = java.lang.reflect.Array
+      .newInstance(classOf[Object], len)
+      .asInstanceOf[Array[Object]]
 
     var pos = 0
-    underlying.foreach {
-      e =>
+    underlying.foreach { e =>
       ret(pos) = e.asInstanceOf[Object]
       pos += 1
     }
@@ -263,24 +266,30 @@ final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
   def toArray[X](in: Array[X with Object]): Array[X with Object] = {
     val clz = in.getClass.getComponentType()
     val len = underlying.length
-    val ret = java.lang.reflect.Array.newInstance(clz, len).asInstanceOf[Array[X with Object]]
+    val ret = java.lang.reflect.Array
+      .newInstance(clz, len)
+      .asInstanceOf[Array[X with Object]]
 
     var pos = 0
-    underlying.foreach{
-      e => ret(pos) = clz.cast(e).asInstanceOf[X with Object]
+    underlying.foreach { e =>
+      ret(pos) = clz.cast(e).asInstanceOf[X with Object]
       pos += 1
     }
 
     ret
   }
 
-  def retainAll(jc: JavaCollection[_]): Boolean = throw new UnsupportedOperationException()
+  def retainAll(jc: JavaCollection[_]): Boolean =
+    throw new UnsupportedOperationException()
 
-  def removeAll(jc: JavaCollection[_]): Boolean = throw new UnsupportedOperationException()
+  def removeAll(jc: JavaCollection[_]): Boolean =
+    throw new UnsupportedOperationException()
 
-  def addAll(jc: JavaCollection[_ <: T]): Boolean = throw new UnsupportedOperationException()
+  def addAll(jc: JavaCollection[_ <: T]): Boolean =
+    throw new UnsupportedOperationException()
 
-  def addAll(index: Int, jc: JavaCollection[_ <: T]): Boolean = throw new UnsupportedOperationException()
+  def addAll(index: Int, jc: JavaCollection[_ <: T]): Boolean =
+    throw new UnsupportedOperationException()
 
   def containsAll(jc: JavaCollection[_]): Boolean = {
     val it = jc.iterator()
@@ -289,15 +298,15 @@ final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
 
     @tailrec def check(): Boolean = it.hasNext() match {
       case false => true
-      case _ => contains(it.next().asInstanceOf[Object]) match {
-        case false => false
-        case _ => check()
-      }
+      case _ =>
+        contains(it.next().asInstanceOf[Object]) match {
+          case false => false
+          case _     => check()
+        }
     }
 
     check()
   }
-
 
 }
 

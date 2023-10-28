@@ -4,42 +4,54 @@ package provider
 package servlet
 package containers
 
-import javax.servlet.http.HttpServletRequest
-
 import olon.common._
 import olon.http._
 import olon.http.provider._
 import olon.http.provider.servlet._
 import olon.util._
-import Helpers._
-
 
 object Jetty7AsyncProvider extends AsyncProviderMeta {
   // contSupport below gets inferred as a Class[?0] existential.
   import scala.language.existentials
 
-  private val (hasContinuations_?,
-               contSupport,
-               getContinuation,
-               getAttribute,
-               setAttribute,
-               suspendMeth,
-               setTimeout,
-               resumeMeth,
-               isExpired,
-               isResumed) = {
+  private val (
+    hasContinuations_?,
+    contSupport,
+    getContinuation,
+    getAttribute,
+    setAttribute,
+    suspendMeth,
+    setTimeout,
+    resumeMeth,
+    isExpired,
+    isResumed
+  ) = {
     try {
-      val cc = Class.forName("org.eclipse.jetty.continuation.ContinuationSupport")
-      val meth = cc.getMethod("getContinuation", classOf[javax.servlet.ServletRequest])
+      val cc =
+        Class.forName("org.eclipse.jetty.continuation.ContinuationSupport")
+      val meth =
+        cc.getMethod("getContinuation", classOf[javax.servlet.ServletRequest])
       val cci = Class.forName("org.eclipse.jetty.continuation.Continuation")
       val getAttribute = cci.getMethod("getAttribute", classOf[String])
-      val setAttribute = cci.getMethod("setAttribute", classOf[String], classOf[AnyRef])
+      val setAttribute =
+        cci.getMethod("setAttribute", classOf[String], classOf[AnyRef])
       val suspend = cci.getMethod("suspend")
       val setTimeout = cci.getMethod("setTimeout", java.lang.Long.TYPE)
       val resume = cci.getMethod("resume")
       val isExpired = cci.getMethod("isExpired")
       val isResumed = cci.getMethod("isResumed")
-      (true, (cc), (meth), (getAttribute), (setAttribute), (suspend), setTimeout, resume, isExpired, isResumed)
+      (
+        true,
+        (cc),
+        (meth),
+        (getAttribute),
+        (setAttribute),
+        (suspend),
+        setTimeout,
+        resume,
+        isExpired,
+        isResumed
+      )
     } catch {
       case e: Exception =>
         (false, null, null, null, null, null, null, null, null, null)
@@ -48,26 +60,23 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
 
   def suspendResumeSupport_? : Boolean = hasContinuations_?
 
-
-  /**
-   * return a function that vends the ServletAsyncProvider
-   */
+  /** return a function that vends the ServletAsyncProvider
+    */
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
-    Full(req => new Jetty7AsyncProvider(req)).filter(i => suspendResumeSupport_?)
+    Full(req => new Jetty7AsyncProvider(req)).filter(i =>
+      suspendResumeSupport_?
+    )
 }
 
-/**
- * Jetty7AsyncProvider
- *
- * Implemented by using Jetty 7 Continuation API
- *
- */
+/** Jetty7AsyncProvider
+  *
+  * Implemented by using Jetty 7 Continuation API
+  */
 class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
 
   import Jetty7AsyncProvider._
 
   private val servletReq = (req.asInstanceOf[HTTPRequestServlet]).req
-
 
   def suspendResumeSupport_? : Boolean = hasContinuations_?
 
@@ -81,13 +90,12 @@ class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
         setAttribute.invoke(cont, "__liftCometState", null)
         ret match {
           case (r: Req, lr: LiftResponse) => Some(r -> lr)
-          case _ => None
+          case _                          => None
         }
-      }
-      catch {
+      } catch {
         case e: Exception => None
       }
-   }
+    }
 
   def suspend(timeout: Long): RetryState.Value = {
     val cont = getContinuation.invoke(contSupport, servletReq)
@@ -104,7 +112,7 @@ class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
       suspendMeth.invoke(cont)
       RetryState.SUSPENDED
     }
-    
+
   }
 
   def resume(what: (Req, LiftResponse)): Boolean = {
@@ -114,8 +122,9 @@ class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
       resumeMeth.invoke(cont)
       true
     } catch {
-      case e: Exception => setAttribute.invoke(cont, "__liftCometState", null)
-                false
+      case e: Exception =>
+        setAttribute.invoke(cont, "__liftCometState", null)
+        false
     }
   }
 }

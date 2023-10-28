@@ -3,18 +3,16 @@ package http
 package js
 
 import common._
-import util.Props
 import http.js._
 import http.js.jquery.JQueryArtifacts
-
 import JsCmds._
 import JE._
 
 // Script file for the current page.
-private[http] object pageScript extends RequestVar[Box[JavaScriptResponse]](Empty)
+private[http] object pageScript
+    extends RequestVar[Box[JavaScriptResponse]](Empty)
 
-/**
-  * Create a javascript command that will initialize lift.js using LiftRules.
+/** Create a javascript command that will initialize lift.js using LiftRules.
   */
 object LiftJavaScript {
 
@@ -35,9 +33,8 @@ object LiftJavaScript {
     }
   }
 
-  def servePageJs: LiftRules.DispatchPF = {
-    case PageJs(response) =>
-      () => Full(response)
+  def servePageJs: LiftRules.DispatchPF = { case PageJs(response) =>
+    () => Full(response)
   }
 
   def settings: JsObj = {
@@ -51,22 +48,40 @@ object LiftJavaScript {
       "cometGetTimeout" -> LiftRules.cometGetTimeout,
       "cometFailureRetryTimeout" -> LiftRules.cometFailureRetryTimeout,
       "cometServer" -> jsCometServer,
-      "logError" -> LiftRules.jsLogFunc.map(fnc => AnonFunc("msg", fnc(JsVar("msg")))).openOr(AnonFunc("msg", Noop)),
-      "ajaxOnFailure" -> LiftRules.ajaxDefaultFailure.map(fnc => AnonFunc(fnc())).openOr(AnonFunc(Noop)),
-      "ajaxOnStart" -> LiftRules.ajaxStart.map(fnc => AnonFunc(fnc())).openOr(AnonFunc(Noop)),
-      "ajaxOnEnd" -> LiftRules.ajaxEnd.map(fnc => AnonFunc(fnc())).openOr(AnonFunc(Noop))
+      "logError" -> LiftRules.jsLogFunc
+        .map(fnc => AnonFunc("msg", fnc(JsVar("msg"))))
+        .openOr(AnonFunc("msg", Noop)),
+      "ajaxOnFailure" -> LiftRules.ajaxDefaultFailure
+        .map(fnc => AnonFunc(fnc()))
+        .openOr(AnonFunc(Noop)),
+      "ajaxOnStart" -> LiftRules.ajaxStart
+        .map(fnc => AnonFunc(fnc()))
+        .openOr(AnonFunc(Noop)),
+      "ajaxOnEnd" -> LiftRules.ajaxEnd
+        .map(fnc => AnonFunc(fnc()))
+        .openOr(AnonFunc(Noop))
     )
   }
 
   def initCmd(settings: JsObj): JsCmd = {
     val extendJsHelpersCmd = LiftRules.jsArtifacts match {
-      case JQueryArtifacts => Call("window.lift.extend", JsVar("lift_settings"), JsVar("window", "liftJQuery"))
-      case _ => Call("window.lift.extend", JsVar("lift_settings"), JsVar("window", "liftVanilla"))
+      case JQueryArtifacts =>
+        Call(
+          "window.lift.extend",
+          JsVar("lift_settings"),
+          JsVar("window", "liftJQuery")
+        )
+      case _ =>
+        Call(
+          "window.lift.extend",
+          JsVar("lift_settings"),
+          JsVar("window", "liftVanilla")
+        )
     }
 
     JsCrVar("lift_settings", JsObj()) &
-    extendJsHelpersCmd &
-    Call("window.lift.extend", JsVar("lift_settings"), settings) &
-    Call("window.lift.init", JsVar("lift_settings"))
+      extendJsHelpersCmd &
+      Call("window.lift.extend", JsVar("lift_settings"), settings) &
+      Call("window.lift.init", JsVar("lift_settings"))
   }
 }

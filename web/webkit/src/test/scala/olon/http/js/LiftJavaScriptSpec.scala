@@ -2,24 +2,24 @@ package olon
 package http
 package js
 
-import java.util.Locale
-
 import olon.http.js.extcore.ExtCoreArtifacts
 import olon.http.js.jquery.JQueryArtifacts
-import org.specs2.execute.{Result, AsResult}
-import org.specs2.mutable.{Around,  Specification}
+import org.specs2.execute.AsResult
+import org.specs2.execute.Result
+import org.specs2.mutable.Around
+import org.specs2.mutable.Specification
+
+import java.util.Locale
 
 import common._
 import http.js._
 import http.js.JsCmds._
 import http.js.JE._
-import util.Props
 import util.Helpers._
 
-/**
-  * System under specification for LiftJavaScript.
+/** System under specification for LiftJavaScript.
   */
-class LiftJavaScriptSpec extends Specification  {
+class LiftJavaScriptSpec extends Specification {
   sequential
   "LiftJavaScript Specification".title
 
@@ -48,7 +48,8 @@ class LiftJavaScriptSpec extends Specification  {
     "create internationalized default settings" in withPolishLocale {
       S.initIfUninitted(session) {
         val settings = LiftJavaScript.settings
-        val internationalizedMessage = "Nie mo\\u017cna skontaktowa\\u0107 si\\u0119 z serwerem"
+        val internationalizedMessage =
+          "Nie mo\\u017cna skontaktowa\\u0107 si\\u0119 z serwerem"
         settings.toJsCmd must_== formatjs(
           s"""{"liftPath": "/lift",
               |"ajaxRetryCount": 3,
@@ -127,11 +128,16 @@ class LiftJavaScriptSpec extends Specification  {
     }
     "create init command" in withEnglishLocale {
       S.initIfUninitted(session) {
-        val init = LiftRules.javaScriptSettings.vend().map(_.apply(session)).map(LiftJavaScript.initCmd(_).toJsCmd)
-        init must_== Full(formatjs(List(
-          "var lift_settings = {};",
-          "window.lift.extend(lift_settings,window.liftJQuery);",
-          """window.lift.extend(lift_settings,{"liftPath": "/lift",
+        val init = LiftRules.javaScriptSettings
+          .vend()
+          .map(_.apply(session))
+          .map(LiftJavaScript.initCmd(_).toJsCmd)
+        init must_== Full(
+          formatjs(
+            List(
+              "var lift_settings = {};",
+              "window.lift.extend(lift_settings,window.liftJQuery);",
+              """window.lift.extend(lift_settings,{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -143,18 +149,25 @@ class LiftJavaScriptSpec extends Specification  {
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}});""",
-          "window.lift.init(lift_settings);"
-        )))
+              "window.lift.init(lift_settings);"
+            )
+          )
+        )
       }
     }
     "create init command with VanillaJS" in withEnglishLocale {
       S.initIfUninitted(session) {
         LiftRules.jsArtifacts = ExtCoreArtifacts
-        val init = LiftRules.javaScriptSettings.vend().map(_.apply(session)).map(LiftJavaScript.initCmd(_).toJsCmd)
-        init must_== Full(formatjs(List(
-          "var lift_settings = {};",
-          "window.lift.extend(lift_settings,window.liftVanilla);",
-          """window.lift.extend(lift_settings,{"liftPath": "/lift",
+        val init = LiftRules.javaScriptSettings
+          .vend()
+          .map(_.apply(session))
+          .map(LiftJavaScript.initCmd(_).toJsCmd)
+        init must_== Full(
+          formatjs(
+            List(
+              "var lift_settings = {};",
+              "window.lift.extend(lift_settings,window.liftVanilla);",
+              """window.lift.extend(lift_settings,{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -166,19 +179,24 @@ class LiftJavaScriptSpec extends Specification  {
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}});""",
-          "window.lift.init(lift_settings);"
-        )))
+              "window.lift.init(lift_settings);"
+            )
+          )
+        )
       }
     }
     "create init command with custom setting" in withEnglishLocale {
       S.initIfUninitted(session) {
         LiftRules.jsArtifacts = JQueryArtifacts
-        val settings = LiftJavaScript.settings.extend(JsObj("liftPath" -> "liftyStuff", "mysetting" -> 99))
+        val settings = LiftJavaScript.settings.extend(
+          JsObj("liftPath" -> "liftyStuff", "mysetting" -> 99)
+        )
         val init = LiftJavaScript.initCmd(settings)
-        init.toJsCmd must_== formatjs(List(
-          "var lift_settings = {};",
-          "window.lift.extend(lift_settings,window.liftJQuery);",
-          """window.lift.extend(lift_settings,{"liftPath": "liftyStuff",
+        init.toJsCmd must_== formatjs(
+          List(
+            "var lift_settings = {};",
+            "window.lift.extend(lift_settings,window.liftJQuery);",
+            """window.lift.extend(lift_settings,{"liftPath": "liftyStuff",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -191,19 +209,24 @@ class LiftJavaScriptSpec extends Specification  {
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {},
             |"mysetting": 99});""",
-          "window.lift.init(lift_settings);"
-        ))
+            "window.lift.init(lift_settings);"
+          )
+        )
       }
     }
   }
 
-  def formatjs(line:String):String = formatjs(line :: Nil)
-  def formatjs(lines:List[String]):String = lines.map { _.stripMargin.linesIterator.toList match {
-    case init :+ last => (init.map(_ + " ") :+ last).mkString
-    case Nil => ""
-    case list =>
-      list.headOption.getOrElse("")
-  }}.mkString("\n")
+  def formatjs(line: String): String = formatjs(line :: Nil)
+  def formatjs(lines: List[String]): String = lines
+    .map {
+      _.stripMargin.linesIterator.toList match {
+        case init :+ last => (init.map(_ + " ") :+ last).mkString
+        case Nil          => ""
+        case list =>
+          list.headOption.getOrElse("")
+      }
+    }
+    .mkString("\n")
 
   object withEnglishLocale extends WithLocale(Locale.ENGLISH)
 

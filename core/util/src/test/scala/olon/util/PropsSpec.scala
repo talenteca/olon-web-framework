@@ -1,10 +1,9 @@
 package olon
 package util
 
-import java.io.ByteArrayInputStream
-
 import org.specs2.mutable.Specification
-import org.specs2.mutable.After
+
+import java.io.ByteArrayInputStream
 
 import common._
 import Props.RunModes._
@@ -28,7 +27,13 @@ class PropsSpec extends Specification {
         wasCalled = true
 
         List(
-          ("test propsters", () => Full(new ByteArrayInputStream("test.prop=value".getBytes("UTF-8"))))
+          (
+            "test propsters",
+            () =>
+              Full(
+                new ByteArrayInputStream("test.prop=value".getBytes("UTF-8"))
+              )
+          )
         )
       }
 
@@ -132,7 +137,9 @@ class PropsSpec extends Specification {
     "Interpolate multiple values in a string from the given interpolator" in {
       val testProps = TestProps()
 
-      testProps.appendInterpolationValues(Map("DB_HOST" -> "localhost", "DB_PORT" -> "3306"))
+      testProps.appendInterpolationValues(
+        Map("DB_HOST" -> "localhost", "DB_PORT" -> "3306")
+      )
       val url = testProps.get("db.url")
 
       url must_== Full("jdbc:mysql://localhost:3306/MYDB")

@@ -1,13 +1,12 @@
 package olon
 package webapptest
 
-import java.net.URL
-
+import junit.framework.AssertionFailedError
+import net.sourceforge.jwebunit.junit.WebTester
 import org.mortbay.jetty.Server
 import org.mortbay.jetty.webapp.WebAppContext
 
-import net.sourceforge.jwebunit.junit.WebTester
-import junit.framework.AssertionFailedError
+import java.net.URL
 
 import common.Box
 
@@ -20,10 +19,11 @@ final class JettyTestServer(baseUrlBox: Box[URL]) {
     val context = new WebAppContext()
     context.setServer(server)
     context.setContextPath("/")
-    val dir = System.getProperty("olon.webapptest.src.test.webapp", "src/test/webapp")
+    val dir =
+      System.getProperty("olon.webapptest.src.test.webapp", "src/test/webapp")
     context.setWar(dir)
-    //val context = new Context(_server, "/", Context.SESSIONS)
-    //context.addFilter(new FilterHolder(new LiftFilter()), "/");
+    // val context = new Context(_server, "/", Context.SESSIONS)
+    // context.addFilter(new FilterHolder(new LiftFilter()), "/");
     server.addHandler(context)
     server.setGracefulShutdown(100)
     server.setStopAtShutdown(true)
@@ -44,7 +44,7 @@ final class JettyTestServer(baseUrlBox: Box[URL]) {
 
   def running = server_.isRunning
 
-  def browse[A](startPath: String, f:(WebTester) => A): A = {
+  def browse[A](startPath: String, f: (WebTester) => A): A = {
     val wc = new WebTester()
     try {
       wc.setScriptingEnabled(false)
@@ -61,4 +61,3 @@ final class JettyTestServer(baseUrlBox: Box[URL]) {
   }
 
 }
-

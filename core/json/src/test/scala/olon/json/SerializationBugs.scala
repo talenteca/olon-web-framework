@@ -2,6 +2,7 @@ package olon
 package json
 
 import org.specs2.mutable.Specification
+
 import java.util.UUID
 
 object SerializationBugs extends Specification {
@@ -12,7 +13,7 @@ object SerializationBugs extends Specification {
   "plan1.Plan can be serialized (issue 341)" in {
     import plan1._
 
-    val game = Game(Map("a" -> Plan(Some(Action(1, None))))) 
+    val game = Game(Map("a" -> Plan(Some(Action(1, None)))))
     val ser = swrite(game)
     read[Game](ser) mustEqual game
   }
@@ -20,9 +21,15 @@ object SerializationBugs extends Specification {
   "plan2.Plan can be serialized (issue 341)" in {
     import plan2._
 
-    val g1 = Game(Map("a" -> Plan(Some(Action("f1", "s", Array(), None)), 
-                                  Some("A"), 
-                                  Some(Action("f2", "s2", Array(0, 1, 2), None)))))
+    val g1 = Game(
+      Map(
+        "a" -> Plan(
+          Some(Action("f1", "s", Array(), None)),
+          Some("A"),
+          Some(Action("f2", "s2", Array(0, 1, 2), None))
+        )
+      )
+    )
     val ser = swrite(g1)
     val g2 = read[Game](ser)
     val plan = g2.buy("a")
@@ -42,7 +49,7 @@ object SerializationBugs extends Specification {
   }
 
   "null serialization bug" in {
-    val x = new X(null) 
+    val x = new X(null)
     val ser = swrite(x)
     read[X](ser) mustEqual x
   }
@@ -57,7 +64,9 @@ object SerializationBugs extends Specification {
     class UUIDFormat extends Serializer[UUID] {
       val UUIDClass = classOf[UUID]
 
-      def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), UUID] = {
+      def deserialize(implicit
+          format: Formats
+      ): PartialFunction[(TypeInfo, JValue), UUID] = {
         case (TypeInfo(UUIDClass, _), JString(x)) => UUID.fromString(x)
       }
 
@@ -78,15 +87,19 @@ object SerializationBugs extends Specification {
     class SeqFormat extends Serializer[Seq[_]] {
       val SeqClass = classOf[Seq[_]]
 
-      def serialize(implicit format: Formats) = {
-        case seq: Seq[_] => JArray(seq.toList.map(Extraction.decompose))
+      def serialize(implicit format: Formats) = { case seq: Seq[_] =>
+        JArray(seq.toList.map(Extraction.decompose))
       }
 
       def deserialize(implicit format: Formats) = {
-        case (TypeInfo(SeqClass, parameterizedType), JArray(xs)) => 
-          val typeInfo = TypeInfo(parameterizedType
-            .map(_.getActualTypeArguments()(0))
-            .getOrElse(failure("No type parameter info for type Seq")).asInstanceOf[Class[_]], None)
+        case (TypeInfo(SeqClass, parameterizedType), JArray(xs)) =>
+          val typeInfo = TypeInfo(
+            parameterizedType
+              .map(_.getActualTypeArguments()(0))
+              .getOrElse(failure("No type parameter info for type Seq"))
+              .asInstanceOf[Class[_]],
+            None
+          )
           xs.map(x => Extraction.extract(x, typeInfo))
       }
     }
@@ -112,7 +125,8 @@ object SerializationBugs extends Specification {
   }
 
   "Either can't be deserialized with type hints" in {
-    implicit val formats = DefaultFormats + FullTypeHints(classOf[Either[_, _]] :: Nil)
+    implicit val formats =
+      DefaultFormats + FullTypeHints(classOf[Either[_, _]] :: Nil)
     val x = Eith(Left("hello"))
     val s = Serialization.write(x)
     read[Eith](s) mustEqual x
@@ -123,18 +137,31 @@ object SerializationBugs extends Specification {
       private val singleOrVectorClass = classOf[SingleOrVector[Double]]
 
       def deserialize(implicit format: Formats) = {
-        case (TypeInfo(`singleOrVectorClass`, _), json) => json match {
-          case JObject(List(JField("val", JDouble(x)))) => SingleValue(x)
-          case JObject(List(JField("val", JArray(xs: List[_])))) =>
-            VectorValue(xs.asInstanceOf[List[JDouble]].map(_.num).toIndexedSeq)
-          case x => throw new MappingException("Can't convert " + x + " to SingleOrVector")
-        }
+        case (TypeInfo(`singleOrVectorClass`, _), json) =>
+          json match {
+            case JObject(List(JField("val", JDouble(x)))) => SingleValue(x)
+            case JObject(List(JField("val", JArray(xs: List[_])))) =>
+              VectorValue(
+                xs.asInstanceOf[List[JDouble]].map(_.num).toIndexedSeq
+              )
+            case x =>
+              throw new MappingException(
+                "Can't convert " + x + " to SingleOrVector"
+              )
+          }
       }
 
       def serialize(implicit format: Formats) = {
         case SingleValue(x: Double) => JObject(List(JField("val", JDouble(x))))
         case VectorValue(x: Vector[_]) =>
-          JObject(List(JField("val", JArray(x.asInstanceOf[Vector[Double]].toList.map(JDouble(_))))))
+          JObject(
+            List(
+              JField(
+                "val",
+                JArray(x.asInstanceOf[Vector[Double]].toList.map(JDouble(_)))
+              )
+            )
+          )
       }
     }
 
@@ -148,8 +175,12 @@ object SerializationBugs extends Specification {
     val jsonA = """ { "data": { "foo": "string" }, "success": true } """
     val jsonB = """ { "data": { "bar": "string" }, "success": true } """
 
-    (read[SomeContainer[TypeA]](jsonA) mustEqual SomeContainer(TypeA("string"))) and
-      (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(TypeB("string")))
+    (read[SomeContainer[TypeA]](jsonA) mustEqual SomeContainer(
+      TypeA("string")
+    )) and
+      (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
+        TypeB("string")
+      ))
   }
 }
 
@@ -176,11 +207,18 @@ package plan1 {
 }
 
 package plan2 {
-  case class Plan(leftOperand: Option[Action], operator: Option[String], 
-                  rightOperand: Option[Action])
+  case class Plan(
+      leftOperand: Option[Action],
+      operator: Option[String],
+      rightOperand: Option[Action]
+  )
   case class Game(buy: Map[String, Plan])
-  case class Action(functionName: String, symbol: String,
-                    inParams: Array[Number], subOperand: Option[Action]) 
+  case class Action(
+      functionName: String,
+      symbol: String,
+      inParams: Array[Number],
+      subOperand: Option[Action]
+  )
 }
 
 case class Opaque(x: JValue)

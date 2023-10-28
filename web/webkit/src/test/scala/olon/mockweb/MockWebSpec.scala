@@ -1,70 +1,76 @@
 package olon
 package mockweb
 
-import scala.xml.{Null,Text,UnprefixedAttribute}
-
 import org.specs2.mutable.Specification
 
+import scala.xml.Null
+import scala.xml.Text
+import scala.xml.UnprefixedAttribute
+
 import common._
-import util._
 import http._
 import provider.servlet.HTTPRequestServlet
 import mocks.MockHttpServletRequest
 
-
-/**
- * System under specification for MockWeb. This does the double duty as both a spec
- * against the MockWeb object as well as an example of how to use it.
- */
-class MockWebSpec extends Specification  {
+/** System under specification for MockWeb. This does the double duty as both a
+  * spec against the MockWeb object as well as an example of how to use it.
+  */
+class MockWebSpec extends Specification {
   "MockWeb Specification".title
 
   import MockWeb._
 
-  /** We can create our own LiftRules instance for the purpose of this spec. In the
-   * examples below we can call LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {...}
-   * whenever we want to evaluate LiftRules. For simpler usage, WebSpecSpec provides
-   * full-featured LiftRules mocking.
-   */
+  /** We can create our own LiftRules instance for the purpose of this spec. In
+    * the examples below we can call
+    * LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {...}
+    * whenever we want to evaluate LiftRules. For simpler usage, WebSpecSpec
+    * provides full-featured LiftRules mocking.
+    */
   val mockLiftRules = new LiftRules()
 
   // Set up our mock LiftRules instance
   LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {
     // Global LiftRules setup
     LiftRules.statelessRewrite.append {
-      case RewriteRequest(ParsePath(List("test", "stateless"), _, _, _), _, _) => {
+      case RewriteRequest(
+            ParsePath(List("test", "stateless"), _, _, _),
+            _,
+            _
+          ) => {
         RewriteResponse(List("stateless", "works"))
       }
     }
 
     LiftRules.statefulRewrite.append {
-      case RewriteRequest(ParsePath(List("test", "stateful"), _, _, _), _, _) => {
+      case RewriteRequest(
+            ParsePath(List("test", "stateful"), _, _, _),
+            _,
+            _
+          ) => {
         RewriteResponse(List("stateful", "works"))
       }
     }
 
-    LiftRules.early.append {
-      req =>
-        req match {
-          case httpReq : HTTPRequestServlet => {
-            httpReq.req match {
-              case mocked : MockHttpServletRequest => {
-                mocked.remoteAddr = "1.2.3.4"
-              }
-              case _ => println("Not a mocked request?")
+    LiftRules.early.append { req =>
+      req match {
+        case httpReq: HTTPRequestServlet => {
+          httpReq.req match {
+            case mocked: MockHttpServletRequest => {
+              mocked.remoteAddr = "1.2.3.4"
             }
+            case _ => println("Not a mocked request?")
           }
-          case _ => println("Not a servlet request?")
         }
+        case _ => println("Not a servlet request?")
+      }
     }
   }
 
   "MockWeb" should {
     "provide a Req corresponding to a string url" in {
-      testReq("http://foo.com/test/this?a=b&a=c", "/test") {
-        req =>
-          req.uri must_== "/this"
-          req.params("a") must_== List("b","c")
+      testReq("http://foo.com/test/this?a=b&a=c", "/test") { req =>
+        req.uri must_== "/this"
+        req.params("a") must_== List("b", "c")
       }
     }
 
@@ -78,17 +84,16 @@ class MockWebSpec extends Specification  {
 
       mockReq.body = ("name" -> "joe") ~ ("age" -> 35)
 
-      testReq(mockReq) {
-        req =>
-          req.json_? must_== true
+      testReq(mockReq) { req =>
+        req.json_? must_== true
       }
     }
 
     "process LiftRules.early when configured" in {
       LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {
         useLiftRules.doWith(true) {
-          testReq("http://foo.com/test/this") {
-            req => req.remoteAddr must_== "1.2.3.4"
+          testReq("http://foo.com/test/this") { req =>
+            req.remoteAddr must_== "1.2.3.4"
           }
         }
       }
@@ -97,8 +102,8 @@ class MockWebSpec extends Specification  {
     "process LiftRules stateless rewrites when configured" in {
       LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {
         useLiftRules.doWith(true) {
-          testReq("http://foo.com/test/stateless") {
-            req => req.path.partPath must_== List("stateless", "works")
+          testReq("http://foo.com/test/stateless") { req =>
+            req.path.partPath must_== List("stateless", "works")
           }
         }
       }
@@ -125,7 +130,9 @@ class MockWebSpec extends Specification  {
       LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {
         useLiftRules.doWith(true) {
           testS("http://foo.com/test/stateless") {
-            S.request.foreach(_.path.partPath must_== List("stateless", "works"))
+            S.request.foreach(
+              _.path.partPath must_== List("stateless", "works")
+            )
           }
         }
       }
@@ -144,14 +151,16 @@ class MockWebSpec extends Specification  {
     }
 
     "emulate a snippet invocation" in {
-        testS("http://foo.com/test/stateful") {
-          withSnippet("MyWidget.foo", new UnprefixedAttribute("bar", Text("bat"), Null)) {
-            S.currentSnippet must_== Full("MyWidget.foo")
-            S.attr("bar") must_== Full("bat")
-          }
+      testS("http://foo.com/test/stateful") {
+        withSnippet(
+          "MyWidget.foo",
+          new UnprefixedAttribute("bar", Text("bat"), Null)
+        ) {
+          S.currentSnippet must_== Full("MyWidget.foo")
+          S.attr("bar") must_== Full("bat")
         }
+      }
     }
-
 
     "simplify shared sessions" in {
       object testVar extends SessionVar[String]("Empty")

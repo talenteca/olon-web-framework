@@ -1,10 +1,11 @@
 package olon
 package util
 
-import scala.concurrent.{Future, Promise}
-import scala.concurrent.ExecutionContext.Implicits.global
-
 import org.specs2.mutable.Spec
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.Promise
 
 import actor.LAFuture
 

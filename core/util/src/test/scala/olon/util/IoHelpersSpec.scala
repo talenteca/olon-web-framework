@@ -3,11 +3,12 @@ package util
 
 import org.specs2.mutable.Specification
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
+
 import common._
 import Helpers._
-
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path}
 
 class IoHelpersSpec extends Specification with IoHelpers {
   "IoHelpers Specification".title
@@ -18,10 +19,13 @@ class IoHelpersSpec extends Specification with IoHelpers {
       // Copy a resource file to the tmp directory so we can refer to it as a Path
       val resourceAsPath: Box[Path] = {
         for {
-          bytes <- tryo(readWholeStream(getClass.getResourceAsStream("IoHelpersSpec.txt"))).filter(_ ne null)
+          bytes <- tryo(
+            readWholeStream(getClass.getResourceAsStream("IoHelpersSpec.txt"))
+          ).filter(_ ne null)
           text <- tryo(new String(bytes))
           path = {
-            val tempFile = Files.createTempFile(s"IoHelpersSpec_${nextFuncName}", ".tmp") 
+            val tempFile =
+              Files.createTempFile(s"IoHelpersSpec_${nextFuncName}", ".tmp")
             Files.write(tempFile, text.getBytes(StandardCharsets.UTF_8))
             tempFile
           }

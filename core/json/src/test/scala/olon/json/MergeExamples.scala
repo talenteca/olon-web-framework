@@ -3,9 +3,7 @@ package json
 
 import org.specs2.mutable.Specification
 
-
-
-object MergeExamples extends Specification  {
+object MergeExamples extends Specification {
   "Merge Examples".title
 
   "Merge example" in {

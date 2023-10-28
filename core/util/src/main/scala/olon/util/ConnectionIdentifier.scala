@@ -1,9 +1,6 @@
 package olon
 package util
 
-import Helpers._
-import common._
-
 trait ConnectionIdentifier {
   def jndiName: String
 
@@ -13,7 +10,7 @@ trait ConnectionIdentifier {
 
   override def equals(other: Any): Boolean = other match {
     case ci: ConnectionIdentifier => ci.jndiName == this.jndiName
-    case _ => false
+    case _                        => false
   }
 }
 

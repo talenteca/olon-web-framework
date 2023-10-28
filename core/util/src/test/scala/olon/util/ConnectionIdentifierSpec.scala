@@ -3,9 +3,8 @@ package util
 
 import org.specs2.mutable.Specification
 
-/**
- * Systems under specification for ConnectionIdentifier.
- */
+/** Systems under specification for ConnectionIdentifier.
+  */
 class ConnectionIdentifierSpec extends Specification {
   "ConnectionIdentifier Specification".title
 

@@ -1,16 +1,15 @@
 package olon
 package util
 
-import scala.xml._
-
 import org.specs2.matcher.XmlMatchers
 import org.specs2.mutable.Specification
 
+import scala.xml._
+
 import common._
 
-/**
- * Systems under specification for HtmlHelpers.
- */
+/** Systems under specification for HtmlHelpers.
+  */
 class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
   "HtmlHelpers Specification".title
 
@@ -18,29 +17,24 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
     "find an id" in {
       val xml = <foo><bar/>Dog<b><woof id="3"/></b></foo>
 
-      findBox(xml) {
-        e => e.attribute("id").
-        filter(_.text == "3").
-        map(i => e)
-      }.openOrThrowException("Test") must ==/ (<woof id="3"/>)
+      findBox(xml) { e =>
+        e.attribute("id").filter(_.text == "3").map(i => e)
+      }.openOrThrowException("Test") must ==/(<woof id="3"/>)
     }
 
     "not find an ide" in {
       val xml = <foo><bar/>Dog<b><woof ide="3"/></b></foo>
 
-      findBox(xml) {
-        e => e.attribute("id").
-        filter(_.text == "3").map(i => e)
+      findBox(xml) { e =>
+        e.attribute("id").filter(_.text == "3").map(i => e)
       } must_== Empty
     }
-
 
     "not find a the wrong id" in {
       val xml = <foo><bar/>Dog<b><woof ide="4"/></b></foo>
 
-      findBox(xml) {
-        e => e.attribute("id").
-        filter(_.text == "3").map(i => e)
+      findBox(xml) { e =>
+        e.attribute("id").filter(_.text == "3").map(i => e)
       } must_== Empty
     }
   }
@@ -49,28 +43,24 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
     "find an id" in {
       val xml = <foo><bar/>Dog<b><woof id="3"/></b></foo>
 
-      findOption(xml) {
-        e => e.attribute("id").
-        filter(_.text == "3").map(i => e)
-      }.get must ==/ (<woof id="3"/>)
+      findOption(xml) { e =>
+        e.attribute("id").filter(_.text == "3").map(i => e)
+      }.get must ==/(<woof id="3"/>)
     }
 
     "not find an ide" in {
       val xml = <foo><bar/>Dog<b><woof ide="3"/></b></foo>
 
-      findOption(xml) {
-        e => e.attribute("id").
-        filter(_.text == "3").map(i => e)
+      findOption(xml) { e =>
+        e.attribute("id").filter(_.text == "3").map(i => e)
       } must_== None
     }
-
 
     "not find a the wrong id" in {
       val xml = <foo><bar/>Dog<b><woof ide="4"/></b></foo>
 
-      findOption(xml) {
-        e => e.attribute("id").
-        filter(_.text == "3").map(i => e)
+      findOption(xml) { e =>
+        e.attribute("id").filter(_.text == "3").map(i => e)
       } must_== None
     }
   }
@@ -83,9 +73,8 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       </whoa>
 
     "find the element with a requested id in a NodeSeq" in {
-      findId(xml, "boom") must beLike {
-        case Some(element) =>
-          element must ==/(<thing id="boom">Boom</thing>)
+      findId(xml, "boom") must beLike { case Some(element) =>
+        element must ==/(<thing id="boom">Boom</thing>)
       }
     }
 
@@ -108,11 +97,15 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
     }
 
     "ignore non-head" in {
-      Helpers.stripHead(<head3><i>hello</i></head3>) must ==/(<head3><i>hello</i></head3>)
+      Helpers.stripHead(<head3><i>hello</i></head3>) must ==/(
+        <head3><i>hello</i></head3>
+      )
     }
 
     "String subhead" in {
-      Helpers.stripHead(<head3><i><head>hello</head></i></head3>) must ==/(<head3><i>hello</i></head3>)
+      Helpers.stripHead(<head3><i><head>hello</head></i></head3>) must ==/(
+        <head3><i>hello</i></head3>
+      )
     }
   }
 
@@ -129,7 +122,7 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val removed = removeAttribute("attribute", element.attributes)
 
       (removed("attribute") must_== null) and
-      (removed("otherAttribute") must_== Text("good-bye"))
+        (removed("otherAttribute") must_== Text("good-bye"))
     }
   }
 
@@ -154,8 +147,8 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val uniqued = <wrapper>{ensureUniqueId(xml).head}</wrapper>
 
       (uniqued must \("boom", "id" -> "thing")) and
-      (uniqued must \\("hello", "id" -> "other-thing")) and
-      (uniqued must \\("bye", "id" -> "third-thing"))
+        (uniqued must \\("hello", "id" -> "other-thing")) and
+        (uniqued must \\("bye", "id" -> "third-thing"))
     }
 
     "strip the ids if elements have an id matching a previous one" in {
@@ -185,7 +178,7 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val uniqued = <wrapper>{ensureUniqueId(xml).head}</wrapper>
 
       (uniqued must \\("hello", "id" -> "thing")) and
-      (uniqued must \\("bye", "id" -> "thing"))
+        (uniqued must \\("bye", "id" -> "thing"))
     }
   }
 
@@ -200,8 +193,8 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val uniqued = <wrapper>{deepEnsureUniqueId(xml).head}</wrapper>
 
       (uniqued must \("boom", "id" -> "thing")) and
-      (uniqued must \\("hello", "id" -> "other-thing")) and
-      (uniqued must \\("bye", "id" -> "third-thing"))
+        (uniqued must \\("hello", "id" -> "other-thing")) and
+        (uniqued must \\("bye", "id" -> "third-thing"))
     }
 
     "strip the ids if elements have an id matching a previous one" in {
@@ -296,4 +289,3 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
     }
   }
 }
-

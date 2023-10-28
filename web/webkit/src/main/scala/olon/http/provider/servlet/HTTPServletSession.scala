@@ -3,22 +3,28 @@ package http
 package provider
 package servlet
 
-import javax.servlet.http._
 import olon.common._
-import olon.util._
+
+import javax.servlet.http._
 
 class HTTPServletSession(session: HttpSession) extends HTTPSession {
-  private[this] val servletSessionIdentifier = LiftRules.servletSessionIdentifier
+  private[this] val servletSessionIdentifier =
+    LiftRules.servletSessionIdentifier
 
   def sessionId: String = session.getId
 
-  def link(liftSession: LiftSession) = session.setAttribute(servletSessionIdentifier, SessionToServletBridge(liftSession.underlyingId))
+  def link(liftSession: LiftSession) = session.setAttribute(
+    servletSessionIdentifier,
+    SessionToServletBridge(liftSession.underlyingId)
+  )
 
-  def unlink(liftSession: LiftSession) = session.removeAttribute(servletSessionIdentifier)
+  def unlink(liftSession: LiftSession) =
+    session.removeAttribute(servletSessionIdentifier)
 
   def maxInactiveInterval: Long = session.getMaxInactiveInterval
 
-  def setMaxInactiveInterval(interval: Long) = session.setMaxInactiveInterval (interval.toInt)
+  def setMaxInactiveInterval(interval: Long) =
+    session.setMaxInactiveInterval(interval.toInt)
 
   def lastAccessedTime: Long = session.getLastAccessedTime
 
@@ -31,26 +37,27 @@ class HTTPServletSession(session: HttpSession) extends HTTPSession {
   def terminate = session.invalidate
 }
 
-/**
- * Represents the "bridge" between HttpSession and LiftSession
- */
-case class SessionToServletBridge(uniqueId: String) extends HttpSessionBindingListener with HttpSessionActivationListener {
+/** Represents the "bridge" between HttpSession and LiftSession
+  */
+case class SessionToServletBridge(uniqueId: String)
+    extends HttpSessionBindingListener
+    with HttpSessionActivationListener {
   def sessionDidActivate(se: HttpSessionEvent) = {
-    SessionMaster.getSession(uniqueId, Empty).foreach(ls =>
-            LiftSession.onSessionActivate.foreach(_(ls)))
+    SessionMaster
+      .getSession(uniqueId, Empty)
+      .foreach(ls => LiftSession.onSessionActivate.foreach(_(ls)))
   }
 
   def sessionWillPassivate(se: HttpSessionEvent) = {
-    SessionMaster.getSession(uniqueId, Empty).foreach(ls =>
-            LiftSession.onSessionPassivate.foreach(_(ls)))
+    SessionMaster
+      .getSession(uniqueId, Empty)
+      .foreach(ls => LiftSession.onSessionPassivate.foreach(_(ls)))
   }
 
-  def valueBound(event: HttpSessionBindingEvent): Unit = {
-  }
+  def valueBound(event: HttpSessionBindingEvent): Unit = {}
 
-  /**
-   * When the session is unbound the the HTTP session, stop us
-   */
+  /** When the session is unbound the the HTTP session, stop us
+    */
   def valueUnbound(event: HttpSessionBindingEvent): Unit = {
     SessionMaster.sendMsg(RemoveSession(uniqueId))
   }

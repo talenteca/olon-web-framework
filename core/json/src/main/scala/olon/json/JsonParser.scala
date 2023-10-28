@@ -4,14 +4,15 @@ package json
 import scala.annotation.switch
 
 /** JSON parser.
- */
+  */
 object JsonParser {
   import java.io._
 
-  class ParseException(message: String, cause: Exception) extends Exception(message, cause)
+  class ParseException(message: String, cause: Exception)
+      extends Exception(message, cause)
 
   /** Parsed tokens from low level pull parser.
-   */
+    */
   sealed abstract class Token
   case object OpenObj extends Token
   case object CloseObj extends Token
@@ -26,47 +27,57 @@ object JsonParser {
   case object CloseArr extends Token
 
   /** Return parsed JSON.
-   * @throws ParseException is thrown if parsing fails
-   */
+    * @throws ParseException
+    *   is thrown if parsing fails
+    */
   def parse(s: String): JValue = parse(new Buffer(new StringReader(s), false))
 
   /** Return parsed JSON.
-   * @param closeAutomatically true (default) if the Reader is automatically closed on EOF
-   * @throws ParseException is thrown if parsing fails
-   */
+    * @param closeAutomatically
+    *   true (default) if the Reader is automatically closed on EOF
+    * @throws ParseException
+    *   is thrown if parsing fails
+    */
   def parse(s: Reader, closeAutomatically: Boolean = true): JValue =
     parse(new Buffer(s, closeAutomatically))
 
   /** Return parsed JSON.
-   */
+    */
   def parseOpt(s: String): Option[JValue] =
-    try { parse(s).toOpt } catch { case e: Exception => None }
+    try { parse(s).toOpt }
+    catch { case e: Exception => None }
 
   /** Return parsed JSON.
-   * @param closeAutomatically true (default) if the Reader is automatically closed on EOF
-   */
+    * @param closeAutomatically
+    *   true (default) if the Reader is automatically closed on EOF
+    */
   def parseOpt(s: Reader, closeAutomatically: Boolean = true): Option[JValue] =
-    try { parse(s, closeAutomatically).toOpt } catch { case e: Exception => None }
+    try { parse(s, closeAutomatically).toOpt }
+    catch { case e: Exception => None }
 
-  /** Parse in pull parsing style.
-   * Use <code>p.nextToken</code> to parse tokens one by one from a string.
-   * @see olon.json.JsonParser.Token
-   */
+  /** Parse in pull parsing style. Use <code>p.nextToken</code> to parse tokens
+    * one by one from a string.
+    * @see
+    *   olon.json.JsonParser.Token
+    */
   def parse[A](s: String, p: Parser => A): A = parse(new StringReader(s), p)
 
-  /** Parse in pull parsing style.
-   * Use <code>p.nextToken</code> to parse tokens one by one from a stream.
-   * The Reader must be closed when parsing is stopped.
-   * @see olon.json.JsonParser.Token
-   */
-  def parse[A](s: Reader, p: Parser => A): A = p(new Parser(new Buffer(s, false)))
+  /** Parse in pull parsing style. Use <code>p.nextToken</code> to parse tokens
+    * one by one from a stream. The Reader must be closed when parsing is
+    * stopped.
+    * @see
+    *   olon.json.JsonParser.Token
+    */
+  def parse[A](s: Reader, p: Parser => A): A = p(
+    new Parser(new Buffer(s, false))
+  )
 
   private[json] def parse(buf: Buffer): JValue = {
     try {
       astParser(new Parser(buf))
     } catch {
       case e: ParseException => throw e
-      case e: Exception => throw new ParseException("parsing failed", e)
+      case e: Exception      => throw new ParseException("parsing failed", e)
     } finally { buf.release }
   }
 
@@ -117,7 +128,8 @@ object JsonParser {
               var finalChar = 0
               val chars = Array(buf.next, buf.next, buf.next, buf.next)
               while (byte < chars.length) {
-                finalChar = (finalChar << hexCharSize) | HexChars(chars(byte).toInt)
+                finalChar =
+                  (finalChar << hexCharSize) | HexChars(chars(byte).toInt)
                 byte += 1
               }
               builder.appendCodePoint(finalChar.toChar)
@@ -160,8 +172,12 @@ object JsonParser {
 
   // Intermediate objects and arrays which can be grown mutably for performance.
   // These are finalized into immutable JObject and JArray.
-  private[this] case class IntermediateJObject(fields: scala.collection.mutable.ListBuffer[JField])
-  private[this] case class IntermediateJArray(bits: scala.collection.mutable.ListBuffer[JValue])
+  private[this] case class IntermediateJObject(
+      fields: scala.collection.mutable.ListBuffer[JField]
+  )
+  private[this] case class IntermediateJArray(
+      bits: scala.collection.mutable.ListBuffer[JValue]
+  )
 
   private val astParser = (p: Parser) => {
     val vals = new ValStack(p)
@@ -173,10 +189,10 @@ object JsonParser {
     // object or array.
     def closeBlock(v: Any): Unit = {
       def toJValue(x: Any) = x match {
-        case json: JValue => json
+        case json: JValue               => json
         case other: IntermediateJObject => JObject(other.fields.result())
-        case other: IntermediateJArray => JArray(other.bits.result())
-        case _ => p.fail("unexpected field " + x)
+        case other: IntermediateJArray  => JArray(other.bits.result())
+        case _                          => p.fail("unexpected field " + x)
       }
 
       vals.peekOption match {
@@ -188,7 +204,7 @@ object JsonParser {
           o.fields.append(vals.peek(classOf[JField]))
         case Some(a: IntermediateJArray) => a.bits.append(toJValue(v))
         case Some(x) => p.fail("expected field, array or object but got " + x)
-        case None => root = Some(toJValue(v))
+        case None    => root = Some(toJValue(v))
       }
     }
 
@@ -198,10 +214,11 @@ object JsonParser {
           case JField(name, value) =>
             vals.pop(classOf[JField])
             val obj = vals.peek(classOf[IntermediateJObject])
-            obj.fields += (JField(name,v))
+            obj.fields += (JField(name, v))
           case a: IntermediateJArray => a.bits += v
           case other => p.fail("expected field or array but got " + other)
-      } else {
+        }
+      else {
         vals.push(v)
         root = Some(v)
       }
@@ -209,7 +226,8 @@ object JsonParser {
     def loop(): Unit = {
       token = p.nextToken
       token match {
-        case OpenObj          => vals.push(IntermediateJObject(scala.collection.mutable.ListBuffer()))
+        case OpenObj =>
+          vals.push(IntermediateJObject(scala.collection.mutable.ListBuffer()))
         case FieldStart(name) => vals.push(JField(name, null))
         case StringVal(x)     => newValue(JString(x))
         case IntVal(x)        => newValue(JInt(x))
@@ -217,9 +235,10 @@ object JsonParser {
         case BoolVal(x)       => newValue(JBool(x))
         case NullVal          => newValue(JNull)
         case CloseObj         => closeBlock(vals.popAny)
-        case OpenArr          => vals.push(IntermediateJArray(scala.collection.mutable.ListBuffer()))
-        case CloseArr         => closeBlock(vals.popAny)
-        case End              =>
+        case OpenArr =>
+          vals.push(IntermediateJArray(scala.collection.mutable.ListBuffer()))
+        case CloseArr => closeBlock(vals.popAny)
+        case End      =>
       }
       if (token != End) {
         loop()
@@ -252,7 +271,10 @@ object JsonParser {
         x.asInstanceOf[A]
       } catch {
         case cce: ClassCastException =>
-          parser.fail(s"failure during class conversion. I got $x but needed a type of $expectedType", cce)
+          parser.fail(
+            s"failure during class conversion. I got $x but needed a type of $expectedType",
+            cce
+          )
       }
     }
 
@@ -268,17 +290,18 @@ object JsonParser {
     private[this] val blocks = new ArrayDeque[BlockMode](32)
     private[this] var fieldNameMode = true
 
-    def fail(msg: String, cause: Exception = null) = throw new ParseException(msg + "\nNear: " + buf.near, cause)
+    def fail(msg: String, cause: Exception = null) =
+      throw new ParseException(msg + "\nNear: " + buf.near, cause)
 
     /** Parse next Token from stream.
-     */
+      */
     def nextToken: Token = {
       def parseString: String =
         try {
           unquote(buf)
         } catch {
           case p: ParseException => throw p
-          case cause: Exception => fail("unexpected string end", cause)
+          case cause: Exception  => fail("unexpected string end", cause)
         }
 
       def parseValue(first: Char) = {
@@ -292,11 +315,12 @@ object JsonParser {
         buf.mark
         while (wasInt) {
           val c = buf.next
-          (c: @switch) match  {
+          (c: @switch) match {
             case '.' | 'e' | 'E' =>
               doubleVal = true
-            case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '-' | '+' =>
-              // continue
+            case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' |
+                '-' | '+' =>
+            // continue
             case _ =>
               wasInt = false
               if (c != EOF) {
@@ -325,7 +349,8 @@ object JsonParser {
             blocks.poll
             return CloseObj
           case '"' =>
-            if (fieldNameMode && blocks.peek == OBJECT) return FieldStart(parseString)
+            if (fieldNameMode && blocks.peek == OBJECT)
+              return FieldStart(parseString)
             else {
               fieldNameMode = true
               return StringVal(parseString)
@@ -338,7 +363,9 @@ object JsonParser {
             fail("expected boolean")
           case 'f' =>
             fieldNameMode = true
-            if (buf.next == 'a' && buf.next == 'l' && buf.next == 's' && buf.next == 'e') {
+            if (
+              buf.next == 'a' && buf.next == 'l' && buf.next == 's' && buf.next == 'e'
+            ) {
               return BoolVal(false)
             }
             fail("expected boolean")
@@ -358,11 +385,12 @@ object JsonParser {
             fieldNameMode = true
             blocks.poll
             return CloseArr
-          case c @ ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '-') =>
+          case c @ ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' |
+              '-') =>
             fieldNameMode = true
             return parseValue(c)
-          case ' ' |  '\n' | ',' | '\r' | '\t' =>
-            // ignore
+          case ' ' | '\n' | ',' | '\r' | '\t' =>
+          // ignore
           case c =>
             c match {
               case `EOF` =>
@@ -385,7 +413,11 @@ object JsonParser {
   /* Buffer used to parse JSON.
    * Buffer is divided to one or more segments (preallocated in segmentPool).
    */
-  private[json] final class Buffer(in: Reader, closeAutomatically: Boolean, segmentPool: SegmentPool = Segments) {
+  private[json] final class Buffer(
+      in: Reader,
+      closeAutomatically: Boolean,
+      segmentPool: SegmentPool = Segments
+  ) {
     // Reused by the parser when appropriate, allows for a single builder to be
     // used throughout the parse process, and to be written to directly from the
     // substring method, so as to avoid allocating new builders when avoidable.
@@ -395,7 +427,8 @@ object JsonParser {
     var curMark = -1
     var curMarkSegment = -1
     var eofIsFailure = false
-    private[this] var segments = scala.collection.mutable.ArrayBuffer(segmentPool.apply())
+    private[this] var segments =
+      scala.collection.mutable.ArrayBuffer(segmentPool.apply())
     private[this] var segment: Array[Char] = segments.head.seg
     private[this] var cur = 0 // Pointer which points current parsing location
     private[this] var curSegmentIdx = 0 // Pointer which points current segment
@@ -411,13 +444,14 @@ object JsonParser {
       curMark = cur
       curMarkSegment = curSegmentIdx
     }
-    def back = cur = cur-1
-    def forward = cur = cur+1
+    def back = cur = cur - 1
+    def forward = cur = cur + 1
 
     // Read the next character; reads new data from the reader if necessary.
     def next: Char = {
       if (cur >= offset && read < 0) {
-        if (eofIsFailure) throw new ParseException("unexpected eof", null) else EOF
+        if (eofIsFailure) throw new ParseException("unexpected eof", null)
+        else EOF
       } else {
         val c = segment(cur)
         cur += 1
@@ -444,7 +478,8 @@ object JsonParser {
         }
       } else { // slower path for case when string is in two or more segments
         val segmentCount = curSegmentIdx - curMarkSegment + 1
-        val substringLength = segmentCount * segmentPool.segmentSize - curMark - (segmentPool.segmentSize - cur) - 1
+        val substringLength =
+          segmentCount * segmentPool.segmentSize - curMark - (segmentPool.segmentSize - cur) - 1
         val chars =
           if (intoBuilder) {
             emptyArray
@@ -457,15 +492,15 @@ object JsonParser {
         while (i <= curSegmentIdx) {
           val s = segments(i).seg
           val start = if (i == curMarkSegment) curMark else 0
-          val end = if (i == curSegmentIdx) cur else s.length+1
-          val partLen = end-start-1
+          val end = if (i == curSegmentIdx) cur else s.length + 1
+          val partLen = end - start - 1
           if (intoBuilder) {
             builder.append(s, start, partLen)
           } else {
             System.arraycopy(s, start, chars, offset, partLen)
           }
           offset += partLen
-          i = i+1
+          i = i + 1
         }
 
         curMarkSegment = -1
@@ -509,7 +544,7 @@ object JsonParser {
         segment = segmentToUse.seg
       }
 
-      val length = in.read(segment, offset, segment.length-offset)
+      val length = in.read(segment, offset, segment.length - offset)
       if (length != -1) {
         cur = offset
         offset += length
@@ -524,13 +559,15 @@ object JsonParser {
     def segmentSize: Int
   }
 
-  private[json] class ArrayBlockingSegmentPool(override val segmentSize: Int) extends SegmentPool {
+  private[json] class ArrayBlockingSegmentPool(override val segmentSize: Int)
+      extends SegmentPool {
     import java.util.concurrent.ArrayBlockingQueue
     import java.util.concurrent.atomic.AtomicInteger
 
     private[this] val maxNumOfSegments = 10000
     private[this] var segmentCount = new AtomicInteger(0)
-    private[this] val segments = new ArrayBlockingQueue[Segment](maxNumOfSegments)
+    private[this] val segments =
+      new ArrayBlockingQueue[Segment](maxNumOfSegments)
     private[json] def clear = segments.clear
 
     def apply(): Segment = {
@@ -551,7 +588,7 @@ object JsonParser {
 
     def release(s: Segment) = s match {
       case _: RecycledSegment => segments.offer(s)
-      case _ =>
+      case _                  =>
     }
   }
 

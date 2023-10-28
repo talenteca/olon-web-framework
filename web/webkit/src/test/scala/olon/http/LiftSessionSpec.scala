@@ -1,12 +1,14 @@
 package olon
 package http
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.xml.NodeSeq
-import olon.common.{Full, Empty, Failure}
+import olon.common.Empty
+import olon.common.Failure
+import olon.common.Full
 import olon.util.Helpers.tryo
-import org.specs2.specification.BeforeEach
 import org.specs2.mutable.Specification
+import org.specs2.specification.BeforeEach
+
+import scala.xml.NodeSeq
 
 object LiftSessionSpec {
   private var receivedMessages = Vector[Int]()
@@ -24,12 +26,12 @@ object LiftSessionSpec {
     }
   }
 
-  private[LiftSessionSpec] class ExplodesInConstructorCometActor extends CometActor {
+  private[LiftSessionSpec] class ExplodesInConstructorCometActor
+      extends CometActor {
     def render = NodeSeq.Empty
 
     throw new RuntimeException("boom, this explodes in the constructor!")
-    override def lowPriority = {
-      case _ =>
+    override def lowPriority = { case _ =>
     }
   }
 }
@@ -54,9 +56,15 @@ class LiftSessionSpec extends Specification with BeforeEach {
           session.sendCometMessage(cometName, Full(cometName), message)
         }
 
-        session.findOrCreateComet[TestCometActor](Full(cometName), NodeSeq.Empty, Map.empty).map { comet =>
-          comet !? NoOp /* Block to allow time for all messages to be collected */
-        }
+        session
+          .findOrCreateComet[TestCometActor](
+            Full(cometName),
+            NodeSeq.Empty,
+            Map.empty
+          )
+          .map { comet =>
+            comet !? NoOp /* Block to allow time for all messages to be collected */
+          }
 
         receivedMessages mustEqual sendingMessages
       }
@@ -77,12 +85,20 @@ class LiftSessionSpec extends Specification with BeforeEach {
         session.sendCometMessage(cometType, 1)
 
         // Ensure both process the message
-        session.findOrCreateComet[TestCometActor](Full(cometName), NodeSeq.Empty, Map.empty).map { comet =>
-          comet !? NoOp
-        }
-        session.findOrCreateComet[TestCometActor](Empty, NodeSeq.Empty, Map.empty).map { comet =>
-          comet !? NoOp
-        }
+        session
+          .findOrCreateComet[TestCometActor](
+            Full(cometName),
+            NodeSeq.Empty,
+            Map.empty
+          )
+          .map { comet =>
+            comet !? NoOp
+          }
+        session
+          .findOrCreateComet[TestCometActor](Empty, NodeSeq.Empty, Map.empty)
+          .map { comet =>
+            comet !? NoOp
+          }
 
         // Assert that the message was seen twice
         receivedMessages mustEqual Vector(1, 1)
@@ -93,14 +109,24 @@ class LiftSessionSpec extends Specification with BeforeEach {
       val session = new LiftSession("Test Session", "", Empty)
 
       S.init(Empty, session) {
-        val result = session.findOrCreateComet[ExplodesInConstructorCometActor](Empty, NodeSeq.Empty, Map.empty)
+        val result = session.findOrCreateComet[ExplodesInConstructorCometActor](
+          Empty,
+          NodeSeq.Empty,
+          Map.empty
+        )
 
         result match {
-          case Failure(_, Full(ex: java.lang.reflect.InvocationTargetException), _) =>
+          case Failure(
+                _,
+                Full(ex: java.lang.reflect.InvocationTargetException),
+                _
+              ) =>
             success
 
           case other =>
-            failure("Comet did not fail with an InvocationTargetException. Please check to ensure error handling in no-arg comet constructors wasn't broken.")
+            failure(
+              "Comet did not fail with an InvocationTargetException. Please check to ensure error handling in no-arg comet constructors wasn't broken."
+            )
         }
       }
     }

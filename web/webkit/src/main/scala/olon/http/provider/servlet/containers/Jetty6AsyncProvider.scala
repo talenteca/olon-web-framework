@@ -1,34 +1,38 @@
-package olon 
-package http 
-package provider 
-package servlet 
-package containers 
-
-import javax.servlet.http.HttpServletRequest
+package olon
+package http
+package provider
+package servlet
+package containers
 
 import olon.common._
 import olon.http._
 import olon.http.provider._
 import olon.http.provider.servlet._
 import olon.util._
-import Helpers._
 
+import javax.servlet.http.HttpServletRequest
 
 object Jetty6AsyncProvider extends AsyncProviderMeta {
   // contSupport below gets inferred as a Class[?0] existential.
   import scala.language.existentials
 
-  private lazy val (hasContinuations_?,
-                    contSupport,
-                    getContinuation,
-                    getObject,
-                    setObject,
-                    suspendMeth,
-                    resumeMeth,
-                    isPending) = {
+  private lazy val (
+    hasContinuations_?,
+    contSupport,
+    getContinuation,
+    getObject,
+    setObject,
+    suspendMeth,
+    resumeMeth,
+    isPending
+  ) = {
     try {
       val cc = Class.forName("org.mortbay.util.ajax.ContinuationSupport")
-      val meth = cc.getMethod("getContinuation", classOf[HttpServletRequest], classOf[AnyRef])
+      val meth = cc.getMethod(
+        "getContinuation",
+        classOf[HttpServletRequest],
+        classOf[AnyRef]
+      )
       val cci = Class.forName("org.mortbay.util.ajax.Continuation")
       val getObj = cci.getMethod("getObject")
       val setObj = cci.getMethod("setObject", classOf[AnyRef])
@@ -43,22 +47,22 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
 
   def suspendResumeSupport_? : Boolean = hasContinuations_?
 
-  /**
-   * return a function that vends the ServletAsyncProvider
-   */
+  /** return a function that vends the ServletAsyncProvider
+    */
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
-    Full(req => new Jetty6AsyncProvider(req)).filter(i => suspendResumeSupport_?)
-
+    Full(req => new Jetty6AsyncProvider(req)).filter(i =>
+      suspendResumeSupport_?
+    )
 
 }
 
-/**
- * Jetty6AsyncProvider
- *
- * Implemented by using Jetty 6 Continuation API
- *
- */
-class Jetty6AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider with Loggable {
+/** Jetty6AsyncProvider
+  *
+  * Implemented by using Jetty 6 Continuation API
+  */
+class Jetty6AsyncProvider(req: HTTPRequest)
+    extends ServletAsyncProvider
+    with Loggable {
 
   import Jetty6AsyncProvider._
 
@@ -76,23 +80,24 @@ class Jetty6AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider with Lo
         setObject.invoke(cont, null)
         ret match {
           case (r: Req, lr: LiftResponse) => Some(r -> lr)
-          case _ => None
+          case _                          => None
         }
-      }
-      catch {
+      } catch {
         case e: Exception => None
       }
-   }
-
+    }
 
   def suspend(timeout: Long): RetryState.Value = {
     try {
       val cont = getContinuation.invoke(contSupport, servletReq, LiftRules)
       logger.trace("About to suspend continuation")
-      val b = suspendMeth.invoke(cont, java.lang.Long.valueOf(timeout)).asInstanceOf[Boolean]
+      val b = suspendMeth
+        .invoke(cont, java.lang.Long.valueOf(timeout))
+        .asInstanceOf[Boolean]
       if (!b) RetryState.TIMED_OUT else RetryState.RESUMED
     } catch {
-      case e: java.lang.reflect.InvocationTargetException if e.getCause.getClass.getName.endsWith("RetryRequest") =>
+      case e: java.lang.reflect.InvocationTargetException
+          if e.getCause.getClass.getName.endsWith("RetryRequest") =>
         throw e.getCause
     }
   }
@@ -103,8 +108,8 @@ class Jetty6AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider with Lo
       logger.trace("In resume on Jetty 6")
       val pending = isPending.invoke(cont).asInstanceOf[Boolean]
       if (pending) {
-       setObject.invoke(cont, what)
-       resumeMeth.invoke(cont)
+        setObject.invoke(cont, what)
+        resumeMeth.invoke(cont)
       }
       pending
     }

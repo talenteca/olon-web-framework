@@ -1,9 +1,9 @@
 package olon
 package http
 
-import scala.xml.NodeSeq
-
 import org.specs2.mutable.Specification
+
+import scala.xml.NodeSeq
 
 import actor.LAScheduler
 import common._
@@ -33,9 +33,8 @@ class CometActorSpec extends Specification {
 
   "A CometActor" should {
     class RedirectingComet extends SpecCometActor {
-      override def lowPriority = {
-        case TestMessage =>
-          S.redirectTo("place")
+      override def lowPriority = { case TestMessage =>
+        S.redirectTo("place")
       }
     }
 
@@ -53,9 +52,8 @@ class CometActorSpec extends Specification {
     }
 
     class FunctionRedirectingComet extends SpecCometActor {
-      override def lowPriority = {
-        case TestMessage =>
-          S.redirectTo("place", () => Math.random())
+      override def lowPriority = { case TestMessage =>
+        S.redirectTo("place", () => Math.random())
       }
     }
 
@@ -65,15 +63,13 @@ class CometActorSpec extends Specification {
       comet ! TestMessage
 
       val matchingMessage =
-        comet.receivedMessages.collect {
-          case PartialUpdateMsg(update) =>
-            update()
+        comet.receivedMessages.collect { case PartialUpdateMsg(update) =>
+          update()
         }
 
-      matchingMessage must beLike {
-        case List(RedirectTo(redirectUri)) =>
-          redirectUri must startWith("place")
-          redirectUri must beMatching("^[^?]+\\?F[^=]+=_$".r)
+      matchingMessage must beLike { case List(RedirectTo(redirectUri)) =>
+        redirectUri must startWith("place")
+        redirectUri must beMatching("^[^?]+\\?F[^=]+=_$".r)
       }
     }
 
@@ -83,15 +79,14 @@ class CometActorSpec extends Specification {
 
       case object BoomSession
       val comet = new SpecCometActor {
-        override def lowPriority = {
-          case BoomSession =>
-            try {
-              didRun = true
-              S.session.foreach(_.destroySession())
-            } catch {
-              case e: Exception =>
-                didThrow = true
-            }
+        override def lowPriority = { case BoomSession =>
+          try {
+            didRun = true
+            S.session.foreach(_.destroySession())
+          } catch {
+            case e: Exception =>
+              didThrow = true
+          }
         }
       }
 

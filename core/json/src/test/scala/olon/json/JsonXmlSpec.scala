@@ -1,16 +1,18 @@
 package olon
 package json
 
-import org.specs2.mutable.Specification
-import org.specs2.ScalaCheck
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
+import org.specs2.ScalaCheck
+import org.specs2.mutable.Specification
 
-
-/**
- * System under specification for JSON XML.
- */
-class JsonXmlSpec extends Specification  with NodeGen with JValueGen with ScalaCheck {
+/** System under specification for JSON XML.
+  */
+class JsonXmlSpec
+    extends Specification
+    with NodeGen
+    with JValueGen
+    with ScalaCheck {
   "JSON XML Specification".title
 
   import Xml._
@@ -22,7 +24,9 @@ class JsonXmlSpec extends Specification  with NodeGen with JValueGen with ScalaC
   }
 
   "JSON can be converted to XML, and back to valid JSON (non symmetric op)" in {
-    val conversion = (json: JValue) => { parse(compactRender(toJson(toXml(json)))); true }
+    val conversion = (json: JValue) => {
+      parse(compactRender(toJson(toXml(json)))); true
+    }
     forAll(conversion)
   }
 

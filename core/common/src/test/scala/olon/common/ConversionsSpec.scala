@@ -1,15 +1,14 @@
 package olon
 package common
 
-import scala.xml.{NodeSeq, Text}
-
 import org.specs2.matcher.XmlMatchers
 import org.specs2.mutable.Specification
 
+import scala.xml.NodeSeq
+import scala.xml.Text
 
-/**
- * System under specification for Conversions.
- */
+/** System under specification for Conversions.
+  */
 class ConversionsSpec extends Specification with XmlMatchers {
 
   "A StringOrNodeSeq" should {
@@ -21,12 +20,12 @@ class ConversionsSpec extends Specification with XmlMatchers {
 
     "convert from an Elem" in {
       val sns: StringOrNodeSeq = <b/>
-      sns.nodeSeq must ==/ (<b/>)
+      sns.nodeSeq must ==/(<b/>)
     }
 
     "convert from a Seq[Node]" in {
       val sns: StringOrNodeSeq = List(<a/>, <b/>)
-      sns.nodeSeq must ==/ (List(<a/>, <b/>) : NodeSeq)
+      sns.nodeSeq must ==/(List(<a/>, <b/>): NodeSeq)
     }
   }
 
@@ -64,28 +63,27 @@ class ConversionsSpec extends Specification with XmlMatchers {
 
     "be created by a NodeSeq constant" in {
       val sf: NodeSeq => NodeSeq = _ => <b>Foo</b>
-      sf(NodeSeq.Empty) must ==/ (<b>Foo</b>)
+      sf(NodeSeq.Empty) must ==/(<b>Foo</b>)
     }
 
     "be created by a NodeSeq Function" in {
       val sf: NodeSeq => NodeSeq = _ => <i>Bar</i>
 
-      sf(NodeSeq.Empty) must ==/ (<i>Bar</i>)
+      sf(NodeSeq.Empty) must ==/(<i>Bar</i>)
     }
 
     "be created by a constant that can be converted to a NodeSeq" in {
       implicit def intToNS(in: Int): NodeSeq = <a>{in}</a>
       val sf: NodeSeq => NodeSeq = _ => 55
-      sf(NodeSeq.Empty) must ==/ (<a>55</a>)
+      sf(NodeSeq.Empty) must ==/(<a>55</a>)
     }
 
     "be created by a function that can be converted to a NodeSeq" in {
       implicit def intToNodeSeq(in: Int): NodeSeq = <a>{in}</a>
       val sf: NodeSeq => NodeSeq = _ => 55
-      sf(NodeSeq.Empty) must ==/ (<a>55</a>)
+      sf(NodeSeq.Empty) must ==/(<a>55</a>)
     }
 
   }
 
 }
-

@@ -1,21 +1,19 @@
-package olon 
-package http 
-package provider 
-package servlet 
+package olon
+package http
+package provider
+package servlet
+
+import olon.common._
+import olon.http._
+import olon.util._
 
 import javax.servlet._
 import javax.servlet.http._
 
-import olon.common._
-import olon.util._
-import olon.http._
-import Helpers._
-
-
 trait ServletFilterProvider extends Filter with HTTPProvider {
   var ctx: HTTPContext = _
 
-  //We need to capture the ServletContext on init
+  // We need to capture the ServletContext on init
   def init(config: FilterConfig): Unit = {
     ctx = new HTTPServletContext(config.getServletContext)
 
@@ -25,7 +23,7 @@ trait ServletFilterProvider extends Filter with HTTPProvider {
 
   }
 
-  //And throw it away on destruction
+  // And throw it away on destruction
   def destroy: Unit = {
     ctx = null
     terminate
@@ -33,33 +31,39 @@ trait ServletFilterProvider extends Filter with HTTPProvider {
 
   def context: HTTPContext = ctx
 
-  /**
-   * Wrap the loans around the incoming request
-   */
+  /** Wrap the loans around the incoming request
+    */
   private def handleLoanWrappers[T](f: => T): T = {
     val wrappers = LiftRules.allAround.toList
 
     def handleLoan(lst: List[LoanWrapper]): T = lst match {
-      case Nil => f
+      case Nil     => f
       case x :: xs => x(handleLoan(xs))
     }
 
     handleLoan(wrappers)
   }
 
-  /**
-   * Executes the Lift filter component.
-   */
-  def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) = {
+  /** Executes the Lift filter component.
+    */
+  def doFilter(
+      req: ServletRequest,
+      res: ServletResponse,
+      chain: FilterChain
+  ) = {
     if (LiftRules.ending) chain.doFilter(req, res)
     else {
       LiftRules.reqCnt.incrementAndGet()
       try {
-        TransientRequestVarHandler(Empty,
-                                   RequestVarHandler(Empty,
-
-                                                     (req, res) match {
-              case (httpReq: HttpServletRequest, httpRes: HttpServletResponse) =>
+        TransientRequestVarHandler(
+          Empty,
+          RequestVarHandler(
+            Empty,
+            (req, res) match {
+              case (
+                    httpReq: HttpServletRequest,
+                    httpRes: HttpServletResponse
+                  ) =>
                 val httpRequest = new HTTPRequestServlet(httpReq, this)
                 val httpResponse = new HTTPResponseServlet(httpRes)
 
@@ -67,8 +71,10 @@ trait ServletFilterProvider extends Filter with HTTPProvider {
                   chain.doFilter(req, res)
                 })
               case _ => chain.doFilter(req, res)
-            }))
-      } finally {LiftRules.reqCnt.decrementAndGet()}
+            }
+          )
+        )
+      } finally { LiftRules.reqCnt.decrementAndGet() }
     }
   }
 }

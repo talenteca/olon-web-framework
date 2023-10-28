@@ -1,9 +1,9 @@
-package olon 
-package http 
+package olon
+package http
 
 import provider._
 
-abstract class RequestType extends Serializable{
+abstract class RequestType extends Serializable {
   def post_? : Boolean = false
 
   def get_? : Boolean = false
@@ -37,7 +37,7 @@ case object PutRequest extends RequestType {
   override def put_? = true
   val method = "PUT"
 }
-case object PatchRequest extends RequestType{
+case object PatchRequest extends RequestType {
   override def patch_? : Boolean = true
   val method: String = "PATCH"
 }
@@ -54,15 +54,14 @@ case class UnknownRequest(method: String) extends RequestType
 object RequestType {
   def apply(req: HTTPRequest): RequestType = {
     req.method.toUpperCase match {
-      case "GET" => GetRequest
-      case "POST" => PostRequest
-      case "HEAD" => HeadRequest
-      case "PUT" => PutRequest
-      case "PATCH" => PatchRequest
-      case "DELETE" => DeleteRequest
+      case "GET"     => GetRequest
+      case "POST"    => PostRequest
+      case "HEAD"    => HeadRequest
+      case "PUT"     => PutRequest
+      case "PATCH"   => PatchRequest
+      case "DELETE"  => DeleteRequest
       case "OPTIONS" => OptionsRequest
-      case meth => UnknownRequest(meth)
+      case meth      => UnknownRequest(meth)
     }
   }
 }
-

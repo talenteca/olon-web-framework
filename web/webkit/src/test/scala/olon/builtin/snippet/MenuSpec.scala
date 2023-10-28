@@ -1,8 +1,9 @@
 package olon
 package builtin.snippet
 
-import scala.xml._
 import org.specs2.mutable.Specification
+
+import scala.xml._
 
 import common._
 import http._
@@ -10,7 +11,6 @@ import mockweb._
 import MockWeb._
 import mocks._
 import sitemap.{Menu => _, _}
-import util.Helpers.randomString
 
 class MenuSpec extends Specification {
   "Menu Specification".title
@@ -23,7 +23,12 @@ class MenuSpec extends Specification {
     val siteMap = SiteMap(
       sitemap.Menu.i("foobar") / "foo" / "bar",
       sitemap.Menu.i("foobaz") / "foo" / "baz",
-      sitemap.Menu.param[Param]("foobiz", "foobiz", s => Full(Param(s)), p => p.s) / "foo" / "biz" / *
+      sitemap.Menu.param[Param](
+        "foobiz",
+        "foobiz",
+        s => Full(Param(s)),
+        p => p.s
+      ) / "foo" / "biz" / *
     )
 
     f(siteMap)
@@ -47,14 +52,18 @@ class MenuSpec extends Specification {
     "Properly render a menu item with default link text" in {
       testSiteMap("http://test.com/foo/baz") {
         S.withAttrs(new UnprefixedAttribute("name", "foobar", Null)) {
-          Menu.item(NodeSeq.Empty).toString mustEqual """<a href="/foo/bar">foobar</a>"""
+          Menu
+            .item(NodeSeq.Empty)
+            .toString mustEqual """<a href="/foo/bar">foobar</a>"""
         }
       }
     }
     "Properly render a menu item with passed in link text" in {
       testSiteMap("http://test.com/foo/baz") {
         S.withAttrs(new UnprefixedAttribute("name", "foobar", Null)) {
-          Menu.item(Text("Foo")).toString mustEqual """<a href="/foo/bar">Foo</a>"""
+          Menu
+            .item(Text("Foo"))
+            .toString mustEqual """<a href="/foo/bar">Foo</a>"""
         }
       }
     }
@@ -78,7 +87,9 @@ class MenuSpec extends Specification {
       testSiteMap("http://test.com/foo/baz") {
         val linkToSelf = new UnprefixedAttribute("linkToSelf", "true", Null)
         S.withAttrs(new UnprefixedAttribute("name", "foobaz", linkToSelf)) {
-          Menu.item(NodeSeq.Empty).toString mustEqual """<a href="/foo/baz">foobaz</a>"""
+          Menu
+            .item(NodeSeq.Empty)
+            .toString mustEqual """<a href="/foo/baz">foobaz</a>"""
         }
       }
     }
@@ -105,4 +116,3 @@ class MenuSpec extends Specification {
     // }
   }
 }
-

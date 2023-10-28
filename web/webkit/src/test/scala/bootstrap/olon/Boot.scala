@@ -1,14 +1,12 @@
 package bootstrap.olon
 
-import olon.util._
 import olon.http._
-import olon.sitemap._
-import olon.sitemap.Loc._
+import olon.util._
+
 import Helpers._
 
-/**
-  * A class that's instantiated early and run.  It allows the application
-  * to modify lift's environment
+/** A class that's instantiated early and run. It allows the application to
+  * modify lift's environment
   */
 class Boot {
   def boot: Unit = {

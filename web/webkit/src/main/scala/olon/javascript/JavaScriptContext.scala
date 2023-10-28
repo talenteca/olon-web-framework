@@ -1,56 +1,63 @@
 package olon.javascript
 
-import olon.http.{TransientRequestVar, RequestVar, LiftRules}
-import olon.util._
-import Helpers._
-import org.mozilla.javascript.{NativeJavaObject, ScriptableObject, Context}
-import scala.xml.NodeSeq
 import olon.actor.LAFuture
 import olon.common._
+import olon.http.LiftRules
+import olon.http.TransientRequestVar
+import olon.util._
+import org.mozilla.javascript.Context
+import org.mozilla.javascript.NativeJavaObject
+import org.mozilla.javascript.ScriptableObject
 
-/**
- * You can add a JavaScript context to Lift so that
- * you can run server-side JavaScript as part of Lift page
- * rendering.
- *
- * In Boot.scala, just do `JavaScriptContext.install()`
- * and you get a JavaScript execution context around
- * all HTTP requests.
- */
+import scala.xml.NodeSeq
+
+import Helpers._
+
+/** You can add a JavaScript context to Lift so that you can run server-side
+  * JavaScript as part of Lift page rendering.
+  *
+  * In Boot.scala, just do `JavaScriptContext.install()` and you get a
+  * JavaScript execution context around all HTTP requests.
+  */
 object JavaScriptContext {
-  /**
-   * Hook into LiftRules to put a JavaScript
-   * execution loanwrapper around everything and
-   * also slurp in <script> tags with the data-lift-server attribute.
-   */
+
+  /** Hook into LiftRules to put a JavaScript execution loanwrapper around
+    * everything and also slurp in <script> tags with the data-lift-server
+    * attribute.
+    */
   def install(): Unit = {
     LiftRules.allAround.append(JSWrapper)
     LiftRules.tagProcessor.prepend {
-      case ("script", e, session) if e.attribute("data-lift-server").isDefined =>
+      case ("script", e, session)
+          if e.attribute("data-lift-server").isDefined =>
         exec(e.text)
         NodeSeq.Empty
     }
 
     LiftRules.dataAttributeProcessor.append {
       case ("jssource", value, elem, session) =>
-
         val (rule, v2): (NodeSeq => NodeSeq, Box[String]) =
           value.roboSplit("\\#\\>") match {
-            case x :: Nil => (PassThru, Full(x))
+            case x :: Nil         => (PassThru, Full(x))
             case x :: "it" :: Nil => session.buildXformer(x, Nil) -> Empty
             case x :: str :: Nil if str.startsWith("it.") =>
-              session.buildXformer(x, str.roboSplit("\\.").filter(_ != "it")) -> Empty
+              session.buildXformer(
+                x,
+                str.roboSplit("\\.").filter(_ != "it")
+              ) -> Empty
             case x :: xs => session.buildXformer(x, Nil) -> Full(xs.mkString)
-            case _ => (PassThru, Full(value))
+            case _       => (PassThru, Full(value))
           }
-
 
         v2 match {
           case Full(v22) =>
             exec(v22) match {
-              case fut: LAFuture[_] => val ret = new LAFuture[NodeSeq]
-              fut.foreach(v => ret.satisfy(session.runSourceContext(v, rule, elem)))
-              ret
+              case fut: LAFuture[_] =>
+                val ret = new LAFuture[NodeSeq]
+                fut.foreach(v =>
+                  ret.satisfy(session.runSourceContext(v, rule, elem))
+                )
+                ret
 
               case func: Function0[_] =>
                 () => {
@@ -66,7 +73,8 @@ object JavaScriptContext {
     }
   }
 
-  private object currentScript extends TransientRequestVar[JSScope](new JSScope) {
+  private object currentScript
+      extends TransientRequestVar[JSScope](new JSScope) {
     registerCleanupFunc(in => get.bye())
   }
 
@@ -77,19 +85,18 @@ object JavaScriptContext {
     }
   }
 
-  /**
-   * Execute some JavaScript in the current context
-   * @param str the string to execute
-   * @return the value returned from the JavaScript execution
-   */
+  /** Execute some JavaScript in the current context
+    * @param str
+    *   the string to execute
+    * @return
+    *   the value returned from the JavaScript execution
+    */
   def exec(str: String): AnyRef = currentScript.get.exec(str)
 
   private class JSScope {
     private var initted = false
     private var context: Context = null
     private var scope: ScriptableObject = null
-
-
 
     def init(): Unit = {
       context = Context.enter()
@@ -100,13 +107,12 @@ object JavaScriptContext {
       if (initted) Context.exit()
     }
 
-    def exec(str: String): AnyRef = synchronized{
+    def exec(str: String): AnyRef = synchronized {
       if (!initted) init()
-      context.evaluateString(scope, str, "Lift", 0, null)  match {
+      context.evaluateString(scope, str, "Lift", 0, null) match {
         case njo: NativeJavaObject => njo.unwrap()
-        case x => x
+        case x                     => x
       }
     }
   }
 }
-

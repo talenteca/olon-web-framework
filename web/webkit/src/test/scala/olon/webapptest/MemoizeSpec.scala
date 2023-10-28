@@ -15,11 +15,9 @@ object SessionInfo {
   object requestMemo extends RequestMemoize[Int, Int]
 }
 
-
-/**
- * System under specification for Memoize.
- */
-class MemoizeSpec extends Specification  {
+/** System under specification for Memoize.
+  */
+class MemoizeSpec extends Specification {
   "Memoize Specification".title
   sequential
 
@@ -68,4 +66,3 @@ class MemoizeSpec extends Specification  {
 
   }
 }
-

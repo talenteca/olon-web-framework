@@ -3,11 +3,9 @@ package json
 
 import org.specs2.mutable.Specification
 
-
-/**
- * System under specification for JSON Query Examples.
- */
-object JsonQueryExamples extends Specification  {
+/** System under specification for JSON Query Examples.
+  */
+object JsonQueryExamples extends Specification {
   "JSON Query Examples".title
 
   "List of IPs" in {
@@ -17,7 +15,13 @@ object JsonQueryExamples extends Specification  {
       ip
     }
 
-    ips mustEqual List("192.168.1.125", "192.168.1.126", "192.168.1.127", "192.168.2.125", "192.168.2.126")
+    ips mustEqual List(
+      "192.168.1.125",
+      "192.168.1.126",
+      "192.168.1.127",
+      "192.168.2.125",
+      "192.168.2.126"
+    )
   }
 
   "List of IPs converted to XML" in {
@@ -25,9 +29,9 @@ object JsonQueryExamples extends Specification  {
 
     val ips = <ips>{
       for {
-        field <-ipsList
+        field <- ipsList
         JString(ip) <- field.value
-      } yield <ip>{ ip }</ip>
+      } yield <ip>{ip}</ip>
     }</ips>
 
     ips mustEqual <ips><ip>192.168.1.125</ip><ip>192.168.1.126</ip><ip>192.168.1.127</ip><ip>192.168.2.125</ip><ip>192.168.2.126</ip></ips>
@@ -67,7 +71,13 @@ object JsonQueryExamples extends Specification  {
       Server(ip, uptime.longValue)
     }
 
-    servers sortWith (_.uptime > _.uptime) mustEqual List(Server("192.168.1.127", 901214), Server("192.168.2.125", 453423), Server("192.168.2.126", 214312), Server("192.168.1.126", 189822), Server("192.168.1.125", 150123))
+    servers sortWith (_.uptime > _.uptime) mustEqual List(
+      Server("192.168.1.127", 901214),
+      Server("192.168.2.125", 453423),
+      Server("192.168.2.126", 214312),
+      Server("192.168.1.126", 189822),
+      Server("192.168.1.125", 150123)
+    )
   }
 
   "Clusters administered by liza" in {

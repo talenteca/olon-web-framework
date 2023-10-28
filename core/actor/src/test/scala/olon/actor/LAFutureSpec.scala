@@ -1,8 +1,9 @@
 package olon.actor
 
-import olon.common.{Box, Failure, Full}
+import olon.common.Box
+import olon.common.Failure
+import olon.common.Full
 import org.specs2.mutable.Specification
-import java.util.concurrent.atomic.AtomicBoolean
 
 class LAFutureSpec extends Specification {
   sequential
@@ -11,7 +12,7 @@ class LAFutureSpec extends Specification {
 
   "LAFuture" should {
     val futureSpecScheduler = new LAScheduler {
-      override def execute(f: ()=>Unit): Unit = f()
+      override def execute(f: () => Unit): Unit = f()
     }
 
     "map to failing future if transforming function throws an Exception" in {
@@ -73,7 +74,10 @@ class LAFutureSpec extends Specification {
         val givenTwoResult = 234
         val one = LAFuture(() => givenOneResult)
         val two = LAFuture(() => givenTwoResult)
-        LAFuture.collect(one, two).get(timeout) shouldEqual List(givenOneResult, givenTwoResult)
+        LAFuture.collect(one, two).get(timeout) shouldEqual List(
+          givenOneResult,
+          givenTwoResult
+        )
       }
 
       "collect empty list immediately" in {
@@ -95,8 +99,12 @@ class LAFutureSpec extends Specification {
 
     "when collecting Boxed results with collectAll" in {
       "collectAll collects an EmptyBox immediately" in {
-        val one: LAFuture[Box[Int]] = LAFuture(() => { Failure("whoops"): Box[Int] })
-        val two: LAFuture[Box[Int]] = LAFuture(() => { Thread.sleep(10000); Full(1) })
+        val one: LAFuture[Box[Int]] = LAFuture(() => {
+          Failure("whoops"): Box[Int]
+        })
+        val two: LAFuture[Box[Int]] = LAFuture(() => {
+          Thread.sleep(10000); Full(1)
+        })
 
         val collectResult = LAFuture.collectAll(one, two)
         collectResult.get(5000) shouldEqual Failure("whoops")
@@ -108,9 +116,8 @@ class LAFutureSpec extends Specification {
         val three: LAFuture[Box[Int]] = LAFuture(() => Full(3): Box[Int])
 
         val collectResult = LAFuture.collectAll(one, two, three)
-        collectResult.get(timeout) should beLike {
-          case Full(Full(results)) =>
-            results should contain(allOf(1, 2, 3))
+        collectResult.get(timeout) should beLike { case Full(Full(results)) =>
+          results should contain(allOf(1, 2, 3))
         }
       }
 
@@ -125,7 +132,7 @@ class LAFutureSpec extends Specification {
       }
 
       "collectAll empty list immediately" in {
-        val collectResult = LAFuture.collectAll(Nil : _*)
+        val collectResult = LAFuture.collectAll(Nil: _*)
         collectResult.isSatisfied shouldEqual true
         collectResult.get(timeout) shouldEqual Nil
       }

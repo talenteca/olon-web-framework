@@ -2,15 +2,15 @@ package olon
 package builtin
 package snippet
 
-import scala.xml._
 import olon.http._
+
+import scala.xml._
 
 object Ignore extends DispatchSnippet {
 
-  def dispatch : DispatchIt = {
-    case _ => render _
+  def dispatch: DispatchIt = { case _ =>
+    render _
   }
 
-  def render(kids: NodeSeq) : NodeSeq = NodeSeq.Empty
+  def render(kids: NodeSeq): NodeSeq = NodeSeq.Empty
 }
-

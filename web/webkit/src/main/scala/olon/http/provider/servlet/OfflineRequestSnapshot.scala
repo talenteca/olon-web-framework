@@ -1,23 +1,27 @@
 package olon.http.provider.servlet
 
+import olon.common.Box
+import olon.http.LiftResponse
+import olon.http.ParamHolder
+import olon.http.Req
+import olon.http.provider._
+import olon.util.Helpers
+
 import java.io.InputStream
 import java.util.Locale
 
-import olon.common.Box
-import olon.http.provider._
-import olon.http.{LiftResponse, ParamHolder, Req}
-import olon.util.Helpers
+private[servlet] class OfflineRequestSnapshot(
+    req: HTTPRequest,
+    val provider: HTTPProvider
+) extends HTTPRequest {
 
-private [servlet] class OfflineRequestSnapshot(req: HTTPRequest, val provider: HTTPProvider) extends HTTPRequest {
+  private[this] val _cookies = List(req.cookies: _*)
 
-  private[this] val _cookies = List(req.cookies :_*)
+  private[this] val _headers = List(req.headers: _*)
 
-  private[this] val _headers = List(req.headers :_*)
-
-  private[this] val _params = List(req.params :_*)
+  private[this] val _params = List(req.params: _*)
 
   private[this] val _serverPort = req.serverPort
-
 
   def cookies: List[HTTPCookie] = _cookies
 
@@ -55,9 +59,8 @@ private [servlet] class OfflineRequestSnapshot(req: HTTPRequest, val provider: H
 
   def paramNames: List[String] = _params.map(_.name)
 
-  /**
-   * Destroy the underlying servlet session... null for offline requests
-   */
+  /** Destroy the underlying servlet session... null for offline requests
+    */
   def destroyServletSession(): Unit = {
     // do nothing here
   }
@@ -89,7 +92,7 @@ private [servlet] class OfflineRequestSnapshot(req: HTTPRequest, val provider: H
 
   val method: String = req.method
 
-  val resumeInfo : Option[(Req, LiftResponse)] = req.resumeInfo
+  val resumeInfo: Option[(Req, LiftResponse)] = req.resumeInfo
 
   def suspend(timeout: Long): RetryState.Value =
     throw new UnsupportedOperationException("Cannot suspend a snapshot")
@@ -110,13 +113,15 @@ private [servlet] class OfflineRequestSnapshot(req: HTTPRequest, val provider: H
   val locale: Box[Locale] = req.locale
 
   def setCharacterEncoding(encoding: String) =
-    throw new UnsupportedOperationException("It is unsafe to set the character encoding ")
+    throw new UnsupportedOperationException(
+      "It is unsafe to set the character encoding "
+    )
 
   def snapshot = this
 
-  /**
-   * The User-Agent of the request
-   */
-  lazy val userAgent: Box[String] =  headers find (_.name equalsIgnoreCase "user-agent") flatMap (_.values.headOption)
+  /** The User-Agent of the request
+    */
+  lazy val userAgent: Box[String] =
+    headers find (_.name equalsIgnoreCase "user-agent") flatMap (_.values.headOption)
 
 }

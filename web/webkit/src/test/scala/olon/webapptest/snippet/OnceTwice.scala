@@ -1,9 +1,9 @@
-package olon 
-package webapptest 
-package snippet 
+package olon
+package webapptest
+package snippet
 
 import olon.http._
-import olon.util.Helpers._
+
 import scala.xml._
 
 object Counter {
@@ -14,7 +14,7 @@ class Oneshot {
   def render(in: NodeSeq): NodeSeq = {
     S.disableTestFuncNames {
       S.oneShot {
-        SHtml.text("", s => {Counter.x += 1})
+        SHtml.text("", s => { Counter.x += 1 })
       }
     }
   }
@@ -27,4 +27,3 @@ class Twoshot {
     }
   }
 }
-

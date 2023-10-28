@@ -2,9 +2,7 @@ package olon
 package http
 package testing
 
-import olon.util.Helpers._
-import olon.common.{ Box, Full, Empty, Failure}
-import olon.util.{Helpers}
+import olon.common.Box
 
 /*
  * The purpose of these classes is not to run actual tests,
@@ -12,39 +10,33 @@ import olon.util.{Helpers}
  * making sure they compile correctly
  */
 
-
 object MyCode extends TestKit {
   val baseUrl = ""
 
   val l2: TestResponse = post("/foo")
-  l2.foreach {
-    x: HttpResponse =>
-      val l3: TestResponse = x.get("ddd")
+  l2.foreach { x: HttpResponse =>
+    val l3: TestResponse = x.get("ddd")
     println("Hello")
   }
 
-  
   for {
     login <- post("/whatever")
     next <- login.get("/bla")
-  } {} 
+  } {}
 }
 
 object MyBoxCode extends RequestKit {
   def baseUrl = ""
 
   val l2: Box[TheResponse] = post("/foo")
-  l2.foreach {
-    x: TheResponse =>
-      val l3: Box[TheResponse] = x.get("ddd")
+  l2.foreach { x: TheResponse =>
+    val l3: Box[TheResponse] = x.get("ddd")
     println("Hello")
   }
 
-  
   for {
     login: TheResponse <- post("/whatever")
     next <- login.get("/bla")
-  } {} 
-  
-}
+  } {}
 
+}
