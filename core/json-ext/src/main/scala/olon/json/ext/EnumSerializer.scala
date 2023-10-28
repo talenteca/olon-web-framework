@@ -2,9 +2,7 @@ package olon
 package json
 package ext
 
-import scala.reflect.ClassTag
-
-class EnumSerializer[E <: Enumeration: ClassTag](_enum: E)
+class EnumSerializer[E <: Enumeration](_enum: E)
     extends json.Serializer[E#Value] {
   import JsonDSL._
 
@@ -29,7 +27,7 @@ class EnumSerializer[E <: Enumeration: ClassTag](_enum: E)
   }
 }
 
-class EnumNameSerializer[E <: Enumeration: ClassTag](_enum: E)
+class EnumNameSerializer[E <: Enumeration](_enum: E)
     extends json.Serializer[E#Value] {
   import JsonDSL._
 

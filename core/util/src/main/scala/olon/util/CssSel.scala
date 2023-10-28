@@ -51,7 +51,7 @@ private final case class AggregatedCssBindFunc(binds: List[CssBind])
 
   def apply(in: NodeSeq): NodeSeq = bad match {
     case Nil => selectorMap(in)
-    case bv  => bad.flatMap(_(in)) ++ selectorMap(in)
+    case _   => bad.flatMap(_(in)) ++ selectorMap(in)
   }
 }
 
@@ -352,259 +352,9 @@ private class SelectorMap(binds: List[CssBind])
     }
 
     // This is where the rules are applied
-    final def applyRule(bind: CssBind, realE: Elem, depth: Int): NodeSeq = {
-      def uniqueClasses(cv: String*): String = {
-        import Helpers._
+    def applyRule(bind: CssBind, realE: Elem, depth: Int): NodeSeq
 
-        val ls: List[String] = cv.toList.flatMap(_.charSplit(' '))
-        import scala.collection.mutable._
-        val hs: HashSet[String] = new HashSet()
-        val ret: ListBuffer[String] = new ListBuffer()
-        ls.foreach { v =>
-          if (!hs.contains(v)) {
-            hs += v
-            ret += v
-          }
-        }
-        ret.mkString(" ")
-      }
-
-      def mergeAll(
-          other: MetaData,
-          stripId: Boolean,
-          skipClassMerge: Boolean
-      ): MetaData = {
-        var oldAttrs = attrs - (if (stripId) "id" else "")
-
-        var builtMeta: MetaData = Null
-        var pos = other
-
-        while (pos != Null) {
-          pos match {
-            case up: UnprefixedAttribute if stripId && up.key == "id" =>
-            // ignore the id attribute
-
-            case up: UnprefixedAttribute if up.key == "class" => {
-              oldAttrs.get("class") match {
-                case Some(ca) if !skipClassMerge => {
-                  oldAttrs -= "class"
-                  builtMeta = new UnprefixedAttribute(
-                    "class",
-                    uniqueClasses(up.value.text, ca),
-                    builtMeta
-                  )
-                }
-
-                case _ =>
-                  oldAttrs -= "class"
-                  builtMeta = up.copy(builtMeta)
-              }
-            }
-
-            case up: UnprefixedAttribute => {
-              oldAttrs -= up.key
-              builtMeta = up.copy(builtMeta)
-            }
-
-            case pa: PrefixedAttribute => {
-              oldAttrs -= (pa.pre + ":" + pa.key)
-              builtMeta = pa.copy(builtMeta)
-            }
-            case _ =>
-          }
-
-          pos = pos.next
-        }
-
-        for {
-          (k, v) <- oldAttrs
-        } {
-          import Helpers._
-          k.charSplit(':') match {
-            case p :: k :: _ =>
-              builtMeta = new PrefixedAttribute(p, k, v, builtMeta)
-            case k :: _ => builtMeta = new UnprefixedAttribute(k, v, builtMeta)
-            case _      =>
-          }
-        }
-
-        builtMeta
-      }
-
-      // we can do an open_! here because all the CssBind elems
-      // have been vetted
-      bind.css
-        .openOrThrowException("Guarded with test before calling this method")
-        .subNodes match {
-        case Full(SelectThisNode(kids)) =>
-          throw new RetryWithException(if (kids) realE.child else realE)
-        case Full(todo: WithKids) => {
-          val calced = bind.calculate(realE.child)
-          calced.length match {
-            case 0 =>
-              new Elem(
-                realE.prefix,
-                realE.label,
-                realE.attributes,
-                realE.scope,
-                realE.minimizeEmpty
-              )
-            case 1 =>
-              new Elem(
-                realE.prefix,
-                realE.label,
-                realE.attributes,
-                realE.scope,
-                realE.minimizeEmpty,
-                todo.transform(realE.child, calced.head): _*
-              )
-            case _ if id.isEmpty =>
-              calced.map(kids =>
-                new Elem(
-                  realE.prefix,
-                  realE.label,
-                  realE.attributes,
-                  realE.scope,
-                  realE.minimizeEmpty,
-                  todo.transform(realE.child, kids): _*
-                )
-              )
-
-            case _ => {
-              val noId = removeId(realE.attributes)
-              calced.toList.zipWithIndex.map {
-                case (kids, 0) =>
-                  new Elem(
-                    realE.prefix,
-                    realE.label,
-                    realE.attributes,
-                    realE.scope,
-                    realE.minimizeEmpty,
-                    todo.transform(realE.child, kids): _*
-                  )
-                case (kids, _) =>
-                  new Elem(
-                    realE.prefix,
-                    realE.label,
-                    noId,
-                    realE.scope,
-                    realE.minimizeEmpty,
-                    todo.transform(realE.child, kids): _*
-                  )
-              }
-            }
-          }
-        }
-
-        case x
-            if x.isInstanceOf[EmptyBox] ||
-              x == Full(DontMergeClass) ||
-              x == Full(DontMergeAttributes) => {
-          val calced = bind.calculate(realE).map(findElemIfThereIsOne _)
-          val skipClassMerge =
-            x == Full(DontMergeClass) || x == Full(DontMergeAttributes)
-
-          calced.length match {
-            case 0 => NodeSeq.Empty
-            case 1 => {
-              calced.head match {
-                case Group(g) => g
-                case e: Elem =>
-                  new Elem(
-                    e.prefix,
-                    e.label,
-                    mergeAll(e.attributes, false, skipClassMerge),
-                    e.scope,
-                    e.minimizeEmpty,
-                    e.child: _*
-                  )
-                case x => x
-              }
-            }
-
-            case n => {
-              val calcedList = calced.toList
-              val availableIds = (attrs.get("id").toList ++
-                calcedList
-                  .collect({ case e: Elem =>
-                    e.attribute("id")
-                  })
-                  .flatten
-                  .map(_.toString)).toSet
-              val merged = calcedList.foldLeft(
-                (availableIds, Nil: List[Seq[scala.xml.Node]])
-              ) { (idsAndResult, a) =>
-                val (ids, result) = idsAndResult
-                a match {
-                  case Group(g) => (ids, g :: result)
-                  case e: Elem => {
-                    val targetId =
-                      e.attribute("id").map(_.toString) orElse (attrs.get("id"))
-                    val keepId = targetId map { id =>
-                      ids.contains(id)
-                    } getOrElse (false)
-                    val newIds = targetId filter (_ => keepId) map (i =>
-                      ids - i
-                    ) getOrElse (ids)
-                    val newElem = new Elem(
-                      e.prefix,
-                      e.label,
-                      mergeAll(e.attributes, !keepId, skipClassMerge),
-                      e.scope,
-                      e.minimizeEmpty,
-                      e.child: _*
-                    )
-                    (newIds, newElem :: result)
-                  }
-                  case x => (ids, x :: result)
-                }
-              }
-              merged._2.reverse.flatten
-            }
-          }
-        }
-
-        case Empty =>
-          throw new RuntimeException("Invalid case for empty subnodes")
-        case Failure(_, _, _) =>
-          throw new RuntimeException("Invalid case for failure subnodes")
-
-        case Full(AttrAppendSubNode(_)) =>
-          throw new RuntimeException(
-            "Invalid case for attribute append subnode subnodes"
-          )
-
-        case Full(AttrRemoveSubNode(_)) =>
-          throw new RuntimeException(
-            "Invalid case for attribute remove subnode subnodes"
-          )
-
-        case Full(AttrSubNode(_)) =>
-          throw new RuntimeException(
-            "Invalid case for attribute subnode subnodes"
-          )
-
-        case Full(DontMergeAttributes) =>
-          throw new RuntimeException(
-            "Invalid case for dont merge attributes subnodes"
-          )
-
-        case Full(DontMergeClass) =>
-          throw new RuntimeException(
-            "Invalid case for dont merge class subnodes"
-          )
-
-        case ParamFailure(_, _, _, _) =>
-          throw new RuntimeException("Invalid case for param failure subnodes")
-      }
-    }
-
-    final def forId(in: Elem, buff: ListBuffer[CssBind]): Unit = {
-      for {
-        rid <- id
-        bind <- idMap.get(rid)
-      } buff ++= bind
-    }
+    def forId(in: Elem, buff: ListBuffer[CssBind]): Unit
 
     final def forElem(in: Elem, buff: ListBuffer[CssBind]): Unit = {
       for {
@@ -622,12 +372,11 @@ private class SelectorMap(binds: List[CssBind])
       } buff += bind
     }
 
-    final def forName(in: Elem, buff: ListBuffer[CssBind]): Unit = {
-      for {
-        rid <- name
-        bind <- nameMap.get(rid)
-      } buff ++= bind
-    }
+    def forName(in: Elem, buff: ListBuffer[CssBind]): Unit
+
+    def forClass(in: Elem, buff: ListBuffer[CssBind]): Unit
+
+    def forAttr(in: Elem, buff: ListBuffer[CssBind]): Unit
 
     def findClass(clz: List[String], buff: ListBuffer[CssBind]): Unit = {
       clz match {
@@ -642,20 +391,6 @@ private class SelectorMap(binds: List[CssBind])
       }
     }
 
-    def forClass(in: Elem, buff: ListBuffer[CssBind]): Unit = {
-      findClass(classes, buff)
-    }
-
-    def forAttr(in: Elem, buff: ListBuffer[CssBind]): Unit = {
-      if (attrMap.isEmpty || attrs.isEmpty) ()
-      else {
-        for {
-          (key, map) <- attrMap
-          v <- attrs.get(key)
-          cb <- map.get(v)
-        } buff ++= cb
-      }
-    }
   }
 
   private def slurpAttrs(in: MetaData): SlurpedAttrs = {
@@ -695,6 +430,289 @@ private class SelectorMap(binds: List[CssBind])
       def attrs: Map[String, String] = theAttrs
 
       def classes: List[String] = clzs
+
+      def forId(in: Elem, buff: ListBuffer[CssBind]): Unit = {
+        for {
+          rid <- this.id
+          bind <- idMap.get(rid)
+        } buff ++= bind
+      }
+
+      def forName(in: Elem, buff: ListBuffer[CssBind]): Unit = {
+        for {
+          rid <- this.name
+          bind <- nameMap.get(rid)
+        } buff ++= bind
+      }
+
+      def forClass(in: Elem, buff: ListBuffer[CssBind]): Unit = {
+        findClass(classes, buff)
+      }
+
+      def forAttr(in: Elem, buff: ListBuffer[CssBind]): Unit = {
+        if (attrMap.isEmpty || attrs.isEmpty) ()
+        else {
+          for {
+            (key, map) <- attrMap
+            v <- attrs.get(key)
+            cb <- map.get(v)
+          } buff ++= cb
+        }
+      }
+
+      // This is where the rules are applied
+      def applyRule(bind: CssBind, realE: Elem, depth: Int): NodeSeq = {
+        def uniqueClasses(cv: String*): String = {
+          import Helpers._
+
+          val ls: List[String] = cv.toList.flatMap(_.charSplit(' '))
+          import scala.collection.mutable._
+          val hs: HashSet[String] = new HashSet()
+          val ret: ListBuffer[String] = new ListBuffer()
+          ls.foreach { v =>
+            if (!hs.contains(v)) {
+              hs += v
+              ret += v
+            }
+          }
+          ret.mkString(" ")
+        }
+
+        def mergeAll(
+            other: MetaData,
+            stripId: Boolean,
+            skipClassMerge: Boolean
+        ): MetaData = {
+          var oldAttrs = attrs - (if (stripId) "id" else "")
+
+          var builtMeta: MetaData = Null
+          var pos = other
+
+          while (pos != Null) {
+            pos match {
+              case up: UnprefixedAttribute if stripId && up.key == "id" =>
+              // ignore the id attribute
+
+              case up: UnprefixedAttribute if up.key == "class" => {
+                oldAttrs.get("class") match {
+                  case Some(ca) if !skipClassMerge => {
+                    oldAttrs -= "class"
+                    builtMeta = new UnprefixedAttribute(
+                      "class",
+                      uniqueClasses(up.value.text, ca),
+                      builtMeta
+                    )
+                  }
+
+                  case _ =>
+                    oldAttrs -= "class"
+                    builtMeta = up.copy(builtMeta)
+                }
+              }
+
+              case up: UnprefixedAttribute => {
+                oldAttrs -= up.key
+                builtMeta = up.copy(builtMeta)
+              }
+
+              case pa: PrefixedAttribute => {
+                oldAttrs -= (pa.pre + ":" + pa.key)
+                builtMeta = pa.copy(builtMeta)
+              }
+              case _ =>
+            }
+
+            pos = pos.next
+          }
+
+          for {
+            (k, v) <- oldAttrs
+          } {
+            import Helpers._
+            k.charSplit(':') match {
+              case p :: k :: _ =>
+                builtMeta = new PrefixedAttribute(p, k, v, builtMeta)
+              case k :: _ =>
+                builtMeta = new UnprefixedAttribute(k, v, builtMeta)
+              case _ =>
+            }
+          }
+
+          builtMeta
+        }
+
+        // we can do an open_! here because all the CssBind elems
+        // have been vetted
+        bind.css
+          .openOrThrowException("Guarded with test before calling this method")
+          .subNodes match {
+          case Full(SelectThisNode(kids)) =>
+            throw new RetryWithException(if (kids) realE.child else realE)
+          case Full(todo: WithKids) => {
+            val calced = bind.calculate(realE.child)
+            calced.length match {
+              case 0 =>
+                new Elem(
+                  realE.prefix,
+                  realE.label,
+                  realE.attributes,
+                  realE.scope,
+                  realE.minimizeEmpty
+                )
+              case 1 =>
+                new Elem(
+                  realE.prefix,
+                  realE.label,
+                  realE.attributes,
+                  realE.scope,
+                  realE.minimizeEmpty,
+                  todo.transform(realE.child, calced.head): _*
+                )
+              case _ if this.id.isEmpty =>
+                calced.map(kids =>
+                  new Elem(
+                    realE.prefix,
+                    realE.label,
+                    realE.attributes,
+                    realE.scope,
+                    realE.minimizeEmpty,
+                    todo.transform(realE.child, kids): _*
+                  )
+                )
+
+              case _ => {
+                val noId = removeId(realE.attributes)
+                calced.toList.zipWithIndex.map {
+                  case (kids, 0) =>
+                    new Elem(
+                      realE.prefix,
+                      realE.label,
+                      realE.attributes,
+                      realE.scope,
+                      realE.minimizeEmpty,
+                      todo.transform(realE.child, kids): _*
+                    )
+                  case (kids, _) =>
+                    new Elem(
+                      realE.prefix,
+                      realE.label,
+                      noId,
+                      realE.scope,
+                      realE.minimizeEmpty,
+                      todo.transform(realE.child, kids): _*
+                    )
+                }
+              }
+            }
+          }
+
+          case x
+              if x.isInstanceOf[EmptyBox] ||
+                x == Full(DontMergeClass) ||
+                x == Full(DontMergeAttributes) => {
+            val calced = bind.calculate(realE).map(findElemIfThereIsOne _)
+            val skipClassMerge =
+              x == Full(DontMergeClass) || x == Full(DontMergeAttributes)
+
+            calced.length match {
+              case 0 => NodeSeq.Empty
+              case 1 => {
+                calced.head match {
+                  case Group(g) => g
+                  case e: Elem =>
+                    new Elem(
+                      e.prefix,
+                      e.label,
+                      mergeAll(e.attributes, false, skipClassMerge),
+                      e.scope,
+                      e.minimizeEmpty,
+                      e.child: _*
+                    )
+                  case x => x
+                }
+              }
+
+              case _ => {
+                val calcedList = calced.toList
+                val availableIds = (attrs.get("id").toList ++
+                  calcedList
+                    .collect({ case e: Elem =>
+                      e.attribute("id")
+                    })
+                    .flatten
+                    .map(_.toString)).toSet
+                val merged = calcedList.foldLeft(
+                  (availableIds, Nil: List[Seq[scala.xml.Node]])
+                ) { (idsAndResult, a) =>
+                  val (ids, result) = idsAndResult
+                  a match {
+                    case Group(g) => (ids, g :: result)
+                    case e: Elem => {
+                      val targetId =
+                        e.attribute("id").map(_.toString) orElse (attrs.get(
+                          "id"
+                        ))
+                      val keepId = targetId map { id =>
+                        ids.contains(id)
+                      } getOrElse (false)
+                      val newIds = targetId filter (_ => keepId) map (i =>
+                        ids - i
+                      ) getOrElse (ids)
+                      val newElem = new Elem(
+                        e.prefix,
+                        e.label,
+                        mergeAll(e.attributes, !keepId, skipClassMerge),
+                        e.scope,
+                        e.minimizeEmpty,
+                        e.child: _*
+                      )
+                      (newIds, newElem :: result)
+                    }
+                    case x => (ids, x :: result)
+                  }
+                }
+                merged._2.reverse.flatten
+              }
+            }
+          }
+
+          case Empty =>
+            throw new RuntimeException("Invalid case for empty subnodes")
+          case Failure(_, _, _) =>
+            throw new RuntimeException("Invalid case for failure subnodes")
+
+          case Full(AttrAppendSubNode(_)) =>
+            throw new RuntimeException(
+              "Invalid case for attribute append subnode subnodes"
+            )
+
+          case Full(AttrRemoveSubNode(_)) =>
+            throw new RuntimeException(
+              "Invalid case for attribute remove subnode subnodes"
+            )
+
+          case Full(AttrSubNode(_)) =>
+            throw new RuntimeException(
+              "Invalid case for attribute subnode subnodes"
+            )
+
+          case Full(DontMergeAttributes) =>
+            throw new RuntimeException(
+              "Invalid case for dont merge attributes subnodes"
+            )
+
+          case Full(DontMergeClass) =>
+            throw new RuntimeException(
+              "Invalid case for dont merge class subnodes"
+            )
+
+          case ParamFailure(_, _, _, _) =>
+            throw new RuntimeException(
+              "Invalid case for param failure subnodes"
+            )
+        }
+      }
+
     }
   }
 
@@ -862,7 +880,7 @@ trait CssBind extends CssSel {
     css + ")"
 
   def apply(in: NodeSeq): NodeSeq = css match {
-    case Full(c) => selectorMap(in)
+    case Full(_) => selectorMap(in)
     case _ => Helpers.errorDiv(<div>
         Syntax error in CSS selector definition:
         {stringSelector openOr "N/A"}
@@ -889,7 +907,7 @@ trait CssBind extends CssSel {
   private[util] def attrSel_? : Boolean = css match {
     case Full(sel) => {
       sel.subNodes match {
-        case Full(x: AttributeRule) => true
+        case Full(_: AttributeRule) => true
         case _                      => false
       }
     }

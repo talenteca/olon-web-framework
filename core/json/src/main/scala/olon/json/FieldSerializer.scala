@@ -8,7 +8,7 @@ package json
   * "animalname") orElse ignore("owner"), renameFrom("animalname", "name") )
   * </pre>
   */
-case class FieldSerializer[A: Manifest](
+case class FieldSerializer[A](
     serializer: PartialFunction[(String, Any), Option[(String, Any)]] = Map(),
     deserializer: PartialFunction[JField, JField] = Map()
 )

@@ -606,7 +606,7 @@ trait HttpHelpers {
       val id = nextFuncName
       (in % ("id" -> id), id)
     }
-    case x :: xs => (in, x.text)
+    case x :: _ => (in, x.text)
   }
 
   /** Within a NodeSeq, find the first elem and run it through the function.

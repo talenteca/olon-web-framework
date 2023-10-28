@@ -431,7 +431,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
     * the specified default. Equivalent to `Option`'s `[[scala.Option.getOrElse
     * getOrElse]]`.
     */
-  def openOr[B >: A](default: => B): B = default
+  def openOr[B >: A](default: => B): B
 
   /** Apply a function to the value contained in this `Box` if it exists and
     * return a `Full` containing the result. If this `Box` is not already
@@ -441,7 +441,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
     *   This means that using `map` with a `Failure` will preserve the
     *   `Failure.`
     */
-  def map[B](f: A => B): Box[B] = Empty
+  def map[B](f: A => B): Box[B]
 
   /** Apply a function returning a `Box` to the value contained in this `Box` if
     * it exists and return the resulting `Box`. If this `Box` is not already
@@ -451,18 +451,14 @@ sealed abstract class Box[+A] extends Product with Serializable {
     *   This means that using `flatMap` with a `Failure` will preserve the
     *   `Failure.`
     */
-  def flatMap[B](f: A => Box[B]): Box[B] = Empty
+  def flatMap[B](f: A => Box[B]): Box[B]
 
-  def flatten[B](implicit ev: A <:< Box[B]): Box[B] = this match {
-    case Full(internal) => ev(internal)
-    case f: Failure     => f
-    case Empty          => Empty
-  }
+  def flatten[B](implicit ev: A <:< Box[B]): Box[B]
 
   /** If this `Box` contains a value and it satisfies the specified `predicate`,
     * return the `Box` unchanged. Otherwise, return an `Empty`.
     */
-  def filter(p: A => Boolean): Box[A] = this
+  def filter(p: A => Boolean): Box[A]
 
   /** Makes `Box` play better with Scala `for` comprehensions.
     */
@@ -484,7 +480,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
     * @return
     *   `true` if this Box does contain a value and it satisfies the predicate.
     */
-  def exists(func: A => Boolean): Boolean = false
+  def exists(func: A => Boolean): Boolean
 
   /** If this `Box` contains a value and it does not satisfy the specified
     * `func`, return `false`. Otherwise, return `true`.
@@ -492,7 +488,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
     * @return
     *   true If the `Box` is empty, or if its value satisfies the predicate.
     */
-  def forall(func: A => Boolean): Boolean = true
+  def forall(func: A => Boolean): Boolean
 
   /** If this `Box` contains a value and it does '''not''' satisfy the specified
     * `f`, return the `Box` unchanged. Otherwise, return an `Empty`.
@@ -502,7 +498,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
   /** Perform a side effect by calling the specified function with the value
     * contained in this box. The function does not run if this `Box` is empty.
     */
-  def foreach[U](f: A => U): Unit = {}
+  def foreach[U](f: A => U): Unit
 
   /** If this box is `Full` and contains an object of type `B`, returns a `Full`
     * of type `Box[B]`. Otherwise, returns `Empty`.
@@ -533,12 +529,12 @@ sealed abstract class Box[+A] extends Product with Serializable {
     * res1: olon.common.Box[Int] = Full(5)
     * }}}
     */
-  def asA[B](implicit m: Manifest[B]): Box[B] = Empty
+  def asA[B](implicit m: Manifest[B]): Box[B]
 
   /** Returns an `[[scala.collection.Iterator Iterator]]` over the value
     * contained in this `Box`, if any.
     */
-  def elements: Iterator[A] = Iterator.empty
+  def elements: Iterator[A]
 
   /** Return this Box if `Full`, or the specified alternative if it is empty.
     * Equivalent to `Option`'s `[[scala.Option.orElse orElse]]`.
@@ -563,12 +559,12 @@ sealed abstract class Box[+A] extends Product with Serializable {
   /** Returns a `[[scala.collection.immutable.List List]]` of one element if
     * this is Full, or an empty list if empty.
     */
-  def toList: List[A] = Nil
+  def toList: List[A]
 
   /** Returns the contents of this box wrapped in `Some` if this is `Full`, or
     * `None` if this is empty (meaning an `Empty`, `Failure` or ParamFailure`).
     */
-  def toOption: Option[A] = None
+  def toOption: Option[A]
 
   /** Transform an `Empty` to a `Failure` with the specified message. Otherwise
     * returns the same box.
@@ -581,7 +577,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
     *   A `Failure` with the message if this `Box` is `Empty`, this box
     *   otherwise.
     */
-  def ?~(msg: => String): Box[A] = this
+  def ?~(msg: => String): Box[A]
 
   /** Transform an `Empty` or `Failure` to a `ParamFailure` with the specified
     * type-safe parameter.
@@ -593,7 +589,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
     *   `ParamFailure` or a `Full`. If this is a `Failure`, the `ParamFailure`
     *   will preserve the message of the `Failure`.
     */
-  def ~>[T](errorCode: => T): Box[A] = this
+  def ~>[T](errorCode: => T): Box[A]
 
   /** Alias for `[[?~]]`.
     */
@@ -639,7 +635,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
     * @return
     *   The result of the function or the `in` value.
     */
-  def run[T](in: => T)(f: (T, A) => T) = in
+  def run[T](in: => T)(f: (T, A) => T): T
 
   /** Perform a side effect by passing this `Box` to the specified function and
     * return this `Box` unmodified. Similar to `foreach`, except that `foreach`
@@ -704,7 +700,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
 
   /** Equivalent to `map(f).openOr(dflt)`.
     */
-  def dmap[B](dflt: => B)(f: A => B): B = dflt
+  def dmap[B](dflt: => B)(f: A => B): B
 
   /** If the `Box` is `Full`, apply the transform function `f` on the value `v`;
     * otherwise, just return the value untransformed.
@@ -729,19 +725,19 @@ sealed abstract class Box[+A] extends Product with Serializable {
     *   If the `Box` is `Full`, the value once transformed by the function
     *   returned by `f`. Otherwise, the initial value `v`.
     */
-  def fullXform[T](v: T)(f: T => A => T): T = v
+  def fullXform[T](v: T)(f: T => A => T): T
 
   /** An `[[scala.util.Either Either]]` that is a `Left` with the given argument
     * `left` if this is empty, or a `Right` with the boxed value if this is
     * `Full`.
     */
-  def toRight[B](left: => B): Either[B, A] = Left(left)
+  def toRight[B](left: => B): Either[B, A]
 
   /** An `[[scala.util.Either Either]]` that is a `Right` with the given
     * argument `right` if this is empty, or a `Left` with the boxed value if
     * this is `Full`.
     */
-  def toLeft[B](right: => B): Either[A, B] = Right(right)
+  def toLeft[B](right: => B): Either[A, B]
 
   /** If the partial function is defined at the current Box's value, apply the
     * partial function.
@@ -832,7 +828,13 @@ final case class Full[+A](value: A) extends Box[A] {
 
   override def flatMap[B](f: A => Box[B]): Box[B] = f(value)
 
+  override def flatten[B](implicit ev: A <:< Box[B]): Box[B] = ev(value)
+
   override def elements: Iterator[A] = Iterator(value)
+
+  def ?~(msg: => String): olon.common.Box[A] = this
+
+  def ~>[T](errorCode: => T): olon.common.Box[A] = this
 
   override def toList: List[A] = List(value)
 
@@ -889,12 +891,43 @@ sealed abstract class EmptyBox extends Box[Nothing] with Serializable {
 
   override def filter(p: Nothing => Boolean): Box[Nothing] = this
 
+  override def flatten[B](implicit ev: Nothing <:< Box[B]): Box[B] = this
+
   override def ?~(msg: => String): Failure = Failure(msg, Empty, Empty)
 
   override def ?~!(msg: => String): Failure = Failure(msg, Empty, Empty)
 
   override def ~>[T](errorCode: => T): ParamFailure[T] =
     ParamFailure("", Empty, Empty, errorCode)
+
+  def asA[B](implicit m: scala.reflect.Manifest[B]): olon.common.Box[B] = this
+
+  def dmap[B](dflt: => B)(f: Nothing => B): B = dflt
+
+  def elements: Iterator[Nothing] = Iterator.empty
+
+  def exists(func: Nothing => Boolean): Boolean = false
+
+  def flatMap[B](f: Nothing => olon.common.Box[B]): olon.common.Box[B] = this
+
+  def forall(func: Nothing => Boolean): Boolean = true
+
+  def foreach[U](f: Nothing => U): Unit = {}
+
+  def fullXform[T](v: T)(f: T => (Nothing => T)): T = v
+
+  def map[B](f: Nothing => B): olon.common.Box[B] = this
+
+  def run[T](in: => T)(f: (T, Nothing) => T): T = in
+
+  def toLeft[B](right: => B): Either[Nothing, B] = Right(right)
+
+  def toList: List[Nothing] = Nil
+
+  def toOption: Option[Nothing] = None
+
+  def toRight[B](left: => B): Either[B, Nothing] = Left(left)
+
 }
 
 /** Companion object used to simplify the creation of a simple `Failure` with
@@ -927,6 +960,8 @@ sealed case class Failure(
   override def map[B](f: A => B): Box[B] = this
 
   override def flatMap[B](f: A => Box[B]): Box[B] = this
+
+  override def flatten[B](implicit ev: Nothing <:< Box[B]): Box[B] = this
 
   override def isA[B](cls: Class[B]): Box[B] = this
 

@@ -138,5 +138,6 @@ object IterableConst {
 
   implicit def optionStringPromotable[T](o: Option[T])(implicit
       view: T => StringPromotable
-  ) = optionString(o.map(view(_).toString))
+  ): IterableConst = optionString(o.map(view(_).toString))
+
 }

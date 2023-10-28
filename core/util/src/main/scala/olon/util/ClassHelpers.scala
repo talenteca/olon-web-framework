@@ -434,9 +434,9 @@ trait ClassHelpers { self: ControlHelpers =>
       .map((m: Method) => tryo { m.invoke(inst, params: _*) })
       .find((x: Box[Any]) =>
         x match {
-          case result @ Full(_)                                 => true
-          case Failure(_, Full(c: IllegalAccessException), _)   => false
-          case Failure(_, Full(c: IllegalArgumentException), _) => false
+          case Full(_)                                          => true
+          case Failure(_, Full(_: IllegalAccessException), _)   => false
+          case Failure(_, Full(_: IllegalArgumentException), _) => false
           case Failure(_, Full(c), _) =>
             if (c.getCause != null) throw c.getCause else throw c
           case _ => false
@@ -486,7 +486,7 @@ trait ClassHelpers { self: ControlHelpers =>
       case instance => {
         controllerMethods(instance).toList match {
           case Nil => Empty
-          case x :: xs =>
+          case x :: _ =>
             Full(() => {
               try {
                 Full(x.invoke(instance))

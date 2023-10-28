@@ -203,9 +203,9 @@ object Extraction {
     val uniquePaths = map.keys
       .foldLeft[Set[String]](Set()) { (set, key) =>
         key match {
-          case ArrayProp(p, f, i) => set + p
-          case OtherProp(p, f)    => set + p
-          case ArrayElem(p, i)    => set + p
+          case ArrayProp(p, _, _) => set + p
+          case OtherProp(p, _)    => set + p
+          case ArrayElem(p, _)    => set + p
           case x @ _              => set + x
         }
       }
@@ -214,10 +214,10 @@ object Extraction {
 
     uniquePaths.foldLeft[JValue](JNothing) { (jvalue, key) =>
       jvalue.merge(key match {
-        case ArrayProp(p, f, i) =>
+        case ArrayProp(_, f, _) =>
           JObject(List(JField(f, unflatten(submap(key)))))
-        case ArrayElem(p, i) => JArray(List(unflatten(submap(key))))
-        case OtherProp(p, f) => JObject(List(JField(f, unflatten(submap(key)))))
+        case ArrayElem(_, _) => JArray(List(unflatten(submap(key))))
+        case OtherProp(_, f) => JObject(List(JField(f, unflatten(submap(key)))))
         case ""              => extractValue(map(key))
       })
     }
@@ -262,7 +262,7 @@ object Extraction {
         } else {
           val argNames = json match {
             case JObject(fs) => fs.map(_.name)
-            case x           => Nil
+            case _           => Nil
           }
           constructor
             .bestMatching(argNames)
@@ -419,9 +419,6 @@ object Extraction {
         }
     }
 
-    def newPrimitive(elementType: Class[_], elem: JValue) =
-      convert(elem, elementType, formats)
-
     def newCollection(
         root: JValue,
         m: Mapping,
@@ -539,12 +536,6 @@ object Extraction {
           (tuple._1, tuple._2 + 1)
         }
       }._1
-    }
-
-    def mkList(root: JValue, m: Mapping) = root match {
-      case JArray(arr)      => arr.map(build(_, m))
-      case JNothing | JNull => Nil
-      case x                => fail("Expected array but got " + x)
     }
 
     def mkValue(
