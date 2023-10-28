@@ -67,7 +67,7 @@ lazy val root =
   .aggregate(olonProjects: _*)
 
 lazy val core: Seq[ProjectReference] =
-  Seq(common, actor, json, json_scalaz7, json_ext, util)
+  Seq(common, actor, json, json_ext, util)
 
 lazy val common =
   coreProject("common")
@@ -92,15 +92,6 @@ lazy val json =
       description := "JSON Library",
       Test / parallelExecution := false,
       libraryDependencies ++= Seq(scalap(scalaVersion.value), paranamer,  scala_xml, json4s)
-    )
-    .settings(crossScalaVersions := crossUpVersions)
-
-lazy val json_scalaz7 =
-  coreProject("json-scalaz7")
-    .dependsOn(json)
-    .settings(
-      description := "JSON Library based on Scalaz 7",
-      libraryDependencies ++= Seq(scalaz7_core)
     )
     .settings(crossScalaVersions := crossUpVersions)
 
