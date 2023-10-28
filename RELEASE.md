@@ -1,6 +1,4 @@
-# Olon Web Framework
-
-## Publish new releases
+# Publish new releases
 
 * Ensure the GPG key csaltos@talenteca.io is published at <https://keyserver.ubuntu.com/>, <https://keys.openpgp.org> and <https://pgp.mit.edu/> with a correct expiration date.
 
