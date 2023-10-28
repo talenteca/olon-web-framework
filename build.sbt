@@ -16,8 +16,8 @@ ThisBuild / licenses += ("Apache License, Version 2.0", url(
 ))
 ThisBuild / organizationName := "Talenteca"
 
-val scala3Version = "3.1.3"
-val scala2Version = "2.13.8"
+val scala3Version = "3.3.1"
+val scala2Version = "2.13.12"
 
 val crossUpVersions = Seq(scala2Version, scala3Version)
 
