@@ -24,6 +24,8 @@ Security recommendations are based on [MDN](https://developer.mozilla.org/en-US/
 
 > Use the command `gpg --keyserver keys.openpgp.org --send-keys FFE4D7AF28EC0EA5C8338752B7D6E88FA79E18BD` to upload and update a new expiration date if required.
 
+* Decrypt the file `.credentials.asc` into `.credentials` using GPG.
+
 * Bump the version to an official release at the `version` value in the `build.sbt` file.
 
 * Run `clean` and `test` on an SBT session
