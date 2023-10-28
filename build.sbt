@@ -69,7 +69,19 @@ ThisBuild / publishTo := {
 }
 ThisBuild / publishMavenStyle := true
 ThisBuild / versionScheme := Some("semver-spec")
-ThisBuild / credentials += Credentials(file(".credentials"))
+
+ThisBuild / credentials += {
+  if (new java.io.File(".credentials").exists()) {
+    Credentials(file(".credentials"))
+  } else {
+    Credentials(
+      "Sonatype Nexus Repository Manager",
+      "s01.oss.sonatype.org",
+      "ignore",
+      "ignore"
+    )
+  }
+}
 
 lazy val olonProjects = core ++ web
 
