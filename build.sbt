@@ -3,8 +3,10 @@ import OlonSbtHelpers._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
+Global / pgpSigningKey := Some("csaltos@talenteca.io")
+
 ThisBuild / organization := "com.talenteca"
-ThisBuild / version := "2.0.0-SNAPSHOT"
+ThisBuild / version := "2.0.0"
 ThisBuild / description := "Olon is a modern web framework based on the view first strategy (based on the Lift web framework)"
 ThisBuild / homepage := Some(url("https://github.com/talenteca/olon-web-framework"))
 ThisBuild / licenses += ("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
