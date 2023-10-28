@@ -1772,7 +1772,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
         () => {
           css.map(str =>
-            CSSHelpers.fixCSS(
+            CssHelpers.fixCSS(
               new BufferedReader(new StringReader(str)),
               prefix openOr (S.contextPath)
             ) match {

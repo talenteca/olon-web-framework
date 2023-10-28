@@ -7,10 +7,7 @@ import scala.util.parsing.combinator._
 
 import common._
 
-// FIXME This needs a capitalization update, but that may be impossible to do
-// FIXME without breaking code :/
-// @deprecated("Please use CssHelpers instead; we are unifying capitalization across Lift.", "3.0")
-object CSSHelpers extends ControlHelpers {
+object CssHelpers extends ControlHelpers {
 
   /** Adds a prefix to root relative paths in the url segments from the css
     * content
