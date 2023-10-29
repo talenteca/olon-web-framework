@@ -311,7 +311,7 @@ trait Loc[T] {
           case _       => early(xs)
         }
 
-      case x :: xs => early(xs)
+      case _ :: xs => early(xs)
     }
 
     early(allParams)
@@ -847,9 +847,9 @@ object Loc {
     */
   object LinkText {
     implicit def nodeSeqToLinkText[T](in: => NodeSeq): LinkText[T] =
-      LinkText[T](T => in)
+      LinkText[T](_ => in)
     implicit def strToLinkText[T](in: => String): LinkText[T] =
-      LinkText(T => Text(in))
+      LinkText(_ => Text(in))
   }
 
   /** This defines the Link to the Loc.

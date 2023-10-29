@@ -213,8 +213,6 @@ trait FlexMenuBuilder {
 
     def ifExpandCurrent(f: => NodeSeq): NodeSeq =
       if (expandAny || expandAll) f else NodeSeq.Empty
-    def ifExpandAll(f: => NodeSeq): NodeSeq =
-      if (expandAll) f else NodeSeq.Empty
     toRender.toList match {
       case Nil if S.attr("group").isDefined => emptyGroup
       case Nil                              => emptyMenu
@@ -222,17 +220,17 @@ trait FlexMenuBuilder {
         def buildANavItem(i: MenuItem): NodeSeq = {
           i match {
             // Per Loc.PlaceHolder, placeholder implies HideIfNoKids
-            case m @ MenuItem(text, uri, kids, _, _, _)
+            case m @ MenuItem(_, _, kids, _, _, _)
                 if m.placeholder_? && kids.isEmpty =>
               emptyPlaceholder
-            case m @ MenuItem(text, uri, kids, _, _, _) if m.placeholder_? =>
+            case m @ MenuItem(_, _, _, _, _, _) if m.placeholder_? =>
               renderPlaceholder(m, buildLine _)
-            case m @ MenuItem(text, uri, kids, true, _, _) if linkToSelf =>
+            case m @ MenuItem(_, _, _, true, _, _) if linkToSelf =>
               renderSelfLinked(m, k => ifExpandCurrent(buildLine(k)))
-            case m @ MenuItem(text, uri, kids, true, _, _) =>
+            case m @ MenuItem(_, _, _, true, _, _) =>
               renderSelfNotLinked(m, k => ifExpandCurrent(buildLine(k)))
             // Not current, but on the path, so we need to expand children to show the current one
-            case m @ MenuItem(text, uri, kids, _, true, _) =>
+            case m @ MenuItem(_, _, _, _, true, _) =>
               renderItemInPath(m, buildLine _)
             case m => renderItem(m, buildLine _)
           }

@@ -98,7 +98,7 @@ object LiftSession {
           .map(const => UnitConstructor(const))
 
       pp match {
-        case Full(ParamPair(value, clz)) =>
+        case Full(ParamPair(_, clz)) =>
           const
             .find { cp =>
               {
@@ -2527,7 +2527,7 @@ class LiftSession(
         case Group(nodes) =>
           Group(processSurroundAndInclude(page, nodes))
 
-        case elem @ DataAttrNode(toDo) =>
+        case DataAttrNode(toDo) =>
           toDo match {
             case DataAttributeProcessorAnswerNodes(nodes) =>
               processSurroundAndInclude(page, nodes)
@@ -2561,7 +2561,7 @@ class LiftSession(
             }
           }
 
-        case elem @ TagProcessingNode(toDo) =>
+        case TagProcessingNode(toDo) =>
           toDo match {
             case DataAttributeProcessorAnswerNodes(nodes) => nodes
             case DataAttributeProcessorAnswerFork(nodeFunc) =>
@@ -2956,7 +2956,7 @@ class LiftSession(
     // others kinds of exceptions, we abort construction attempts intentionally so we surface
     // the correct error.
     val attemptedComet = tryo(buildWithNoArgConstructor) match {
-      case fail @ Failure(_, Full(e: java.lang.NoSuchMethodException), _) =>
+      case fail @ Failure(_, Full(_: java.lang.NoSuchMethodException), _) =>
         fail or tryo(buildWithCreateInfoConstructor)
 
       case other =>
@@ -3014,7 +3014,7 @@ class LiftSession(
       .openOr("/templates-hidden/default")
 
     findTemplate(name) match {
-      case f @ Failure(msg, be, _) if Props.devMode =>
+      case f @ Failure(_, _, _) if Props.devMode =>
         failedFind(f)
       case Full(s) =>
         atWhat.toList match {
