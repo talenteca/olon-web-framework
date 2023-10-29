@@ -49,7 +49,7 @@ object Embed extends DispatchSnippet {
       (what, Templates.checkForContentId(templateOpt))
     }
   } match {
-    case Full((templateName, template)) => {
+    case Full((_, template)) => {
       val bindings: Seq[CssSel] = kids.collect {
         case BindAtWithName(element, name) =>
           s"#$name" #> element.child

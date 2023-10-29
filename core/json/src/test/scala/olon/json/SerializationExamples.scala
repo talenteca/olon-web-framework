@@ -8,7 +8,7 @@ import java.util.Date
 object SerializationExamples extends Specification {
   import Serialization.{read, write => swrite}
 
-  implicit val formats = Serialization.formats(NoTypeHints)
+  implicit val formats: Formats = Serialization.formats(NoTypeHints)
 
   val project = Project(
     "test",
@@ -188,7 +188,7 @@ object SerializationExamples extends Specification {
 }
 
 object ShortTypeHintExamples extends TypeHintExamples {
-  implicit val formats =
+  implicit val formats: Formats =
     Serialization.formats(ShortTypeHints(classOf[Fish] :: classOf[Dog] :: Nil))
 
   "Deserialization succeeds even if jsonClass is not the first field" in {
@@ -200,7 +200,7 @@ object ShortTypeHintExamples extends TypeHintExamples {
 object FullTypeHintExamples extends TypeHintExamples {
   import Serialization.{read, write => swrite}
 
-  implicit val formats = Serialization.formats(
+  implicit val formats: Formats = Serialization.formats(
     FullTypeHints(
       List[Class[_]](
         classOf[Animal],
@@ -244,7 +244,7 @@ object FullTypeHintExamples extends TypeHintExamples {
 object CustomTypeHintFieldNameExample extends TypeHintExamples {
   import Serialization.{write => swrite}
 
-  implicit val formats = new Formats {
+  implicit val formats: Formats = new Formats {
     val dateFormat = DefaultFormats.lossless.dateFormat
     override val typeHints = ShortTypeHints(
       classOf[Fish] :: classOf[Dog] :: Nil
@@ -298,7 +298,7 @@ object CustomSerializerExamples extends Specification {
   import java.util.regex.Pattern
 
   class IntervalSerializer
-      extends CustomSerializer[Interval](format =>
+      extends CustomSerializer[Interval](_ =>
         (
           {
             case JObject(
@@ -316,7 +316,7 @@ object CustomSerializerExamples extends Specification {
       )
 
   class PatternSerializer
-      extends CustomSerializer[Pattern](format =>
+      extends CustomSerializer[Pattern](_ =>
         (
           { case JObject(JField("$pattern", JString(s)) :: Nil) =>
             Pattern.compile(s)
@@ -371,7 +371,7 @@ object CustomSerializerExamples extends Specification {
     }
   }
 
-  implicit val formats = Serialization.formats(NoTypeHints) +
+  implicit val formats: Formats = Serialization.formats(NoTypeHints) +
     new IntervalSerializer + new PatternSerializer + new DateSerializer + new IndexedSeqSerializer
 
   "Interval serialization example" in {
@@ -426,7 +426,7 @@ object CustomClassWithTypeHintsExamples extends Specification {
         new DateTime(t.longValue)
     }
   }
-  implicit val formats = Serialization.formats(hints)
+  implicit val formats: Formats = Serialization.formats(hints)
 
   "Custom class serialization using provided serialization and deserialization functions" in {
     val m = Meeting("The place", new DateTime(1256681210802L))

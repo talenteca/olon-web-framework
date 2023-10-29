@@ -45,7 +45,7 @@ object JsonParser {
     */
   def parseOpt(s: String): Option[JValue] =
     try { parse(s).toOpt }
-    catch { case e: Exception => None }
+    catch { case _: Exception => None }
 
   /** Return parsed JSON.
     * @param closeAutomatically
@@ -53,7 +53,7 @@ object JsonParser {
     */
   def parseOpt(s: Reader, closeAutomatically: Boolean = true): Option[JValue] =
     try { parse(s, closeAutomatically).toOpt }
-    catch { case e: Exception => None }
+    catch { case _: Exception => None }
 
   /** Parse in pull parsing style. Use <code>p.nextToken</code> to parse tokens
     * one by one from a string.
@@ -196,7 +196,7 @@ object JsonParser {
       }
 
       vals.peekOption match {
-        case Some(JField(name: String, value)) =>
+        case Some(JField(name: String, _)) =>
           vals.pop(classOf[JField])
           val obj = vals.peek(classOf[IntermediateJObject])
           obj.fields.append(JField(name, toJValue(v)))
@@ -211,7 +211,7 @@ object JsonParser {
     def newValue(v: JValue): Unit = {
       if (!vals.isEmpty)
         vals.peekAny match {
-          case JField(name, value) =>
+          case JField(name, _) =>
             vals.pop(classOf[JField])
             val obj = vals.peek(classOf[IntermediateJObject])
             obj.fields += (JField(name, v))
@@ -427,7 +427,7 @@ object JsonParser {
     var curMark = -1
     var curMarkSegment = -1
     var eofIsFailure = false
-    private[this] var segments =
+    private[this] val segments =
       scala.collection.mutable.ArrayBuffer(segmentPool.apply())
     private[this] var segment: Array[Char] = segments.head.seg
     private[this] var cur = 0 // Pointer which points current parsing location
@@ -565,7 +565,7 @@ object JsonParser {
     import java.util.concurrent.atomic.AtomicInteger
 
     private[this] val maxNumOfSegments = 10000
-    private[this] var segmentCount = new AtomicInteger(0)
+    private[this] val segmentCount = new AtomicInteger(0)
     private[this] val segments =
       new ArrayBlockingQueue[Segment](maxNumOfSegments)
     private[json] def clear = segments.clear

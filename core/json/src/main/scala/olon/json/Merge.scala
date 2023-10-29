@@ -12,17 +12,19 @@ private[json] trait MergeDep[A <: JValue, B <: JValue, R <: JValue] {
 }
 
 private[json] trait LowPriorityMergeDep {
-  implicit def jjj[A <: JValue, B <: JValue] = new MergeDep[A, B, JValue] {
-    def apply(val1: A, val2: B): JValue = merge(val1, val2)
+  implicit def jjj[A <: JValue, B <: JValue]: MergeDep[A, B, JValue] =
+    new MergeDep[A, B, JValue] {
+      def apply(val1: A, val2: B): JValue = merge(val1, val2)
 
-    private def merge(val1: JValue, val2: JValue): JValue = (val1, val2) match {
-      case (JObject(xs), JObject(ys)) => JObject(Merge.mergeFields(xs, ys))
-      case (JArray(xs), JArray(ys))   => JArray(Merge.mergeVals(xs, ys))
-      case (JNothing, x)              => x
-      case (x, JNothing)              => x
-      case (_, y)                     => y
+      private def merge(val1: JValue, val2: JValue): JValue =
+        (val1, val2) match {
+          case (JObject(xs), JObject(ys)) => JObject(Merge.mergeFields(xs, ys))
+          case (JArray(xs), JArray(ys))   => JArray(Merge.mergeVals(xs, ys))
+          case (JNothing, x)              => x
+          case (x, JNothing)              => x
+          case (_, y)                     => y
+        }
     }
-  }
 }
 
 private[json] trait MergeDeps extends LowPriorityMergeDep {
@@ -60,7 +62,7 @@ object Merge {
         case Nil => yleft
         case JField(xn, xv) :: xs =>
           yleft find (_.name == xn) match {
-            case Some(y @ JField(yn, yv)) =>
+            case Some(y @ JField(_, yv)) =>
               JField(xn, merge(xv, yv)) :: mergeRec(
                 xs,
                 yleft filterNot (_ == y)

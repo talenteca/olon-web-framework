@@ -239,7 +239,7 @@ private[json] object Meta {
               )
             else
               mkConstructor(t)
-          case x => (Constructor(TypeInfo(classOf[AnyRef], None), Nil), false)
+          case _ => (Constructor(TypeInfo(classOf[AnyRef], None), Nil), false)
         }
       }
 
@@ -417,7 +417,7 @@ private[json] object Meta {
       def argsInfo(c: JConstructor[_], typeArgs: Map[TypeVariable[_], Type]) = {
         val Name = """^((?:[^$]|[$][^0-9]+)+)([$][0-9]+)?$""".r
         def clean(name: String) = name match {
-          case Name(text, junk) => text
+          case Name(text, _) => text
         }
         try {
           val names = nameReader.lookupParameterNames(c).map(clean)
@@ -440,12 +440,12 @@ private[json] object Meta {
           }
           names.toList.zip(types)
         } catch {
-          case e: ParameterNamesNotFoundException => Nil
+          case _: ParameterNamesNotFoundException => Nil
         }
       }
 
       t match {
-        case c: Class[_] => argsInfo(constructor, Map())
+        case _: Class[_] => argsInfo(constructor, Map())
         case p: ParameterizedType =>
           val vars =
             Map() ++ rawClassOf(p).getTypeParameters.toList

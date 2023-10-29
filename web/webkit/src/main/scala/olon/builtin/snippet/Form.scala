@@ -49,7 +49,7 @@ object Form extends DispatchSnippet {
               e.attributes.filter {
                 case up: UnprefixedAttribute =>
                   up.key != "method" && up.key != "action"
-                case x => true
+                case _ => true
               }
             )
           )

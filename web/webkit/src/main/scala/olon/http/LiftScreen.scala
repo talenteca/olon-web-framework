@@ -176,7 +176,7 @@ trait AbstractScreen extends Factory with Loggable {
 
       func
         .map(f => f(is, set _))
-        .filter(x => editable_?)
+        .filter(_ => editable_?)
         .map(ns => SHtml.ElemAttr.applyToAllElems(ns, formElemAttrs))
     }
 

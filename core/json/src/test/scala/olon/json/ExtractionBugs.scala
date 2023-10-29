@@ -6,7 +6,7 @@ import org.specs2.mutable.Specification
 object ExtractionBugs extends Specification {
   "Extraction bugs Specification".title
 
-  implicit val formats = DefaultFormats
+  implicit val formats: Formats = DefaultFormats
 
   case class Response(data: List[Map[String, Int]])
 
@@ -171,7 +171,7 @@ object ExtractionBugs extends Specification {
   }
 
   "throw the correct exceptions when things go wrong during extraction" in {
-    implicit val formats = DefaultFormats
+    implicit val formats: Formats = DefaultFormats
 
     class Holder(bacon: String) {
       throw new Exception("I'm an exception!")

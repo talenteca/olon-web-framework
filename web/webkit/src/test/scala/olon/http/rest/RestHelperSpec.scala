@@ -73,8 +73,8 @@ class RestHelperSpec extends WebSpec(RestHelperSpecBoot.boot _) {
 
 object RestHelperSpecRest extends RestHelper {
   serve {
-    case "api" :: "info" :: Nil Options req  => OkResponse()
-    case "api" :: "patched" :: Nil Patch req => OkResponse()
+    case "api" :: "info" :: Nil Options _  => OkResponse()
+    case "api" :: "patched" :: Nil Patch _ => OkResponse()
   }
 }
 

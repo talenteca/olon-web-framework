@@ -53,7 +53,7 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
         isResumed
       )
     } catch {
-      case e: Exception =>
+      case _: Exception =>
         (false, null, null, null, null, null, null, null, null, null)
     }
   }
@@ -63,7 +63,7 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
   /** return a function that vends the ServletAsyncProvider
     */
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
-    Full(req => new Jetty7AsyncProvider(req)).filter(i =>
+    Full(req => new Jetty7AsyncProvider(req)).filter(_ =>
       suspendResumeSupport_?
     )
 }
@@ -93,7 +93,7 @@ class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
           case _                          => None
         }
       } catch {
-        case e: Exception => None
+        case _: Exception => None
       }
     }
 
@@ -122,7 +122,7 @@ class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
       resumeMeth.invoke(cont)
       true
     } catch {
-      case e: Exception =>
+      case _: Exception =>
         setAttribute.invoke(cont, "__liftCometState", null)
         false
     }

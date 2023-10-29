@@ -125,7 +125,7 @@ object JsonAST {
     ): List[JValue] = xs.flatMap {
       case JObject(l) =>
         l.collect {
-          case JField(n, x) if p(x) => x
+          case JField(_, x) if p(x) => x
         }
       case JArray(l) => findDirect(l, p)
       case x if p(x) => x :: Nil
@@ -328,7 +328,7 @@ object JsonAST {
         val newAcc = f(acc, v)
         v match {
           case JObject(l) =>
-            l.foldLeft(newAcc) { case (a, JField(name, value)) =>
+            l.foldLeft(newAcc) { case (a, JField(_, value)) =>
               value.fold(a)(f)
             }
           case JArray(l) =>
@@ -353,7 +353,7 @@ object JsonAST {
       def rec(acc: A, v: JValue) = {
         v match {
           case JObject(l) =>
-            l.foldLeft(acc) { case (a, field @ JField(name, value)) =>
+            l.foldLeft(acc) { case (a, field @ JField(_, value)) =>
               value.foldField(f(a, field))(f)
             }
           case JArray(l) => l.foldLeft(acc)((a, e) => e.foldField(a)(f))
@@ -537,7 +537,7 @@ object JsonAST {
       def find(json: JValue): Option[JField] = json match {
         case JObject(fs) if (fs find p).isDefined => return fs find p
         case JObject(fs) =>
-          fs.flatMap { case JField(n, v) => find(v) }.headOption
+          fs.flatMap { case JField(_, v) => find(v) }.headOption
         case JArray(l) => l.flatMap(find _).headOption
         case _         => None
       }
@@ -559,7 +559,7 @@ object JsonAST {
         json match {
           case _ if p(json) => Some(json)
           case JObject(fs) =>
-            fs.flatMap { case JField(n, v) => find(v) }.headOption
+            fs.flatMap { case JField(_, v) => find(v) }.headOption
           case JArray(l) => l.flatMap(find _).headOption
           case _         => None
         }
@@ -1164,14 +1164,16 @@ object JsonAST {
   */
 object Implicits extends Implicits
 trait Implicits {
-  implicit def int2jvalue(x: Int) = JInt(x)
-  implicit def long2jvalue(x: Long) = JInt(x)
-  implicit def bigint2jvalue(x: BigInt) = JInt(x)
-  implicit def double2jvalue(x: Double) = JDouble(x)
-  implicit def float2jvalue(x: Float) = JDouble(x)
-  implicit def bigdecimal2jvalue(x: BigDecimal) = JDouble(x.doubleValue)
-  implicit def boolean2jvalue(x: Boolean) = JBool(x)
-  implicit def string2jvalue(x: String) = JString(x)
+  implicit def int2jvalue(x: Int): JInt = JInt(x)
+  implicit def long2jvalue(x: Long): JInt = JInt(x)
+  implicit def bigint2jvalue(x: BigInt): JInt = JInt(x)
+  implicit def double2jvalue(x: Double): JDouble = JDouble(x)
+  implicit def float2jvalue(x: Float): JDouble = JDouble(x)
+  implicit def bigdecimal2jvalue(x: BigDecimal): JDouble = JDouble(
+    x.doubleValue
+  )
+  implicit def boolean2jvalue(x: Boolean): JBool = JBool(x)
+  implicit def string2jvalue(x: String): JString = JString(x)
 }
 
 /** A DSL to produce valid JSON. Example:<pre> import olon.json.JsonDSL._
@@ -1180,12 +1182,14 @@ trait Implicits {
   */
 object JsonDSL extends JsonDSL
 trait JsonDSL extends Implicits {
-  implicit def seq2jvalue[A](s: Iterable[A])(implicit ev: A => JValue) =
+  implicit def seq2jvalue[A](s: Iterable[A])(implicit ev: A => JValue): JArray =
     JArray(s.toList.map { a =>
       val v: JValue = a; v
     })
 
-  implicit def map2jvalue[A](m: Map[String, A])(implicit ev: A => JValue) =
+  implicit def map2jvalue[A](m: Map[String, A])(implicit
+      ev: A => JValue
+  ): JObject =
     JObject(m.toList.map { case (k, v) => JField(k, v) })
 
   implicit def option2jvalue[A](
@@ -1195,12 +1199,18 @@ trait JsonDSL extends Implicits {
     case None    => JNothing
   }
 
-  implicit def symbol2jvalue(x: Symbol) = JString(x.name)
-  implicit def pair2jvalue[A](t: (String, A))(implicit ev: A => JValue) =
+  implicit def symbol2jvalue(x: Symbol): JString = JString(x.name)
+  implicit def pair2jvalue[A](t: (String, A))(implicit
+      ev: A => JValue
+  ): JObject =
     JObject(List(JField(t._1, t._2)))
-  implicit def list2jvalue(l: List[JField]) = JObject(l)
-  implicit def jobject2assoc(o: JObject) = new JsonListAssoc(o.obj)
-  implicit def pair2Assoc[A](t: (String, A))(implicit ev: A => JValue) =
+  implicit def list2jvalue(l: List[JField]): JObject = JObject(l)
+  implicit def jobject2assoc(o: JObject): JsonListAssoc = new JsonListAssoc(
+    o.obj
+  )
+  implicit def pair2Assoc[A](t: (String, A))(implicit
+      ev: A => JValue
+  ): JsonAssoc[A] =
     new JsonAssoc(t)
 
   class JsonAssoc[A](left: (String, A))(implicit ev: A => JValue) {

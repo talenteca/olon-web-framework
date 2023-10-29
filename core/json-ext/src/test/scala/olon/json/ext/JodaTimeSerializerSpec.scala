@@ -12,7 +12,7 @@ import json.Serialization.{read, write => swrite}
 class JodaTimeSerializerSpec extends Specification {
   "JodaTimeSerializer Specification".title
 
-  implicit val formats =
+  implicit val formats: Formats =
     Serialization.formats(NoTypeHints) ++ JodaTimeSerializers.all
 
   "Serialize joda time types" in {

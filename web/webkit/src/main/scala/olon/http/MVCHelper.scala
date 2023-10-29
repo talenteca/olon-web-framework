@@ -92,7 +92,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
 
     def tryIt(path: List[String]): Box[NodeSeq] = path match {
       case Nil => Empty
-      case xs =>
+      case _ =>
         Templates(path) match {
           case ret @ Full(_) => ret
           case _             => tryIt(path.dropRight(1))

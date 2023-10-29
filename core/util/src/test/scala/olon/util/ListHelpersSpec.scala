@@ -48,7 +48,7 @@ class ListHelpersSpec extends Specification with ListHelpers {
 
   "The ListHelpers first_? function" should {
     "return an Empty can if the list is empty" in {
-      first_?((Nil: List[Int]))((i: Int) => true) must_== Empty
+      first_?((Nil: List[Int]))((_: Int) => true) must_== Empty
     }
     "return an Empty can if no element in the list satisfies the predicate" in {
       first_?(List(1, 2, 3))((i: Int) => i < 0) must_== Empty
@@ -60,10 +60,10 @@ class ListHelpersSpec extends Specification with ListHelpers {
 
   "The ListHelpers first function" should {
     "return an Empty can if the list is empty" in {
-      first((Nil: List[Int]))((i: Int) => Full(1)) must_== Empty
+      first((Nil: List[Int]))((_: Int) => Full(1)) must_== Empty
     }
     "return an Empty can if no element in the list returns a Full can when applied a function" in {
-      first(List(1, 2, 3))((i: Int) => Empty) must_== Empty
+      first(List(1, 2, 3))((_: Int) => Empty) must_== Empty
     }
     "return the first Full can returned by a function f over the list elements" in {
       val f = (i: Int) =>

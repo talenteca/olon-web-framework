@@ -12,7 +12,8 @@ import json.Serialization.{read, write => swrite}
 class JsonBoxSerializerSpec extends Specification {
   "JsonBoxSerializer Specification".title
 
-  implicit val formats = olon.json.DefaultFormats + new JsonBoxSerializer
+  implicit val formats: Formats =
+    olon.json.DefaultFormats + new JsonBoxSerializer
 
   "Extract empty age" in {
     parse("""{"name":"joe"}""")

@@ -284,7 +284,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       val future = FutureWithSession
         .withCurrentSession("something")
         .transform(
-          s => throw new Exception(SessionVar1.is),
+          _ => throw new Exception(SessionVar1.is),
           identity[Throwable]
         )
         .transform(
@@ -302,7 +302,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
 
       val future = FutureWithSession
         .withCurrentSession("something")
-        .transform(s => throw new Exception(ReqVar1.is), identity[Throwable])
+        .transform(_ => throw new Exception(ReqVar1.is), identity[Throwable])
         .transform(
           identity[String],
           t => new Exception(t.getMessage + " " + ReqVar2.is)
@@ -318,7 +318,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
 
       val future = FutureWithSession
         .withCurrentSession("something")
-        .transform(s => throw new Exception(SessionVar1.is))
+        .transform(_ => throw new Exception(SessionVar1.is))
         .transform({
           case Success(_) =>
             throw new Exception("Nooope.")
@@ -336,7 +336,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
 
       val future = FutureWithSession
         .withCurrentSession("something")
-        .transform(s => throw new Exception(ReqVar1.is), identity[Throwable])
+        .transform(_ => throw new Exception(ReqVar1.is), identity[Throwable])
         .transform({
           case Success(_) =>
             throw new Exception("Nooope.")
@@ -354,7 +354,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
 
       val future = FutureWithSession
         .withCurrentSession("something")
-        .transformWith { s =>
+        .transformWith { _ =>
           val thingie = SessionVar1.is
 
           Future(thingie)
@@ -376,7 +376,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
 
       val future = FutureWithSession
         .withCurrentSession("something")
-        .transformWith { s =>
+        .transformWith { _ =>
           val thingie = ReqVar1.is
 
           Future(thingie)
@@ -418,17 +418,17 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
 
       S.initIfUninitted(session2) {
-        val mapped = future.map(v => SessionVar1.is)
+        val mapped = future.map(_ => SessionVar1.is)
         mapped.value must eventually(beEqualTo(Some(Success("two"))))
       }
 
       S.initIfUninitted(session3) {
-        val mapped = future.map(v => SessionVar1.is)
+        val mapped = future.map(_ => SessionVar1.is)
         mapped.value must eventually(beEqualTo(Some(Success("three"))))
       }
 
       S.initIfUninitted(session1) {
-        val mapped = future.map(v => SessionVar1.is)
+        val mapped = future.map(_ => SessionVar1.is)
         mapped.value must eventually(beEqualTo(Some(Success("one"))))
       }
     }

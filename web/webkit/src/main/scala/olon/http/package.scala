@@ -18,7 +18,7 @@ package object http {
   implicit def asyncResolvableTransform[ResolvableType, ResolvedType](implicit
       asyncResolveProvider: CanResolveAsync[ResolvableType, ResolvedType],
       innerTransform: CanBind[ResolvedType]
-  ) = {
+  ): CanBind[ResolvableType] = {
     new CanBind[ResolvableType] {
       def apply(resolvable: => ResolvableType)(ns: NodeSeq): Seq[NodeSeq] = {
         val placeholderId = Helpers.nextFuncName

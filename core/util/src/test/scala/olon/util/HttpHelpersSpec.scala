@@ -95,7 +95,7 @@ class HttpHelpersSpec
         findOrAddId(<a id="1"></a>) must_== (<a id="1"></a>, "1")
       }
       "returning an element with a random id if not found" in {
-        val (e, id) = findOrAddId(<a></a>)
+        val (e, _) = findOrAddId(<a></a>)
         e must \("@id")
         // id must beMatching("R\\[a-zA-Z0-9]*")
       }

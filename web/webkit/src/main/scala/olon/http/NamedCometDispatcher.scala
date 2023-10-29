@@ -17,7 +17,7 @@ class NamedCometDispatcher(name: Box[String]) extends LiftActor with Loggable {
   override def messageHandler = {
     /** if we do not have this actor in the list, add it (register it)
       */
-    case registerCometActor(actor, Full(name)) => {
+    case registerCometActor(actor, Full(_)) => {
       if (cometActorsToUpdate.contains(actor) == false) {
         logger.debug("We are adding actor: %s to the list".format(actor))
         cometActorsToUpdate = cometActorsToUpdate :+ actor
@@ -32,7 +32,7 @@ class NamedCometDispatcher(name: Box[String]) extends LiftActor with Loggable {
     }
 
     // Catch the dummy message we send on comet creation
-    case CometName(name) =>
+    case CometName(_) =>
 
     /** Go through the list of actors and send them a message
       */

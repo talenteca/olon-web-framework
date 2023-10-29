@@ -1190,7 +1190,9 @@ trait BaseCometActor
     * convert a NodeSeq => NodeSeq to a RenderOut. This is helpful if you use
     * Lift's CSS Selector Transforms to define rendering.
     */
-  protected implicit def nsToNsFuncToRenderOut(f: NodeSeq => NodeSeq) = {
+  protected implicit def nsToNsFuncToRenderOut(
+      f: NodeSeq => NodeSeq
+  ): RenderOut = {
     val additionalJs =
       if (autoIncludeJsonCode) {
         Full(jsonToIncludeInCode)

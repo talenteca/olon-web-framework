@@ -5,7 +5,7 @@ package util
   */
 object MonadicConversions {
 
-  implicit def bool2Monadic(cond: Boolean) = cond match {
+  implicit def bool2Monadic(cond: Boolean): MonadicCondition = cond match {
     case true => True
     case _    => False(Nil)
   }
@@ -38,7 +38,7 @@ trait MonadicCondition {
 
 case object True extends MonadicCondition {
   def &&(cond: MonadicCondition): MonadicCondition = cond match {
-    case f @ False(m) => f
+    case f @ False(_) => f
     case _            => this
   }
   def ~(msg: String): MonadicCondition = this

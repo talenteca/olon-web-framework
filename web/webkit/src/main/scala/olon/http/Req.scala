@@ -1367,7 +1367,7 @@ class Req(
     case null => "Outside HTTP Request (e.g., on Actor)"
     case request =>
       val ret = for {
-        uri <- Box.legacyNullTest(request.uri)
+        _ <- Box.legacyNullTest(request.uri)
         cp <- Box.legacyNullTest(contextPath)
         part <- (request.uri.length >= cp.length) match {
           case true => Full(request.uri.substring(cp.length))
@@ -1412,7 +1412,7 @@ class Req(
     */
   lazy val userAgent: Box[String] =
     for (
-      r <- Box.legacyNullTest(request);
+      _ <- Box.legacyNullTest(request);
       uah <- request.header("User-Agent")
     )
       yield uah

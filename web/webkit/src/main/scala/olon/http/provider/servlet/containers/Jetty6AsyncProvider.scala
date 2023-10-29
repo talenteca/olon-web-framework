@@ -41,7 +41,7 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
       val isPending = cci.getMethod("isPending")
       (true, (cc), (meth), (getObj), (setObj), (suspend), resume, isPending)
     } catch {
-      case e: Exception => (false, null, null, null, null, null, null, null)
+      case _: Exception => (false, null, null, null, null, null, null, null)
     }
   }
 
@@ -50,7 +50,7 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
   /** return a function that vends the ServletAsyncProvider
     */
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
-    Full(req => new Jetty6AsyncProvider(req)).filter(i =>
+    Full(req => new Jetty6AsyncProvider(req)).filter(_ =>
       suspendResumeSupport_?
     )
 
@@ -83,7 +83,7 @@ class Jetty6AsyncProvider(req: HTTPRequest)
           case _                          => None
         }
       } catch {
-        case e: Exception => None
+        case _: Exception => None
       }
     }
 

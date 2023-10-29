@@ -10,13 +10,11 @@ import olon.http.provider._
 import olon.http.provider.servlet._
 
 object Servlet30AsyncProvider extends AsyncProviderMeta {
-  // cc below gets inferred as a Class[?0] existential.
-  import scala.language.existentials
 
   private lazy val (
     hasContinuations_?,
-    cc,
-    asyncClass,
+    _,
+    _,
     startAsync,
     getResponse,
     complete,
@@ -31,7 +29,7 @@ object Servlet30AsyncProvider extends AsyncProviderMeta {
       val isSupported = cc.getMethod("isAsyncSupported")
       (true, cc, asyncClass, startAsync, getResponse, complete, isSupported)
     } catch {
-      case e: Exception =>
+      case _: Exception =>
         (false, null, null, null, null, null, null)
     }
   }

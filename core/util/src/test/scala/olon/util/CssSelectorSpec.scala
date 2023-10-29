@@ -283,8 +283,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers {
       def anchor(quesType: String, value: String) = {
         <a href="foo" class="selected">(value)</a>
       }
-      var page = 1
-      var elements = List("1", "2", "3", "4")
+      val elements = List("1", "2", "3", "4")
 
       val xml = <div class="lift:Bug.attack bug">
         <div id="question" class="question">
@@ -320,7 +319,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers {
     }
 
     "not stack overflow on Elem" in {
-      val xf = "* [id]" #> "xx" &
+      "* [id]" #> "xx" &
         "* [style]" #> "border:thin solid black" &
         "* *" #> <a/>
       success
@@ -522,7 +521,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "option transform on *" in {
       val opt: Option[String] = None
-      val res = ("* *" #> opt.map(ignore => "Dog")).apply(<top>cat</top>)
+      val res = ("* *" #> opt.map(_ => "Dog")).apply(<top>cat</top>)
       res.head must_== <top></top>
     }
 
@@ -603,7 +602,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "option transform on *" in {
       val opt: Option[Int] = Full(44)
-      val res = ("* *" #> opt.map(ignore => "Dog")).apply(<top>cat</top>)
+      val res = ("* *" #> opt.map(_ => "Dog")).apply(<top>cat</top>)
       res must ==/(<top>Dog</top>)
     }
 

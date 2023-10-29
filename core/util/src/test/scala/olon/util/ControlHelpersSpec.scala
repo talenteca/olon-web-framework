@@ -45,13 +45,13 @@ class ControlHelpersSpec extends Specification {
     }
     "don't trigger a callback if the tested block doesn't throw an exception" in {
       var x = false
-      val callback = (e: Throwable) => { x = true }
+      val callback = (_: Throwable) => { x = true }
       tryo(callback) { "valid" }
       x must_== false
     }
     "don't trigger a callback if the tested block doesn't throw an exception, even with an ignore list" in {
       var x = false
-      val callback = (e: Throwable) => { x = true }
+      val callback = (_: Throwable) => { x = true }
       tryo(List(classOf[RuntimeException]), Full(callback)) { "valid" }
       x must_== false
     }

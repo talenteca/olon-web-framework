@@ -18,7 +18,7 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val xml = <foo><bar/>Dog<b><woof id="3"/></b></foo>
 
       findBox(xml) { e =>
-        e.attribute("id").filter(_.text == "3").map(i => e)
+        e.attribute("id").filter(_.text == "3").map(_ => e)
       }.openOrThrowException("Test") must ==/(<woof id="3"/>)
     }
 
@@ -26,7 +26,7 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val xml = <foo><bar/>Dog<b><woof ide="3"/></b></foo>
 
       findBox(xml) { e =>
-        e.attribute("id").filter(_.text == "3").map(i => e)
+        e.attribute("id").filter(_.text == "3").map(_ => e)
       } must_== Empty
     }
 
@@ -34,7 +34,7 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val xml = <foo><bar/>Dog<b><woof ide="4"/></b></foo>
 
       findBox(xml) { e =>
-        e.attribute("id").filter(_.text == "3").map(i => e)
+        e.attribute("id").filter(_.text == "3").map(_ => e)
       } must_== Empty
     }
   }
@@ -44,7 +44,7 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val xml = <foo><bar/>Dog<b><woof id="3"/></b></foo>
 
       findOption(xml) { e =>
-        e.attribute("id").filter(_.text == "3").map(i => e)
+        e.attribute("id").filter(_.text == "3").map(_ => e)
       }.get must ==/(<woof id="3"/>)
     }
 
@@ -52,7 +52,7 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val xml = <foo><bar/>Dog<b><woof ide="3"/></b></foo>
 
       findOption(xml) { e =>
-        e.attribute("id").filter(_.text == "3").map(i => e)
+        e.attribute("id").filter(_.text == "3").map(_ => e)
       } must_== None
     }
 
@@ -60,7 +60,7 @@ class HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
       val xml = <foo><bar/>Dog<b><woof ide="4"/></b></foo>
 
       findOption(xml) { e =>
-        e.attribute("id").filter(_.text == "3").map(i => e)
+        e.attribute("id").filter(_.text == "3").map(_ => e)
       } must_== None
     }
   }

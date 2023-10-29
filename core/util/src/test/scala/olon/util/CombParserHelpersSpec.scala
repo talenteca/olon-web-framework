@@ -63,7 +63,7 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
       val isDigit: String => Boolean =
         (s: String) =>
           digit(s) match {
-            case Success(x, y) => s must beMatching("(?s)\\p{Nd}.*")
+            case Success(_, _) => s must beMatching("(?s)\\p{Nd}.*")
             case _             => true
           }
       forAll(isDigit)
@@ -72,7 +72,7 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
       val number: String => Boolean =
         (s: String) => {
           aNumber(s) match {
-            case Success(x, y) => s must beMatching("(?s)\\p{Nd}+.*")
+            case Success(_, _) => s must beMatching("(?s)\\p{Nd}+.*")
             case _             => true
           }
         }

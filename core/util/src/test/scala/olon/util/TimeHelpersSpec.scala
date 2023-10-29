@@ -79,7 +79,7 @@ class TimeHelpersSpec
     "have a toString method returning the relevant number of weeks, days, hours, minutes, seconds, millis" in forAllTimeZones {
       val conversionIsOk = forAll(timeAmounts)((t: TimeAmounts) => {
         val (timeSpanToString, timeSpanAmounts) = t
-        timeSpanAmounts forall { case (amount, unit) =>
+        timeSpanAmounts forall { case (amount, _) =>
           amount >= 1 &&
           timeSpanToString.contains(amount.toString) || true
         }

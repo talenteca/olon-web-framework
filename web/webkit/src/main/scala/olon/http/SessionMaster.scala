@@ -224,7 +224,7 @@ object SessionMaster extends LiftActor with Loggable {
               try {
                 s.httpSession.foreach(_.unlink(s))
               } catch {
-                case e: Exception => // ignore... sometimes you can't do this and it's okay
+                case _: Exception => // ignore... sometimes you can't do this and it's okay
               }
             } catch {
               case e: Exception => logger.warn("Failure in remove session", e)

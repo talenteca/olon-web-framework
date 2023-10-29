@@ -21,7 +21,7 @@ object LAFutureWithSession {
       scheduler: LAScheduler = LAScheduler
   ): LAFuture[T] = {
     S.session match {
-      case Full(session) =>
+      case Full(_) =>
         withSession(task, scheduler)
 
       case empty: EmptyBox =>

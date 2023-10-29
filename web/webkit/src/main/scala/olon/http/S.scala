@@ -257,7 +257,6 @@ object S extends S {
       */
     private[this] def this() = this(Empty, null)
 
-    private val loc = S.location
     private val snapshot: Function1[Function0[Any], Any] =
       RequestVarHandler.generateSnapshotRestorer()
     override def sessionLife: Boolean = false
@@ -1108,7 +1107,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
           case x           => Full(Text(x.toString))
         }).flatMap(s => s)
       )
-      .find(e => true)
+      .find(_ => true)
 
   /** Localize the incoming string based on a resource bundle for the current
     * locale, with a default value to to return if localization fails.
@@ -1303,7 +1302,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
           case _           => Empty
         }).flatMap(s => s)
       )
-      .find(s => true) getOrElse {
+      .find(_ => true) getOrElse {
       LiftRules.localizationLookupFailureNotice.foreach(_(str, locale));
       str
     }
@@ -3331,7 +3330,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     res.toList
   }
 
-  implicit def tuple2FieldError(t: (FieldIdentifier, NodeSeq)) =
+  implicit def tuple2FieldError(t: (FieldIdentifier, NodeSeq)): FieldError =
     FieldError(t._1, t._2)
 
   /** Use this in DispatchPF for processing REST requests asynchronously. Note

@@ -82,7 +82,7 @@ class XmlApiSpec extends Specification {
             response
           )
         }
-        case other => result(false, "matches", "not an XmlResponse", response)
+        case _ => result(false, "matches", "not an XmlResponse", response)
       }
   }
 

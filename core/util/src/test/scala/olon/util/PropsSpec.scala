@@ -20,7 +20,7 @@ class PropsSpec extends Specification {
 
     "Allow modification of whereToLook before run-mode is set" in {
       val testProps = TestProps()
-      val originalWtl = testProps.whereToLook
+      testProps.whereToLook()
 
       var wasCalled = false
       testProps.whereToLook = () => {

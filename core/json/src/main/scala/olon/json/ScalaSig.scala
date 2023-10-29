@@ -92,7 +92,7 @@ private[json] object ScalaSigReader {
   ): Class[_] = {
     def findPrimitive(t: Type): Symbol = t match {
       case TypeRefType(ThisType(_), symbol, _) if isPrimitive(symbol) => symbol
-      case TypeRefType(_, _, TypeRefType(ThisType(_), symbol, _) :: xs) =>
+      case TypeRefType(_, _, TypeRefType(ThisType(_), symbol, _) :: _) =>
         symbol
       case TypeRefType(_, symbol, Nil) => symbol
       case TypeRefType(_, _, args) if typeArgIndex >= args.length =>

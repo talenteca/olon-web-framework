@@ -27,7 +27,7 @@ object WithParam extends DispatchSnippet {
   def render(kids: NodeSeq): NodeSeq = {
     (for {
       ctx <- S.session ?~ ("FIX" + "ME: Invalid session")
-      req <- S.request ?~ ("FIX" + "ME: Invalid request")
+      _ <- S.request ?~ ("FIX" + "ME: Invalid request")
     } yield {
       val name: String = S.attr("name") openOr "main"
       val body = ctx.processSurroundAndInclude(PageName.get, kids)

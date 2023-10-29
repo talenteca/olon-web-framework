@@ -27,9 +27,6 @@ object CookieEncoder {
 
   private val VALID_COOKIE_VALUE_OCTETS = validCookieValueOctets();
 
-  private val VALID_COOKIE_ATTRIBUTE_VALUE_OCTETS =
-    validCookieAttributeValueOctets();
-
   private val PATH = "Path"
 
   private val EXPIRES = "Expires"
@@ -182,13 +179,6 @@ object CookieEncoder {
     (0x2d to 0x3a) foreach bits.set
     (0x3c to 0x5b) foreach bits.set
     (0x5d to 0x7e) foreach bits.set
-    bits
-  }
-
-  private def validCookieAttributeValueOctets() = {
-    val bits = new BitSet()
-    (32 until 127) foreach bits.set
-    bits.set(';', false)
     bits
   }
 

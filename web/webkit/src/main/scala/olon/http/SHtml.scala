@@ -1211,7 +1211,7 @@ trait SHtml extends Loggable {
           attrs.foldLeft(<input type="radio" name={groupName}
                                      value={Helpers.nextFuncName}/>)(_ % _) %
             checked(deflt == Full(v)) %
-            ("onclick" -> ajaxCall(Str(""), ignore => ajaxFunc(v))._2.toJsCmd)
+            ("onclick" -> ajaxCall(Str(""), _ => ajaxFunc(v))._2.toJsCmd)
         )
       }
     }
