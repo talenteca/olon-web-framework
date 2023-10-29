@@ -15,7 +15,6 @@ import java.io.OutputStream
 import java.util.regex.Pattern
 import java.util.{Iterator => JavaIterator}
 import java.util.{List => JavaList}
-import java.util.{Map => JavaMap}
 import scala.xml.Utility.trim
 import scala.xml._
 
@@ -35,7 +34,7 @@ trait ToResponse {
     val ret: ResponseType =
       try {
         (baseUrl + fullUrl, httpClient.executeMethod(getter)) match {
-          case (server, responseCode) =>
+          case (_, responseCode) =>
             val respHeaders = slurpApacheHeaders(getter.getResponseHeaders)
 
             new HttpResponse(
@@ -74,7 +73,7 @@ trait ToBoxTheResponse {
     val ret =
       try {
         (baseUrl + fullUrl, httpClient.executeMethod(getter)) match {
-          case (server, responseCode) =>
+          case (_, responseCode) =>
             val respHeaders = slurpApacheHeaders(getter.getResponseHeaders)
 
             Full(
@@ -667,22 +666,6 @@ object TestHelpers {
     def hasNext = in.hasNext
   }
 
-  private def snurpHeaders(
-      in: JavaMap[String, CRK]
-  ): Map[String, List[String]] = {
-    def morePulling(e: JavaMap.Entry[String, CRK]): (String, List[String]) = {
-      e.getValue match {
-        case null => (e.getKey, Nil)
-        case a    => (e.getKey, a.iterator.toList)
-      }
-    }
-
-    Map(
-      in.entrySet.iterator.toList
-        .filter(e => (e ne null) && (e.getKey != null))
-        .map(e => morePulling(e)): _*
-    )
-  }
 }
 
 /** A response returned from an HTTP request. Responses can be chained and
@@ -919,20 +902,6 @@ abstract class BaseResponse(
 ) extends Response
     with BaseGetPoster
     with GetPosterHelper {
-  private object FindElem {
-    def unapply(in: NodeSeq): Option[Elem] = in match {
-      case e: Elem         => Some(e)
-      case d: Document     => unapply(d.docElem)
-      case g: Group        => unapply(g.nodes)
-      case n: Text         => None
-      case sn: SpecialNode => None
-      case n: NodeSeq =>
-        val ns: Seq[Node] = n
-        val x: Seq[Elem] = ns.flatMap(v => unapply(v))
-        x.headOption
-      case _ => None
-    }
-  }
 
   /** Get the body of the response as XML
     */
@@ -959,7 +928,7 @@ abstract class BaseResponse(
   /** The content type header of the response
     */
   lazy val contentType: String = headers
-    .filter { case (name, value) => name equalsIgnoreCase "content-type" }
+    .filter { case (name, _) => name equalsIgnoreCase "content-type" }
     .toList
     .headOption
     .map(_._2.head) getOrElse ""

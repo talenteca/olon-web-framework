@@ -180,7 +180,6 @@ class TestRunner(
 
 case class TestResults(res: List[Tracker]) {
   def stats = {
-    val rev = res.reverse
     val start =
       res.map(_.at).reduceLeft((a: Long, b: Long) => if (a < b) a else b)
     val end =
@@ -192,7 +191,7 @@ case class TestResults(res: List[Tracker]) {
 
     val append = (failedTests, failedAsserts) match {
       case (ft, fa) if ft.length == 0 && fa.length == 0 => ""
-      case (ft, fa) =>
+      case (ft, _) =>
         "\n" + ft.length + " Failed Tests:\n" + ft
           .map(v =>
             v.name + " " + v.exception

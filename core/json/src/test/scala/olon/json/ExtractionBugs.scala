@@ -174,7 +174,7 @@ object ExtractionBugs extends Specification {
     implicit val formats: Formats = DefaultFormats
 
     class Holder(bacon: String) {
-      throw new Exception("I'm an exception!")
+      throw new Exception("I'm an exception for " + bacon + "!")
     }
 
     val correctArgsAstRepresentation: JObject = JObject(
@@ -186,7 +186,7 @@ object ExtractionBugs extends Specification {
     correctArgsAstRepresentation
       .extract[Holder] must throwA[MappingException].like { case e =>
       e.getMessage mustEqual "An exception was thrown in the class constructor during extraction"
-      e.getCause.getCause.getMessage mustEqual "I'm an exception!"
+      e.getCause.getCause.getMessage mustEqual "I'm an exception for apple!"
     }
   }
 }

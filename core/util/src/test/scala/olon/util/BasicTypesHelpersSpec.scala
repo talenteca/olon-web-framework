@@ -11,7 +11,10 @@ import BasicTypesHelpers._
 
 /** Systems under specification for BasicTypesHelpers.
   */
-class BasicTypesHelpersSpec extends Specification with DataTables {
+class BasicTypesHelpersSpec
+    extends Specification
+    with DataTables
+    with Loggable {
   "BasicTypesHelpers Specification".title
 
   "Basic types helpers" should {
@@ -165,8 +168,12 @@ class BasicTypesHelpersSpec extends Specification with DataTables {
 
   "AvoidTypeErasure implicit value" should {
     "be in scope" in {
-      def f(i: Int)(implicit d: AvoidTypeErasureIssues1) = i + 1
-
+      def f(i: Int)(implicit d: AvoidTypeErasureIssues1) = {
+        logger.trace(
+          "Avoiding type erasure for class " + d.getClass().getSimpleName()
+        )
+        i + 1
+      }
       f(2) must_== 3
     }
   }

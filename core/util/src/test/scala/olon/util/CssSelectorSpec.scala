@@ -267,7 +267,7 @@ class CssSelectorSpec extends Specification with XmlMatchers {
 
 }
 
-class CssBindHelpersSpec extends Specification with XmlMatchers {
+class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
 
   "css bind helpers" should {
     "clear clearable" in {
@@ -281,6 +281,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers {
     "not duplicate classes" in {
 
       def anchor(quesType: String, value: String) = {
+        logger.trace("Creating anchor for " + quesType + " with value " + value)
         <a href="foo" class="selected">(value)</a>
       }
       val elements = List("1", "2", "3", "4")
@@ -662,13 +663,13 @@ class CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "option transform on *" in {
       val opt: Box[String] = Empty
-      val res = ("* *" #> opt.map(ignore => "Dog")).apply(<top>cat</top>)
+      val res = ("* *" #> opt.map(_ => "Dog")).apply(<top>cat</top>)
       res.head must_== <top></top>
     }
 
     "option transform on *" in {
       val opt: Box[Int] = Some(44)
-      val res = ("* *" #> opt.map(ignore => "Dog")).apply(<top>cat</top>)
+      val res = ("* *" #> opt.map(_ => "Dog")).apply(<top>cat</top>)
       res must ==/(<top>Dog</top>)
     }
 

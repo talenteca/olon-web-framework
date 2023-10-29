@@ -44,7 +44,7 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
       import StringWithWhiteGen._
       val whiteSpaceParse =
         (s: String) =>
-          whiteSpace(s) must beLike { case Success(x, y) =>
+          whiteSpace(s) must beLike { case Success(x, _) =>
             x.toString must_== "()"
           }
       forAll(whiteSpaceParse)
@@ -53,7 +53,7 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
       val ignoreCaseStringParse: Function2[String, String, Boolean] =
         (s: String, s2: String) =>
           acceptCI(s).apply(s2) match {
-            case Success(x, y) => s2.toUpperCase must startWith(s.toUpperCase)
+            case Success(_, _) => s2.toUpperCase must startWith(s.toUpperCase)
             case _             => true
           }
       forAll(ignoreCaseStringParse)

@@ -178,7 +178,7 @@ class MockHttpServletRequest(
             // Append to the current key's value
             newParams += key -> ""
           }
-          case invalid =>
+          case _ =>
             throw new IllegalArgumentException(
               "Invalid query string: \"" + q + "\""
             )
@@ -389,7 +389,7 @@ class MockHttpServletRequest(
 
   def getParameterMap(): java.util.Map[String, Array[String]] = {
     // Build a new map based on the parameters List
-    var newMap = Map[String, List[String]]().withDefault(ignore => Nil)
+    var newMap = Map[String, List[String]]().withDefault(_ => Nil)
 
     parameters.foreach { case (k, v) =>
       newMap += k -> (newMap(
@@ -453,7 +453,7 @@ class MockHttpServletRequest(
     val handler: PartialFunction[Throwable, Box[Long]] = {
       case pe: ParseException => {
         throw new IllegalArgumentException(
-          "Could not parse the date for %s : \"%s\"".format(h, getHeader(h))
+          "Could not parse the date for %s : \"%s\"".format(h, getHeader(h), pe)
         )
         Empty
       }

@@ -905,8 +905,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   @volatile var timeZoneCalculator: Box[HTTPRequest] => TimeZone =
     defaultTimeZoneCalculator _
 
-  def defaultTimeZoneCalculator(request: Box[HTTPRequest]): TimeZone =
+  def defaultTimeZoneCalculator(request: Box[HTTPRequest]): TimeZone = {
+    logger.trace("Default time zone calculator for uri " + request.map(_.uri))
     TimeZone.getDefault
+  }
 
   /** How many times do we retry an Ajax command before calling it a failure?
     */

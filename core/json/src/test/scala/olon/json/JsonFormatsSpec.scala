@@ -8,7 +8,7 @@ import org.specs2.mutable.Specification
 class JsonFormatsSpec extends Specification with TypeHintExamples {
   "JsonFormats Specification".title
 
-  implicit val formats =
+  implicit val formats: Formats =
     ShortTypeHintExamples.formats + FullTypeHintExamples.formats.typeHints
 
   val hintsForFish =

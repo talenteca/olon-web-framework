@@ -304,7 +304,7 @@ object JsonParser {
           case cause: Exception  => fail("unexpected string end", cause)
         }
 
-      def parseValue(first: Char) = {
+      def parseValue() = {
         var wasInt = true
         var doubleVal = false
         val buf = this.buf
@@ -385,10 +385,10 @@ object JsonParser {
             fieldNameMode = true
             blocks.poll
             return CloseArr
-          case c @ ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' |
+          case ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' |
               '-') =>
             fieldNameMode = true
-            return parseValue(c)
+            return parseValue()
           case ' ' | '\n' | ',' | '\r' | '\t' =>
           // ignore
           case c =>
