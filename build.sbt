@@ -1,4 +1,3 @@
-import Dependencies._
 import OlonSbtHelpers._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
@@ -16,23 +15,110 @@ ThisBuild / licenses += ("Apache License, Version 2.0", url(
 ))
 ThisBuild / organizationName := "Talenteca"
 
-val scala3Version = "3.3.1"
-val scala2Version = "2.13.12"
+lazy val versions = new {
+  val scala3Version = "3.3.1"
+  val scala2Version = "2.13.12"
+  val specs2 = "4.15.0"
+  val slf4jVersion = "1.7.36"
+}
 
-val crossUpVersions = Seq(scala2Version, scala3Version)
+lazy val libs = new {
 
-ThisBuild / scalaVersion := scala2Version
+  type ModuleMap = String => ModuleID
+
+  lazy val commons_codec = "commons-codec" % "commons-codec" % "1.11"
+  
+  lazy val commons_fileupload =
+    "commons-fileupload" % "commons-fileupload" % "1.3.3"
+  
+  lazy val commons_httpclient =
+    "commons-httpclient" % "commons-httpclient" % "3.1"
+  
+  lazy val jbcrypt = "org.mindrot" % "jbcrypt" % "0.4"
+  
+  lazy val joda_time = "joda-time" % "joda-time" % "2.10"
+  
+  lazy val joda_convert = "org.joda" % "joda-convert" % "2.1"
+  
+  lazy val htmlparser = "nu.validator" % "htmlparser" % "1.4.12"
+  
+  lazy val paranamer = "com.thoughtworks.paranamer" % "paranamer" % "2.8"
+  
+  lazy val scalap: ModuleMap = "org.scala-lang" % "scalap" % _
+  
+  lazy val scala_compiler: ModuleMap = "org.scala-lang" % "scala-compiler" % _
+  
+  lazy val slf4j_api = "org.slf4j" % "slf4j-api" % versions.slf4jVersion
+  
+  lazy val scala_parallel_collections =
+    "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0"
+  
+  lazy val scala_parser =
+    "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
+  
+  lazy val scala_xml = "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
+  
+  lazy val rhino = "org.mozilla" % "rhino" % "1.7.10"
+  
+  lazy val xerces = "xerces" % "xercesImpl" % "2.11.0"
+
+  lazy val logback = "ch.qos.logback" % "logback-classic" % "1.2.8" % Provided
+  
+  lazy val servlet_api =
+    "javax.servlet" % "javax.servlet-api" % "3.1.0" % Provided
+  
+  lazy val jquery = "org.webjars.bower" % "jquery" % "1.11.3" % Provided
+  
+  lazy val jasmineCore =
+    "org.webjars.bower" % "jasmine-core" % "2.4.1" % Provided
+  
+  lazy val jasmineAjax =
+    "org.webjars.bower" % "jasmine-ajax" % "3.2.0" % Provided
+  
+  lazy val log4j = "log4j" % "log4j" % "1.2.17" % Provided
+
+  lazy val jetty6 = "org.mortbay.jetty" % "jetty" % "6.1.26" % Test
+  
+  lazy val jwebunit =
+    "net.sourceforge.jwebunit" % "jwebunit-htmlunit-plugin" % "2.5" % Test
+  
+  lazy val specs2 = "org.specs2" %% "specs2-core" % "4.15.0" % Test
+  
+  lazy val specs2Core = "org.specs2" %% "specs2-core" % versions.specs2 % Test withSources ()
+
+  lazy val specs2Matchers = "org.specs2" %% "specs2-matcher-extra" % specs2.revision % Test withSources ()
+
+  lazy val scalacheck =
+    "org.specs2" %% "specs2-scalacheck" % specs2.revision % Test
+  
+  lazy val specs2Prov =
+    "org.specs2" %% "specs2-core" % specs2.revision % Provided
+  
+  
+  lazy val specs2MatchersProv =
+    "org.specs2" %% "specs2-matcher-extra" % specs2.revision % Provided
+  
+  lazy val specs2Mock = "org.specs2" %% "specs2-mock" % specs2.revision % Test
+  
+  lazy val json4s = "org.json4s" %% "json4s-native" % "4.0.6" % Test
+}
+
+val crossUpVersions = Seq(versions.scala2Version, versions.scala3Version)
+
+ThisBuild / scalaVersion := versions.scala2Version
 ThisBuild / crossScalaVersions := crossUpVersions
 
 ThisBuild / libraryDependencies ++= Seq(
-  specs2,
-  specs2Matchers,
-  specs2Mock,
-  scalacheck
+  libs.specs2Core,
+  libs.specs2Matchers,
+  libs.specs2Mock,
+  libs.scalacheck
 )
 
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
+  "-feature",
+  "-language:implicitConversions",
   "-Ypatmat-exhaust-depth",
   "80",
   "-Ywarn-unused"
@@ -101,11 +187,11 @@ lazy val common =
     .settings(
       description := "Common Libraries and Utilities",
       libraryDependencies ++= Seq(
-        slf4j_api,
-        logback,
-        log4j,
-        scala_xml,
-        scala_parser
+        libs.slf4j_api,
+        libs.logback,
+        libs.log4j,
+        libs.scala_xml,
+        libs.scala_parser
       )
     )
     .settings(crossScalaVersions := crossUpVersions)
@@ -125,10 +211,10 @@ lazy val json =
       description := "JSON Library",
       Test / parallelExecution := false,
       libraryDependencies ++= Seq(
-        scalap(scalaVersion.value),
-        paranamer,
-        scala_xml,
-        json4s
+        libs.scalap(scalaVersion.value),
+        libs.paranamer,
+        libs.scala_xml,
+        libs.json4s
       )
     )
     .settings(crossScalaVersions := crossUpVersions)
@@ -138,7 +224,7 @@ lazy val json_ext =
     .dependsOn(common, json)
     .settings(
       description := "Extentions to JSON Library",
-      libraryDependencies ++= Seq(commons_codec, joda_time, joda_convert)
+      libraryDependencies ++= Seq(libs.commons_codec, libs.joda_time, libs.joda_convert)
     )
     .settings(crossScalaVersions := crossUpVersions)
 
@@ -149,13 +235,13 @@ lazy val util =
       description := "Utilities Library",
       Test / parallelExecution := false,
       libraryDependencies ++= Seq(
-        scala_compiler(scalaVersion.value),
-        joda_time,
-        joda_convert,
-        commons_codec,
-        htmlparser,
-        xerces,
-        jbcrypt
+        libs.scala_compiler(scalaVersion.value),
+        libs.joda_time,
+        libs.joda_convert,
+        libs.commons_codec,
+        libs.htmlparser,
+        libs.xerces,
+        libs.jbcrypt
       )
     )
     .settings(crossScalaVersions := crossUpVersions)
@@ -168,7 +254,7 @@ lazy val testkit =
     .dependsOn(util)
     .settings(
       description := "Testkit for Webkit Library",
-      libraryDependencies ++= Seq(commons_httpclient, servlet_api)
+      libraryDependencies ++= Seq(libs.commons_httpclient, libs.servlet_api)
     )
     .settings(crossScalaVersions := crossUpVersions)
 
@@ -179,21 +265,21 @@ lazy val webkit =
       description := "Webkit Library",
       Test / parallelExecution := false,
       libraryDependencies ++= Seq(
-        commons_fileupload,
-        rhino,
-        servlet_api,
-        specs2Prov,
-        specs2MatchersProv,
-        jetty6,
-        jwebunit,
-        jquery,
-        jasmineCore,
-        jasmineAjax
+        libs.commons_fileupload,
+        libs.rhino,
+        libs.servlet_api,
+        libs.specs2Prov,
+        libs.specs2MatchersProv,
+        libs.jetty6,
+        libs.jwebunit,
+        libs.jquery,
+        libs.jasmineCore,
+        libs.jasmineAjax
       ),
       libraryDependencies ++= {
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, scalaMajor)) if scalaMajor >= 13 =>
-            Seq(scala_parallel_collections)
+            Seq(libs.scala_parallel_collections)
           case _ => Seq.empty
         }
       },

@@ -29,13 +29,6 @@ object OlonSbtHelpers {
   def olonProject(id: String, base: File): Project = {
     Project(id, base)
       .settings(
-        scalacOptions ++= List(
-          "-feature",
-          "-language:implicitConversions",
-          "-deprecation"
-        )
-      )
-      .settings(
         autoAPIMappings := true,
         apiMappings ++= {
           val cp: Seq[Attributed[File]] = (Compile / fullClasspath).value
