@@ -220,7 +220,7 @@ object Templates {
                       }
                     </div>)
 
-                    case e: ValidationException => Empty
+                    case _: ValidationException => Empty
                   }
                 if (xmlb.isDefined) {
                   found = true
@@ -301,7 +301,7 @@ object Templates {
       } catch {
         case ite: java.lang.reflect.InvocationTargetException =>
           throw ite.getCause
-        case e: NoClassDefFoundError => Empty
+        case _: NoClassDefFoundError => Empty
       }
     }
   }

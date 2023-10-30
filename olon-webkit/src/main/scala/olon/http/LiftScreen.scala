@@ -844,7 +844,7 @@ trait AbstractScreen extends Factory with Loggable {
 
           override def name: String = theName
 
-          override implicit def manifest = buildIt[T]
+          override implicit def manifest: Manifest[T] = buildIt[T]
 
           override def default: T = defaultValue
 
@@ -883,7 +883,7 @@ trait AbstractScreen extends Factory with Loggable {
 
           override def name: String = theName
 
-          override implicit def manifest = buildIt[T]
+          override implicit def manifest: Manifest[T] = buildIt[T]
 
           override def default: T = defaultValue
 

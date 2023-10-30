@@ -1853,7 +1853,7 @@ class LiftSession(
                         inst.statelessDispatch(method)(kids)
                       else NodeSeq.Empty
 
-                    case Full(inst: StatefulSnippet) if !stateful_? =>
+                    case Full(_: StatefulSnippet) if !stateful_? =>
                       reportSnippetError(
                         page,
                         snippetName,
@@ -1973,7 +1973,7 @@ class LiftSession(
                           Helpers
                             .invokeMethod(inst.getClass, inst, method)) match {
                           case CheckNodeSeq(md) => md
-                          case it =>
+                          case _ =>
                             val intersection = if (Props.devMode) {
                               val methodNames = inst.getClass
                                 .getMethods()

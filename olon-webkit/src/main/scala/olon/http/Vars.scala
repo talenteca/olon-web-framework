@@ -287,7 +287,7 @@ trait ContainerSerializer[T] {
   def deserialize(in: Array[Byte]): T
 }
 
-object ContainerSerializer {
+object ContainerSerializer extends Loggable {
 
   import java.util.Date
   import org.joda.time.DateTime
@@ -328,11 +328,17 @@ object ContainerSerializer {
 
   implicit def arraySerializer[T](implicit
       tc: ContainerSerializer[T]
-  ): ContainerSerializer[Array[T]] = buildSerializer
+  ): ContainerSerializer[Array[T]] = {
+    logger.trace("Array serializer with " + tc)
+    buildSerializer
+  }
 
   implicit def listSerializer[T](implicit
       tc: ContainerSerializer[T]
-  ): ContainerSerializer[List[T]] = buildSerializer
+  ): ContainerSerializer[List[T]] = {
+    logger.trace("List serializer with " + tc)
+    buildSerializer
+  }
 
   implicit def anyRefSerializer[T <: Serializable]: ContainerSerializer[T] =
     buildSerializer
@@ -637,7 +643,7 @@ private[http] trait CoreRequestVarHandler {
 
       // remove all the session variables that are CleanRequestVarOnSessionTransition
       val toRemove: Iterable[String] = tv.asScala.flatMap {
-        case (name, (it: CleanRequestVarOnSessionTransition, _, _)) =>
+        case (name, (_: CleanRequestVarOnSessionTransition, _, _)) =>
           List(name)
         case _ => Nil
       }

@@ -180,6 +180,10 @@ object S extends S {
     def this(func: String => Any) = this(func, Empty)
 
     def apply(in: List[String]): Any = in.headOption.toList.map(func(_))
+
+    def apply(in: FileParamHolder): Any = {
+      error("Attempt to apply file upload to a non-file upload handler")
+    }
   }
 
   object LFuncHolder {
@@ -199,6 +203,10 @@ object S extends S {
   ) extends AFuncHolder
       with Serializable {
     def apply(in: List[String]): Any = func(in)
+
+    def apply(in: FileParamHolder): Any = {
+      error("Attempt to apply file upload to a non-file upload handler")
+    }
   }
 
   object NFuncHolder {
@@ -214,7 +222,11 @@ object S extends S {
   private final class NFuncHolder(val func: () => Any, val owner: Box[String])
       extends AFuncHolder
       with Serializable {
-    def apply(in: List[String]): Any = in.headOption.toList.map(s => func())
+    def apply(in: List[String]): Any = in.headOption.toList.map(_ => func())
+
+    def apply(in: FileParamHolder): Any = {
+      error("Attempt to apply file upload to a non-file upload handler")
+    }
   }
 
   /** Abstrats a function that is executed on HTTP requests from client.
@@ -226,9 +238,7 @@ object S extends S {
 
     def apply(in: List[String]): Any
 
-    def apply(in: FileParamHolder): Any = {
-      error("Attempt to apply file upload to a non-file upload handler")
-    }
+    def apply(in: FileParamHolder): Any
 
     def supportsFileParams_? : Boolean = false
 
@@ -253,9 +263,7 @@ object S extends S {
       session: LiftSession
   ) extends AFuncHolder {
 
-    /** Private no-arg constructor needed for deserialization.
-      */
-    private[this] def this() = this(Empty, null)
+    def this() = this(Empty, null)
 
     private val snapshot: Function1[Function0[Any], Any] =
       RequestVarHandler.generateSnapshotRestorer()
@@ -265,10 +273,15 @@ object S extends S {
       error("You shouldn't really be calling apply on this dude...")
     }
 
+    def apply(in: FileParamHolder): Any = {
+      error("Attempt to apply file upload to a non-file upload handler")
+    }
+
     def runInContext[T](f: => T): T = {
       val ret = snapshot(() => f).asInstanceOf[T]
       ret
     }
+
   }
 
   /** The companion object that generates AFuncHolders from other functions
@@ -1741,7 +1754,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       .legacyNullTest(_responseHeaders.value)
       .map(rh =>
         rh.headers.iterator.toList :::
-          in.filter { case (n, v) => !rh.headers.contains(n) }
+          in.filter { case (n, _) => !rh.headers.contains(n) }
       )
       .openOr(Nil)
   }
@@ -1871,7 +1884,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
               case Full(s) if s.stateful_? =>
                 LiftRules.earlyInStateful.toList.foreach(_(req))
 
-              case Full(s) =>
+              case Full(_) =>
                 LiftRules.earlyInStateless.toList.foreach(_(req))
 
               case _ =>
@@ -2037,8 +2050,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def attrs: List[(Either[String, (String, String)], String)] =
     _attrs.value match {
-      case null            => Nil
-      case (current, full) => full
+      case null      => Nil
+      case (_, full) => full
     }
 
   /** Returns the S attributes that are prefixed by 'prefix' parameter as a
@@ -2185,7 +2198,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see
     *   # attrsToMetaData ( String = > Boolean )
     */
-  def attrsToMetaData: MetaData = attrsToMetaData(ignore => true)
+  def attrsToMetaData: MetaData = attrsToMetaData(_ => true)
 
   /** Similar to S.attrsToMetaData, but lets you specify a predicate function
     * that filters the generated MetaData. For example, if you only wanted the
@@ -2230,7 +2243,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see
     *   # attrsToMetaData ( String = > Boolean )
     */
-  def currentAttrsToMetaData: MetaData = currentAttrsToMetaData(ignore => true)
+  def currentAttrsToMetaData: MetaData = currentAttrsToMetaData(_ => true)
 
   /** Similar to S.attrsToMetaData, but lets you specify a predicate function
     * that filters the generated MetaData. For example, if you only wanted the
@@ -2411,8 +2424,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * simplifies things considerably.
     */
   def currentAttrs: MetaData = _attrs.value match {
-    case null            => Null
-    case (current, full) => current
+    case null         => Null
+    case (current, _) => current
   }
 
   /** Temporarily adds the given attributes to the current set, then executes
@@ -2629,7 +2642,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     if (__functionMap.box.map(_.size).openOr(0) > 0) {
       // Issue #1037
       testFunctionMap {
-        __functionMap.box.foreach(ignore => __functionMap.set(Map()))
+        __functionMap.box.foreach(_ => __functionMap.set(Map()))
       }
     }
   }
@@ -3023,7 +3036,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
    """).toJsCmd
         ) openOr ""
 
-      val onErrorParam = onError.map(f => "onError_" + key) openOr "null"
+      val onErrorParam = onError.map(_ => "onError_" + key) openOr "null"
 
       val af: AFuncHolder = jsonCallback _
       addFunctionMap(key, af)
@@ -3138,6 +3151,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def jsonFmapFunc[T](
       in: JValue => JsCmd
   )(f: String => T)(implicit dummy: AvoidTypeErasureIssues1): T = {
+    logger.trace("Avoiding type erasure issues 1 with " + dummy)
+
     import json._
 
     val name = formFuncName
