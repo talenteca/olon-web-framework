@@ -6,8 +6,7 @@ import scala.xml._
 import StringHelpers._
 import common._
 
-/** This trait is used to identify an object that is representable as a {{@link
-  * scala.xml.NodeSeq}} .
+/** This trait is used to identify an object that is representable as a NodeSeq.
   */
 trait Bindable {
   def asHtml: NodeSeq

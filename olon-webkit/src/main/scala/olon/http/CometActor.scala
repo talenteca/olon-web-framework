@@ -325,13 +325,13 @@ trait LiftCometActor
   def cometProcessingTimeoutHandler(): JsCmd = Noop
 
   /** This is to react to comet-actors timing out while initial rendering, calls
-    * to render(). When the timeout specified in {{@link
-    * kolon.http.LiftRules#cometRenderTimeout}} occurs one may override this to
-    * customise the output. <p/><p/> Do NOT manipulate actor-state here. If you
-    * want to manipulate state, send the actor a new message. <p/><p/> Typical
-    * example would be: <pre> override def renderTimeoutHandler(): Box[NodeSeq]
-    * \= { Full(&lt;div&gt;Comet {this.getClass} timed out, timeout is
-    * {cometRenderTimeout}ms&lt;/div&gt;) } </pre>
+    * to render(). When the timeout specified in cometRenderTimeout at LiftRules
+    * occurs one may override this to customise the output. <p/><p/> Do NOT
+    * manipulate actor-state here. If you want to manipulate state, send the
+    * actor a new message. <p/><p/> Typical example would be: <pre> override def
+    * renderTimeoutHandler(): Box[NodeSeq] \= { Full(&lt;div&gt;Comet
+    * {this.getClass} timed out, timeout is {cometRenderTimeout}ms&lt;/div&gt;)
+    * } </pre>
     */
   def cometRenderTimeoutHandler(): Box[NodeSeq] = Empty
 
