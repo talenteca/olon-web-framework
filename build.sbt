@@ -102,10 +102,7 @@ lazy val libs = new {
   lazy val json4s = "org.json4s" %% "json4s-native" % "4.0.6" % Test
 }
 
-val crossUpVersions = Seq(versions.scala2Version, versions.scala3Version)
-
 ThisBuild / scalaVersion := versions.scala2Version
-ThisBuild / crossScalaVersions := crossUpVersions
 
 ThisBuild / libraryDependencies ++= Seq(
   libs.specs2Core,
@@ -168,8 +165,9 @@ ThisBuild / credentials += {
   }
 }
 
-def olonBaseSettings() = {
-  Seq(
+def commonProjectSettings = {
+  Defaults.coreDefaultSettings ++ Seq(
+    crossScalaVersions := Seq(versions.scala2Version, versions.scala3Version),
     autoAPIMappings := true,
     apiMappings ++= {
       val cp: Seq[Attributed[File]] = (Compile / fullClasspath).value
@@ -191,21 +189,6 @@ def olonBaseSettings() = {
   )
 }
 
-def findApiUrl(
-    moduleInfo: ModuleID,
-    scalaBinaryVersionString: String
-): Option[URL] = {
-  if (moduleInfo.organization == "com.talenteca") {
-    None
-  } else {
-    Some(
-      url(
-        "https://www.javadoc.io/doc/" + moduleInfo.organization + "/" + moduleInfo.name + "/" + moduleInfo.revision + "/"
-      )
-    )
-  }
-}
-
 lazy val root = Project(id = "root", base = file("."))
   .settings(
     publish := false,
@@ -222,6 +205,7 @@ lazy val root = Project(id = "root", base = file("."))
   )
 
 lazy val olon_common = Project(id = "olon-common", base = file("olon-common"))
+  .settings(commonProjectSettings)
   .settings(
     description := "Common Libraries and Utilities",
     libraryDependencies ++= Seq(
@@ -232,122 +216,134 @@ lazy val olon_common = Project(id = "olon-common", base = file("olon-common"))
       libs.scala_parser
     )
   )
-  .settings(crossScalaVersions := crossUpVersions)
 
 lazy val olon_actor = Project("olon-actor", file("olon-actor"))
-    .dependsOn(olon_common)
-    .settings(
-      description := "Simple Actor",
-      Test / parallelExecution := false
-    )
-    .settings(crossScalaVersions := crossUpVersions)
+  .settings(commonProjectSettings)
+  .settings(
+    description := "Simple Actor",
+    Test / parallelExecution := false
+  )
+  .dependsOn(olon_common)
 
 lazy val olon_json = Project("olon-json", file("olon-json"))
-    .settings(
-      description := "JSON Library",
-      Test / parallelExecution := false,
-      libraryDependencies ++= Seq(
-        libs.scalap(scalaVersion.value),
-        libs.paranamer,
-        libs.scala_xml,
-        libs.json4s
-      )
+  .settings(commonProjectSettings)
+  .settings(
+    description := "JSON Library",
+    Test / parallelExecution := false,
+    libraryDependencies ++= Seq(
+      libs.scalap(scalaVersion.value),
+      libs.paranamer,
+      libs.scala_xml,
+      libs.json4s
     )
-    .settings(crossScalaVersions := crossUpVersions)
+  )
 
 lazy val olon_json_ext = Project("olon-json-ext", file("olon-json-ext"))
-    .dependsOn(olon_common, olon_json)
-    .settings(
-      description := "Extentions to JSON Library",
-      libraryDependencies ++= Seq(
-        libs.commons_codec,
-        libs.joda_time,
-        libs.joda_convert
-      )
+  .settings(commonProjectSettings)
+  .settings(
+    description := "Extentions to JSON Library",
+    libraryDependencies ++= Seq(
+      libs.commons_codec,
+      libs.joda_time,
+      libs.joda_convert
     )
-    .settings(crossScalaVersions := crossUpVersions)
+  )
+  .dependsOn(olon_common, olon_json)
 
-lazy val olon_util =Project("olon-util", file("olon-util"))
-    .dependsOn(olon_actor, olon_json)
-    .settings(
-      description := "Utilities Library",
-      Test / parallelExecution := false,
-      libraryDependencies ++= Seq(
-        libs.scala_compiler(scalaVersion.value),
-        libs.joda_time,
-        libs.joda_convert,
-        libs.commons_codec,
-        libs.htmlparser,
-        libs.xerces,
-        libs.jbcrypt
-      )
+lazy val olon_util = Project("olon-util", file("olon-util"))
+  .settings(commonProjectSettings)
+  .settings(
+    description := "Utilities Library",
+    Test / parallelExecution := false,
+    libraryDependencies ++= Seq(
+      libs.scala_compiler(scalaVersion.value),
+      libs.joda_time,
+      libs.joda_convert,
+      libs.commons_codec,
+      libs.htmlparser,
+      libs.xerces,
+      libs.jbcrypt
     )
-    .settings(crossScalaVersions := crossUpVersions)
+  )
+  .dependsOn(olon_actor, olon_json)
 
-lazy val olon_testkit =
-  Project("olon-testkit", file("olon-testkit"))
-    .dependsOn(olon_util)
-    .settings(
-      description := "Testkit for Webkit Library",
-      libraryDependencies ++= Seq(libs.commons_httpclient, libs.servlet_api)
-    )
-    .settings(crossScalaVersions := crossUpVersions)
+lazy val olon_testkit = Project("olon-testkit", file("olon-testkit"))
+  .settings(commonProjectSettings)
+  .settings(
+    description := "Testkit for Webkit Library",
+    libraryDependencies ++= Seq(libs.commons_httpclient, libs.servlet_api)
+  )
+  .dependsOn(olon_util)
 
-lazy val olon_webkit =
-  Project("olon-webkit", file("olon-webkit"))
-    .dependsOn(olon_util, olon_testkit % Provided)
-    .settings(
-      description := "Webkit Library",
-      Test / parallelExecution := false,
-      libraryDependencies ++= Seq(
-        libs.commons_fileupload,
-        libs.rhino,
-        libs.servlet_api,
-        libs.specs2Prov,
-        libs.specs2MatchersProv,
-        libs.jetty6,
-        libs.jwebunit,
-        libs.jquery,
-        libs.jasmineCore,
-        libs.jasmineAjax
-      ),
-      libraryDependencies ++= {
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, scalaMajor)) if scalaMajor >= 13 =>
-            Seq(libs.scala_parallel_collections)
-          case _ => Seq.empty
-        }
-      },
-      Test / initialize := {
-        System.setProperty(
-          "olon.webapptest.src.test.webapp",
-          ((Test / sourceDirectory).value / "webapp").absString
-        )
-      },
-      Compile / unmanagedSourceDirectories += {
-        (Compile / sourceDirectory).value / ("scala_" + scalaBinaryVersion.value)
-      },
-      Test / unmanagedSourceDirectories += {
-        (Test / sourceDirectory).value / ("scala_" + scalaBinaryVersion.value)
-      },
-      Compile / compile := (Compile / compile).dependsOn(WebKeys.assets).value,
-      /** This is to ensure that the tests in olon.webapptest run last so that
-        * other tests (MenuSpec in particular) run before the SiteMap is set.
-        */
-      Test / testGrouping := {
-        (Test / definedTests).map { tests =>
-          import Tests._
-
-          val (webapptests, others) = tests.partition { test =>
-            test.name.startsWith("olon.webapptest")
-          }
-
-          Seq(
-            new Group("others", others, InProcess),
-            new Group("webapptests", webapptests, InProcess)
-          )
-        }.value
+lazy val olon_webkit = Project("olon-webkit", file("olon-webkit"))
+  .settings(commonProjectSettings)
+  .settings(
+    description := "Webkit Library",
+    Test / parallelExecution := false,
+    libraryDependencies ++= Seq(
+      libs.commons_fileupload,
+      libs.rhino,
+      libs.servlet_api,
+      libs.specs2Prov,
+      libs.specs2MatchersProv,
+      libs.jetty6,
+      libs.jwebunit,
+      libs.jquery,
+      libs.jasmineCore,
+      libs.jasmineAjax
+    ),
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, scalaMajor)) if scalaMajor >= 13 =>
+          Seq(libs.scala_parallel_collections)
+        case _ => Seq.empty
       }
+    },
+    Test / initialize := {
+      System.setProperty(
+        "olon.webapptest.src.test.webapp",
+        ((Test / sourceDirectory).value / "webapp").absString
+      )
+    },
+    Compile / unmanagedSourceDirectories += {
+      (Compile / sourceDirectory).value / ("scala_" + scalaBinaryVersion.value)
+    },
+    Test / unmanagedSourceDirectories += {
+      (Test / sourceDirectory).value / ("scala_" + scalaBinaryVersion.value)
+    },
+    Compile / compile := (Compile / compile).dependsOn(WebKeys.assets).value,
+    /** This is to ensure that the tests in olon.webapptest run last so that
+      * other tests (MenuSpec in particular) run before the SiteMap is set.
+      */
+    Test / testGrouping := {
+      (Test / definedTests).map { tests =>
+        import Tests._
+
+        val (webapptests, others) = tests.partition { test =>
+          test.name.startsWith("olon.webapptest")
+        }
+
+        Seq(
+          new Group("others", others, InProcess),
+          new Group("webapptests", webapptests, InProcess)
+        )
+      }.value
+    }
+  )
+  .dependsOn(olon_util, olon_testkit % Provided)
+  .enablePlugins(SbtWeb)
+
+def findApiUrl(
+    moduleInfo: ModuleID,
+    scalaBinaryVersionString: String
+): Option[URL] = {
+  if (moduleInfo.organization == "com.talenteca") {
+    None
+  } else {
+    Some(
+      url(
+        "https://www.javadoc.io/doc/" + moduleInfo.organization + "/" + moduleInfo.name + "/" + moduleInfo.revision + "/"
+      )
     )
-    .enablePlugins(SbtWeb)
-    .settings(crossScalaVersions := crossUpVersions)
+  }
+}
