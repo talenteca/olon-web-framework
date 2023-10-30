@@ -8,6 +8,9 @@
 
 * Bump the version to an official release at the `version` value in the `build.sbt` file.
 
+> Only official versions are available to public release, do not use SNAPSHOT version
+  for official releases.
+
 * Run `clean` and `test` on an SBT session
 
 * If all tests are OK run `publishSigned` in the SBT session
@@ -17,5 +20,7 @@
 * Check the signed deployment is OK and then select "Close".
 
 * If the closed deployment is OK then select "Release" and check everything is OK.
+
+> **IMPORTANT:** Once a release is published there is no way back, Sonatype will always keep an official release, ensure the build and release is correct before publishing.
 
 > For more reference check the pages <https://central.sonatype.org/publish/release/> <https://central.sonatype.org/publish/requirements/> <https://central.sonatype.org/publish/requirements/gpg/>
