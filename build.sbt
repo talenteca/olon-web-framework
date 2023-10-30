@@ -1,5 +1,3 @@
-import OlonSbtHelpers._
-
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 Global / pgpSigningKey := Some("csaltos@talenteca.io")
@@ -27,79 +25,80 @@ lazy val libs = new {
   type ModuleMap = String => ModuleID
 
   lazy val commons_codec = "commons-codec" % "commons-codec" % "1.11"
-  
+
   lazy val commons_fileupload =
     "commons-fileupload" % "commons-fileupload" % "1.3.3"
-  
+
   lazy val commons_httpclient =
     "commons-httpclient" % "commons-httpclient" % "3.1"
-  
+
   lazy val jbcrypt = "org.mindrot" % "jbcrypt" % "0.4"
-  
+
   lazy val joda_time = "joda-time" % "joda-time" % "2.10"
-  
+
   lazy val joda_convert = "org.joda" % "joda-convert" % "2.1"
-  
+
   lazy val htmlparser = "nu.validator" % "htmlparser" % "1.4.12"
-  
+
   lazy val paranamer = "com.thoughtworks.paranamer" % "paranamer" % "2.8"
-  
+
   lazy val scalap: ModuleMap = "org.scala-lang" % "scalap" % _
-  
+
   lazy val scala_compiler: ModuleMap = "org.scala-lang" % "scala-compiler" % _
-  
+
   lazy val slf4j_api = "org.slf4j" % "slf4j-api" % versions.slf4jVersion
-  
+
   lazy val scala_parallel_collections =
     "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0"
-  
+
   lazy val scala_parser =
     "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
-  
+
   lazy val scala_xml = "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
-  
+
   lazy val rhino = "org.mozilla" % "rhino" % "1.7.10"
-  
+
   lazy val xerces = "xerces" % "xercesImpl" % "2.11.0"
 
   lazy val logback = "ch.qos.logback" % "logback-classic" % "1.2.8" % Provided
-  
+
   lazy val servlet_api =
     "javax.servlet" % "javax.servlet-api" % "3.1.0" % Provided
-  
+
   lazy val jquery = "org.webjars.bower" % "jquery" % "1.11.3" % Provided
-  
+
   lazy val jasmineCore =
     "org.webjars.bower" % "jasmine-core" % "2.4.1" % Provided
-  
+
   lazy val jasmineAjax =
     "org.webjars.bower" % "jasmine-ajax" % "3.2.0" % Provided
-  
+
   lazy val log4j = "log4j" % "log4j" % "1.2.17" % Provided
 
   lazy val jetty6 = "org.mortbay.jetty" % "jetty" % "6.1.26" % Test
-  
+
   lazy val jwebunit =
     "net.sourceforge.jwebunit" % "jwebunit-htmlunit-plugin" % "2.5" % Test
-  
-  lazy val specs2 = "org.specs2" %% "specs2-core" % "4.15.0" % Test
-  
-  lazy val specs2Core = "org.specs2" %% "specs2-core" % versions.specs2 % Test withSources ()
 
-  lazy val specs2Matchers = "org.specs2" %% "specs2-matcher-extra" % specs2.revision % Test withSources ()
+  lazy val specs2 = "org.specs2" %% "specs2-core" % "4.15.0" % Test
+
+  lazy val specs2Core =
+    "org.specs2" %% "specs2-core" % versions.specs2 % Test withSources ()
+
+  lazy val specs2Matchers =
+    "org.specs2" %% "specs2-matcher-extra" % specs2.revision % Test withSources ()
 
   lazy val scalacheck =
     "org.specs2" %% "specs2-scalacheck" % specs2.revision % Test
-  
+
   lazy val specs2Prov =
     "org.specs2" %% "specs2-core" % specs2.revision % Provided
-  
-  
+
   lazy val specs2MatchersProv =
     "org.specs2" %% "specs2-matcher-extra" % specs2.revision % Provided
-  
+
   lazy val specs2Mock = "org.specs2" %% "specs2-mock" % specs2.revision % Test
-  
+
   lazy val json4s = "org.json4s" %% "json4s-native" % "4.0.6" % Test
 }
 
@@ -169,44 +168,81 @@ ThisBuild / credentials += {
   }
 }
 
-lazy val olonProjects = core ++ web
+def olonBaseSettings() = {
+  Seq(
+    autoAPIMappings := true,
+    apiMappings ++= {
+      val cp: Seq[Attributed[File]] = (Compile / fullClasspath).value
+      val apiUrlSeq = cp map { entry =>
+        entry.get(moduleID.key) match {
+          case Some(moduleInfo) =>
+            findApiUrl(moduleInfo, scalaBinaryVersion.value) match {
+              case Some(apiUrl) =>
+                Some((entry.data -> apiUrl))
+              case None =>
+                None
+            }
+          case None =>
+            None
+        }
+      }
+      apiUrlSeq.filter(_.nonEmpty).map(_.get).toMap
+    }
+  )
+}
 
-lazy val root =
-  (project in file("."))
-    .settings(
-      publish := false,
-      publishLocal := false
-    )
-    .aggregate(olonProjects: _*)
-
-lazy val core: Seq[ProjectReference] =
-  Seq(common, actor, json, json_ext, util)
-
-lazy val common =
-  coreProject("common")
-    .settings(
-      description := "Common Libraries and Utilities",
-      libraryDependencies ++= Seq(
-        libs.slf4j_api,
-        libs.logback,
-        libs.log4j,
-        libs.scala_xml,
-        libs.scala_parser
+def findApiUrl(
+    moduleInfo: ModuleID,
+    scalaBinaryVersionString: String
+): Option[URL] = {
+  if (moduleInfo.organization == "com.talenteca") {
+    None
+  } else {
+    Some(
+      url(
+        "https://www.javadoc.io/doc/" + moduleInfo.organization + "/" + moduleInfo.name + "/" + moduleInfo.revision + "/"
       )
     )
-    .settings(crossScalaVersions := crossUpVersions)
+  }
+}
 
-lazy val actor =
-  coreProject("actor")
-    .dependsOn(common)
+lazy val root = Project(id = "root", base = file("."))
+  .settings(
+    publish := false,
+    publishLocal := false
+  )
+  .aggregate(
+    olon_common,
+    olon_actor,
+    olon_json,
+    olon_json_ext,
+    olon_util,
+    olon_testkit,
+    olon_webkit
+  )
+
+lazy val olon_common = Project(id = "olon-common", base = file("olon-common"))
+  .settings(
+    description := "Common Libraries and Utilities",
+    libraryDependencies ++= Seq(
+      libs.slf4j_api,
+      libs.logback,
+      libs.log4j,
+      libs.scala_xml,
+      libs.scala_parser
+    )
+  )
+  .settings(crossScalaVersions := crossUpVersions)
+
+lazy val olon_actor = Project("olon-actor", file("olon-actor"))
+    .dependsOn(olon_common)
     .settings(
       description := "Simple Actor",
       Test / parallelExecution := false
     )
     .settings(crossScalaVersions := crossUpVersions)
 
-lazy val json =
-  coreProject("json")
+lazy val olon_json = Project("olon-json", file("olon-json"))
     .settings(
       description := "JSON Library",
       Test / parallelExecution := false,
@@ -219,18 +255,20 @@ lazy val json =
     )
     .settings(crossScalaVersions := crossUpVersions)
 
-lazy val json_ext =
-  coreProject("json-ext")
-    .dependsOn(common, json)
+lazy val olon_json_ext = Project("olon-json-ext", file("olon-json-ext"))
+    .dependsOn(olon_common, olon_json)
     .settings(
       description := "Extentions to JSON Library",
-      libraryDependencies ++= Seq(libs.commons_codec, libs.joda_time, libs.joda_convert)
+      libraryDependencies ++= Seq(
+        libs.commons_codec,
+        libs.joda_time,
+        libs.joda_convert
+      )
     )
     .settings(crossScalaVersions := crossUpVersions)
 
-lazy val util =
-  coreProject("util")
-    .dependsOn(actor, json)
+lazy val olon_util =Project("olon-util", file("olon-util"))
+    .dependsOn(olon_actor, olon_json)
     .settings(
       description := "Utilities Library",
       Test / parallelExecution := false,
@@ -246,21 +284,18 @@ lazy val util =
     )
     .settings(crossScalaVersions := crossUpVersions)
 
-lazy val web: Seq[ProjectReference] =
-  Seq(testkit, webkit)
-
-lazy val testkit =
-  webProject("testkit")
-    .dependsOn(util)
+lazy val olon_testkit =
+  Project("olon-testkit", file("olon-testkit"))
+    .dependsOn(olon_util)
     .settings(
       description := "Testkit for Webkit Library",
       libraryDependencies ++= Seq(libs.commons_httpclient, libs.servlet_api)
     )
     .settings(crossScalaVersions := crossUpVersions)
 
-lazy val webkit =
-  webProject("webkit")
-    .dependsOn(util, testkit % "provided")
+lazy val olon_webkit =
+  Project("olon-webkit", file("olon-webkit"))
+    .dependsOn(olon_util, olon_testkit % Provided)
     .settings(
       description := "Webkit Library",
       Test / parallelExecution := false,

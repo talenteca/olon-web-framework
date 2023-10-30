@@ -1,5 +1,4 @@
-DefaultOptions.addPluginResolvers
-resolvers += Resolver.typesafeRepo("releases")
+resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.4.4")
 
