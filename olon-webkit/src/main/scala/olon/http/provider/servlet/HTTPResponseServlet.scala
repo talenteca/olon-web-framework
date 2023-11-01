@@ -3,10 +3,10 @@ package http
 package provider
 package servlet
 
+import jakarta.servlet.http.HttpServletResponse
 import olon.http.provider.encoder.CookieEncoder
 
 import java.io.OutputStream
-import javax.servlet.http.HttpServletResponse
 
 class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
   private var _status = 0;

@@ -1,12 +1,13 @@
 package olon
 package mocks
 
+import jakarta.servlet._
+import jakarta.servlet.http._
+
 import java.io.PrintWriter
 import java.util.Collection
 import java.util.Date
 import java.util.Locale
-import javax.servlet._
-import javax.servlet.http._
 import scala.jdk.CollectionConverters._
 
 /** A Mock HttpServletResponse. Take a peek at it's writer or outputStream to

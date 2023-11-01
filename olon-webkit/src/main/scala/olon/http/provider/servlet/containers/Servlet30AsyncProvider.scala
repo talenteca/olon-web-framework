@@ -21,8 +21,8 @@ object Servlet30AsyncProvider extends AsyncProviderMeta {
     isSupported
   ) = {
     try {
-      val cc = Class.forName("javax.servlet.ServletRequest")
-      val asyncClass = Class.forName("javax.servlet.AsyncContext")
+      val cc = Class.forName("jakarta.servlet.ServletRequest")
+      val asyncClass = Class.forName("jakarta.servlet.AsyncContext")
       val startAsync = cc.getMethod("startAsync")
       val getResponse = asyncClass.getMethod("getResponse")
       val complete = asyncClass.getMethod("complete")
@@ -86,7 +86,7 @@ class Servlet30AsyncProvider(req: HTTPRequest)
     logger.trace("Servlet 3.0 begin resume")
     val httpRes = getResponse
       .invoke(asyncCtx)
-      .asInstanceOf[javax.servlet.http.HttpServletResponse]
+      .asInstanceOf[jakarta.servlet.http.HttpServletResponse]
     val httpResponse = new HTTPResponseServlet(httpRes)
     val liftServlet = req.provider.liftServlet
     try {

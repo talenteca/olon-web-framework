@@ -30,7 +30,7 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
       val cc =
         Class.forName("org.eclipse.jetty.continuation.ContinuationSupport")
       val meth =
-        cc.getMethod("getContinuation", classOf[javax.servlet.ServletRequest])
+        cc.getMethod("getContinuation", classOf[jakarta.servlet.ServletRequest])
       val cci = Class.forName("org.eclipse.jetty.continuation.Continuation")
       val getAttribute = cci.getMethod("getAttribute", classOf[String])
       val setAttribute =

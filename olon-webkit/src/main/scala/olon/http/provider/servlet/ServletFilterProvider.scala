@@ -3,18 +3,17 @@ package http
 package provider
 package servlet
 
+import jakarta.servlet._
+import jakarta.servlet.http._
 import olon.common._
 import olon.http._
 import olon.util._
-
-import javax.servlet._
-import javax.servlet.http._
 
 trait ServletFilterProvider extends Filter with HTTPProvider {
   var ctx: HTTPContext = _
 
   // We need to capture the ServletContext on init
-  def init(config: FilterConfig): Unit = {
+  override def init(config: FilterConfig): Unit = {
     ctx = new HTTPServletContext(config.getServletContext)
 
     LiftRules.setContext(ctx)
@@ -24,7 +23,7 @@ trait ServletFilterProvider extends Filter with HTTPProvider {
   }
 
   // And throw it away on destruction
-  def destroy: Unit = {
+  override def destroy: Unit = {
     ctx = null
     terminate
   }

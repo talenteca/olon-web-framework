@@ -1,12 +1,12 @@
 package olon
 package mockweb
 
+import jakarta.servlet.http.HttpServletRequest
 import olon.json.JsonAST._
 import org.specs2.execute.Result
 import org.specs2.matcher.XmlMatchers
 import org.specs2.mutable._
 
-import javax.servlet.http.HttpServletRequest
 import scala.xml.NodeSeq
 
 import common.{Box, Empty, Full}

@@ -4,13 +4,12 @@ package provider
 package servlet
 package containers
 
+import jakarta.servlet.http.HttpServletRequest
 import olon.common._
 import olon.http._
 import olon.http.provider._
 import olon.http.provider.servlet._
 import olon.util._
-
-import javax.servlet.http.HttpServletRequest
 
 object Jetty6AsyncProvider extends AsyncProviderMeta {
   // contSupport below gets inferred as a Class[?0] existential.

@@ -1,6 +1,9 @@
 package olon
 package mocks
 
+import jakarta.servlet._
+import jakarta.servlet.http._
+
 import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
@@ -10,8 +13,6 @@ import java.text.ParseException
 import java.util.Collection
 import java.util.Locale
 import java.util.{Enumeration => JEnum}
-import javax.servlet._
-import javax.servlet.http._
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 import scala.xml.NodeSeq
@@ -565,13 +566,13 @@ class MockHttpServletRequest(
   def isAsyncStarted(): Boolean = false
   def isAsyncSupported(): Boolean = false
   def startAsync(
-      request: javax.servlet.ServletRequest,
-      response: javax.servlet.ServletResponse
+      request: jakarta.servlet.ServletRequest,
+      response: jakarta.servlet.ServletResponse
   ): AsyncContext = null
   def startAsync(): AsyncContext = null
   def changeSessionId(): String = null
   def getContentLengthLong(): Long = body.length
 
-  def upgrade[T <: javax.servlet.http.HttpUpgradeHandler](x$1: Class[T]): T =
+  def upgrade[T <: jakarta.servlet.http.HttpUpgradeHandler](x$1: Class[T]): T =
     ???
 }

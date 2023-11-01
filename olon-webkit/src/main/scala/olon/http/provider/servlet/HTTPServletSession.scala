@@ -3,9 +3,8 @@ package http
 package provider
 package servlet
 
+import jakarta.servlet.http._
 import olon.common._
-
-import javax.servlet.http._
 
 class HTTPServletSession(session: HttpSession) extends HTTPSession {
   private[this] val servletSessionIdentifier =
@@ -42,23 +41,23 @@ class HTTPServletSession(session: HttpSession) extends HTTPSession {
 case class SessionToServletBridge(uniqueId: String)
     extends HttpSessionBindingListener
     with HttpSessionActivationListener {
-  def sessionDidActivate(se: HttpSessionEvent) = {
+  override def sessionDidActivate(se: HttpSessionEvent) = {
     SessionMaster
       .getSession(uniqueId, Empty)
       .foreach(ls => LiftSession.onSessionActivate.foreach(_(ls)))
   }
 
-  def sessionWillPassivate(se: HttpSessionEvent) = {
+  override def sessionWillPassivate(se: HttpSessionEvent) = {
     SessionMaster
       .getSession(uniqueId, Empty)
       .foreach(ls => LiftSession.onSessionPassivate.foreach(_(ls)))
   }
 
-  def valueBound(event: HttpSessionBindingEvent): Unit = {}
+  override def valueBound(event: HttpSessionBindingEvent): Unit = {}
 
   /** When the session is unbound the the HTTP session, stop us
     */
-  def valueUnbound(event: HttpSessionBindingEvent): Unit = {
+  override def valueUnbound(event: HttpSessionBindingEvent): Unit = {
     SessionMaster.sendMsg(RemoveSession(uniqueId))
   }
 

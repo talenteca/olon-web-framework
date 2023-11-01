@@ -3,13 +3,13 @@ package http
 package provider
 package servlet
 
+import jakarta.servlet.ServletContext
 import olon.common._
 import olon.http.provider._
 import olon.util._
 
 import java.io.InputStream
 import java.net.URL
-import javax.servlet.ServletContext
 
 import Helpers._
 
