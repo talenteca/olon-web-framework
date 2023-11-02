@@ -32,6 +32,10 @@ lazy val libs = new {
 
   lazy val commons_codec = Seq("commons-codec" % "commons-codec" % "1.11")
 
+  lazy val commons_fileupload = Seq(
+    "org.apache.commons" % "commons-fileupload2-jakarta" % "2.0.0-M1"
+  )
+
   lazy val commons_httpclient =
     Seq("commons-httpclient" % "commons-httpclient" % "3.1")
 
@@ -118,9 +122,9 @@ ThisBuild / scalaVersion := versions.scala2Version
 
 ThisBuild / libraryDependencies ++=
   libs.specs2Core ++
-  libs.specs2Matchers ++
-  libs.specs2Mock ++
-  libs.scalacheck
+    libs.specs2Matchers ++
+    libs.specs2Mock ++
+    libs.scalacheck
 
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
@@ -287,7 +291,8 @@ lazy val olon_webkit = Project("olon-webkit", file("olon-webkit"))
     description := "Webkit Library",
     Test / parallelExecution := false,
     libraryDependencies ++=
-      libs.rhino ++
+      libs.commons_fileupload ++
+        libs.rhino ++
         libs.servlet_api ++
         libs.specs2Prov ++
         libs.specs2MatchersProv ++
