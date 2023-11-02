@@ -9,7 +9,7 @@ import scala.xml.Elem
 import scala.xml.NodeSeq
 import scala.xml.Text
 
-trait FlexMenuBuilder {
+trait FlexMenuBuilder extends Loggable {
   // a hack to use structural typing to get around the private[http] on Loc.buildItem
   type StructBuildItem = {
     def buildItem(
@@ -90,12 +90,18 @@ trait FlexMenuBuilder {
   /** Take the incoming Elem and add any attributes based on path which is true
     * if this Elem is the path to the current page
     */
-  protected def updateForPath(nodes: Elem, path: Boolean): Elem = nodes
+  protected def updateForPath(nodes: Elem, path: Boolean): Elem = {
+    logger.trace("Update for path " + path)
+    nodes
+  }
 
   /** Take the incoming Elem and add any attributes based on current which is a
     * flag that indicates this is the currently viewed page
     */
-  protected def updateForCurrent(nodes: Elem, current: Boolean): Elem = nodes
+  protected def updateForCurrent(nodes: Elem, current: Boolean): Elem = {
+    logger.trace("Update for current " + current)
+    nodes
+  }
 
   /** By default, create an li for a menu item
     */
@@ -157,8 +163,10 @@ trait FlexMenuBuilder {
       text: NodeSeq,
       path: Boolean,
       current: Boolean
-  ): NodeSeq =
+  ): NodeSeq = {
+    logger.trace("Rendering link for path and current " + path + " " + current)
     <a href={uri}>{text}</a>
+  }
 
   /** Render an item in the current path
     */
@@ -190,9 +198,12 @@ trait FlexMenuBuilder {
 
   /** Render the outer tag for a group of menu items
     */
-  protected def renderOuterTag(inner: NodeSeq, top: Boolean): NodeSeq = <ul>{
-    inner
-  }</ul>
+  protected def renderOuterTag(inner: NodeSeq, top: Boolean): NodeSeq = {
+    logger.trace("Rendering outer tag for inner top nodes " + top)
+    <ul>{
+      inner
+    }</ul>
+  }
 
   /** The default set of MenuItems to be rendered
     */

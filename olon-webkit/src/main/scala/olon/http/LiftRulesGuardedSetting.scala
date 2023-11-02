@@ -1,5 +1,6 @@
 package olon.http
 
+import olon.common.Loggable
 import olon.util.HasCalcDefaultValue
 import olon.util.LiftValue
 
@@ -19,12 +20,14 @@ object LiftRulesGuardedSetting {
       settingName: String,
       stackTrace: StackTrace,
       message: String
-  ) extends Serializable {
+  ) extends Serializable
+      with Loggable {
 
     /** Converts this violation into an Exception which can be handed to a
       * logger for clean message printing
       */
     def toException: Exception = {
+      logger.trace("Converting to exception " + settingName)
       val e = new Exception(message)
       e.setStackTrace(stackTrace)
       e

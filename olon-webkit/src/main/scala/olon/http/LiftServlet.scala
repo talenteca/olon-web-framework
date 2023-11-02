@@ -863,7 +863,8 @@ class LiftServlet extends Loggable {
       session: LiftSession,
       actors: List[(LiftCometActor, Long)],
       onBreakout: List[AnswerRender] => Unit
-  ) extends LiftActor {
+  ) extends LiftActor
+      with Loggable {
     private var answers: List[AnswerRender] = Nil
     private var done = false
     val seqId = Helpers.nextNum
@@ -881,6 +882,7 @@ class LiftServlet extends Loggable {
         LAPinger.schedule(this, BreakOut(), 5)
 
       case BreakOut() if !done =>
+        logger.trace("Breaking out continuation actor for " + request)
         done = true
         session.exitComet(this)
         actors.foreach { case (act, _) =>

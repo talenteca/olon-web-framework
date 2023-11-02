@@ -24,7 +24,7 @@ import Helpers._
   *
   * <p>More detailed usage of each method is provided below</p>
   */
-object Menu extends DispatchSnippet {
+object Menu extends DispatchSnippet with Loggable {
   def dispatch: DispatchIt = {
     case "builder" => builder
     case "title"   => title
@@ -77,6 +77,7 @@ object Menu extends DispatchSnippet {
     * <pre> &lt;lift:Menu.builder li_item:style="color: red;" /&gt; </pre>
     */
   def builder(info: NodeSeq): NodeSeq = {
+    logger.trace("Builder for " + info.size + " nodes")
     val outerTag: String = S.attr("outer_tag") openOr "ul"
     val innerTag: String = S.attr("inner_tag") openOr "li"
     val expandAll = (S.attr("expandAll") or S.attr("expandall")).isDefined
@@ -267,6 +268,7 @@ object Menu extends DispatchSnippet {
      else S.request.map(_.buildMenu.lines)) openOr Nil
 
   def jsonMenu(ignore: NodeSeq): NodeSeq = {
+    logger.trace("JSON menu for " + ignore.size + " ignored nodes")
     val toRender = renderWhat(true)
 
     def buildItem(in: MenuItem): JsExp = in match {

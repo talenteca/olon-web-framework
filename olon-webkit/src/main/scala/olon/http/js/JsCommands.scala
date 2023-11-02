@@ -720,11 +720,14 @@ trait JsCmd extends HtmlFixer with ToJsCmd {
   override def toString() = "JsCmd(" + toJsCmd + ")"
 }
 
-object JsCmd {
+object JsCmd extends Loggable {
 
   /** If you've got Unit and need a JsCmd, return a Noop
     */
-  implicit def unitToJsCmd(in: Unit): JsCmd = JsCmds.Noop
+  implicit def unitToJsCmd(in: Unit): JsCmd = {
+    logger.trace("No operations Javascript command for " + in)
+    JsCmds.Noop
+  }
 }
 
 object JsCmds {

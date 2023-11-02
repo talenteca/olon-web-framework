@@ -1300,6 +1300,7 @@ trait SHtml extends Loggable {
       jsFunc: Call,
       attrs: ElemAttr*
   )(onSubmit: T => JsCmd)(implicit f: PairStringPromoter[T]): Elem = {
+    logger.trace("Ajax select element for " + attrs)
     ajaxSelectObj[T](options.map(v => (v, f(v))), default, jsFunc, onSubmit)
   }
 
@@ -2007,7 +2008,7 @@ trait SHtml extends Loggable {
       attrs: ElemAttr*
   ): Elem = {
     import Helpers._
-
+    logger.trace("Number double with max " + max)
     makeFormElement("number", func, attrs: _*) %
       ("value" -> value.toString) %
       ("min" -> min.toString) %

@@ -863,7 +863,8 @@ object Loc {
     *   pages)
     */
   class Link[-T](val uriList: List[String], val matchHead_? : Boolean)
-      extends PartialFunction[Req, Box[Boolean]] {
+      extends PartialFunction[Req, Box[Boolean]]
+      with Loggable {
     def this(b: List[String]) = this(b, false)
 
     def isDefinedAt(req: Req): Boolean = {
@@ -883,7 +884,10 @@ object Loc {
     /** Override this method to modify the uriList with data from the Loc's
       * value
       */
-    def pathList(value: T): List[String] = uriList
+    def pathList(value: T): List[String] = {
+      logger.trace("Path list for " + value)
+      uriList
+    }
 
     /** Creates a string representation of the path to the Loc.
       */

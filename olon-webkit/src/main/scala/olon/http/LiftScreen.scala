@@ -541,6 +541,7 @@ trait AbstractScreen extends Factory with Loggable {
       man: Manifest[T],
       marker: BoxMarker
   ): Field { type ValueType = T } = {
+    logger.trace("Field for " + marker)
     val paramFieldId: Box[String] = (stuff.collect { case FormFieldId(id) =>
       id
     }).headOption
@@ -776,9 +777,11 @@ trait AbstractScreen extends Factory with Loggable {
 
   def noticeTypeToAttr(
       screen: AbstractScreen
-  ): Box[NoticeType.Value => MetaData] =
+  ): Box[NoticeType.Value => MetaData] = {
+    logger.trace("Notice type to attribute for " + screen)
     inject[NoticeType.Value => MetaData] or LiftScreenRules
       .inject[NoticeType.Value => MetaData]
+  }
 
   /** Create a field that's added to the Screen
     *
@@ -1938,8 +1941,6 @@ trait LiftScreen
            "document.getElementById(" + cancelId.encJs + ").submit()"
          }))
 
-    val url = S.uri
-
     def fieldBinding(field: BaseField): Box[FieldBinding] =
       field match {
         case f: Field => f.binding
@@ -2087,7 +2088,6 @@ trait StringField extends FieldIdentifier with StringValidators {
 }
 
 object LiftScreenRules extends Factory with FormVendor {
-  private def m[T](implicit man: Manifest[T]): Manifest[T] = man
 
   val allTemplatePath: FactoryMaker[List[String]] =
     new FactoryMaker[List[String]](() =>

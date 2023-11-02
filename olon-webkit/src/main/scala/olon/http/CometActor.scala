@@ -920,6 +920,7 @@ trait BaseCometActor
         ls <- lifespan
         if listeners.isEmpty && (lastListenerTime + ls.millis + 1000L) < millis
       } {
+        logger.trace("Stutting down with lifespan " + ls)
         this ! ShutDown
       }
 
@@ -1353,7 +1354,7 @@ private[http] class XmlOrJsCmd(
     spanFunc: (NodeSeq) => NodeSeq,
     ignoreHtmlOnJs: Boolean,
     notices: List[(NoticeType.Value, NodeSeq, Box[String])]
-) {
+) extends Loggable {
   def this(
       id: String,
       ro: RenderOut,
@@ -1385,6 +1386,7 @@ private[http] class XmlOrJsCmd(
   /** Returns the JsCmd that will be sent to client
     */
   def toJavaScript(session: LiftSession, displayAll: Boolean): JsCmd = {
+    logger.trace("Converting to Javascript for session " + session.contextPath)
     val updateJs =
       (if (ignoreHtmlOnJs) Empty else xml, javaScript, displayAll) match {
         case (Full(xml), Full(js), false) =>

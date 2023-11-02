@@ -374,7 +374,7 @@ class LiftSession(
 
   /** Private no-arg constructor needed for deserialization.
     */
-  private[this] def this() = this("", "", Empty)
+  private[http] def this() = this("", "", Empty)
 
   def sessionHtmlProperties =
     LiftRules.htmlProperties.session.is.make openOr LiftRules.htmlProperties.default.is.vend
@@ -444,7 +444,7 @@ class LiftSession(
     * See LiftServlet.handleAjax for how we determine we no longer need to hold
     * a reference to an AJAX request.
     */
-  private var ajaxRequests =
+  private val ajaxRequests =
     scala.collection.mutable.Map[String, List[AjaxRequestInfo]]()
 
   private[http] def withAjaxRequests[T](
@@ -539,7 +539,7 @@ class LiftSession(
                 else
                   soFar
               } catch {
-                case exception: Exception =>
+                case _: Exception =>
                   (valid, invalid :+ pair)
               }
           }
@@ -636,7 +636,7 @@ class LiftSession(
           Option(nasyncById.get(id)).toList.flatMap(a =>
             a.!?(ActionMessageSet(f.map(i => buildFunc(i)), state)) match {
               case li: List[_] => li
-              case other       => Nil
+              case _           => Nil
             }
           )
         case _ => f.map(i => buildFunc(i).apply())
@@ -653,6 +653,7 @@ class LiftSession(
       uniqueId: String,
       when: Long
   ): Unit = {
+    logger.trace("Updating function map when " + when)
     funcs.foreach { case (name, func) =>
       nmessageCallback.put(
         name,
@@ -1213,6 +1214,7 @@ class LiftSession(
       re: ResponseShortcutException,
       request: Req
   ): LiftResponse = {
+    logger.trace("Handing redirect for " + request)
     if (re.doNotices) notices = S.getAllNotices
 
     re.response
@@ -1274,22 +1276,6 @@ class LiftSession(
         RedirectResponse(attachRedirectFunc(uri, state.func), cookies: _*)
       case _ => resp
     }
-
-  private def allElems(in: NodeSeq, f: Elem => Boolean): List[Elem] = {
-    val lb = new ListBuffer[Elem]
-
-    def appendAll(in: NodeSeq, lb: ListBuffer[Elem]): Unit = {
-      in.foreach {
-        case Group(ns)       => appendAll(ns, lb)
-        case e: Elem if f(e) => lb += e; appendAll(e.child, lb)
-        case e: Elem         => appendAll(e.child, lb)
-        case _               =>
-      }
-    }
-    appendAll(in, lb)
-
-    lb.toList
-  }
 
   object currentSourceContext extends TransientRequestVar[Any](Empty)
 
@@ -1430,6 +1416,7 @@ class LiftSession(
       path: ParsePath,
       session: Req
   ): Box[NodeSeq] = {
+    logger.trace("Finding visible template for " + session)
     val tpath = path.partPath
     val splits = tpath.toList.filter { a =>
       !a.startsWith("_") && !a.startsWith(".") && a.toLowerCase.indexOf(
@@ -1473,7 +1460,7 @@ class LiftSession(
       )
 
     } catch {
-      case e: IllegalAccessException => Empty
+      case _: IllegalAccessException => Empty
     }
   }
 
@@ -1634,12 +1621,11 @@ class LiftSession(
       addlMsg: NodeSeq,
       whole: NodeSeq
   ): NodeSeq = {
-    (for {
-      nodeSeq <- S.currentSnippetNodeSeq if S.ignoreFailedSnippets
-    } yield {
-      // don't keep nailing the same snippet name if we just failed it
-      (snippetName or S.currentSnippet).foreach(s => _lastFoundSnippet.set(s))
-      nodeSeq
+    (S.currentSnippetNodeSeq.filter(_ => S.ignoreFailedSnippets).map {
+      nodeSeq =>
+        // don't keep nailing the same snippet name if we just failed it
+        (snippetName or S.currentSnippet).foreach(s => _lastFoundSnippet.set(s))
+        nodeSeq
     }) openOr {
 
       for {
@@ -1818,6 +1804,7 @@ class LiftSession(
         method: String,
         kids: NodeSeq
     )(f: => NodeSeq): NodeSeq = {
+      logger.trace("Run whitelist for " + snippet)
       val pf = LiftRules.snippetWhiteList.vend()
       val pair = (cls, method)
       if (pf.isDefinedAt(pair)) {
@@ -2062,7 +2049,7 @@ class LiftSession(
     def checkMultiPart(in: MetaData): MetaData =
       in.filter(_.key == "multipart").toList match {
         case Nil => Null
-        case x =>
+        case _ =>
           new UnprefixedAttribute("enctype", Text("multipart/form-data"), Null)
       }
 
@@ -2200,8 +2187,6 @@ class LiftSession(
 
   liftTagProcessing =
     LiftRules.liftTagProcessing.toList ::: List(_defaultLiftTagProcessing)
-
-  private def asNodeSeq(in: Seq[Node]): NodeSeq = in
 
   private class DeferredProcessor extends SpecializedLiftActor[ProcessSnippet] {
     protected def messageHandler = { case ProcessSnippet(f) =>

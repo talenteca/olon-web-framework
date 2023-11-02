@@ -102,8 +102,9 @@ trait MVCHelper extends LiftRules.DispatchPF {
     tryIt(req.path.partPath)
   }
 
-  object MVCResponse {
-    implicit def unitToResponse(unit: Unit): MVCResponse =
+  object MVCResponse extends Loggable {
+    implicit def unitToResponse(unit: Unit): MVCResponse = {
+      logger.trace("Converting to response " + unit)
       new MVCResponse {
         val toResponse: Box[LiftResponse] =
           for {
@@ -113,6 +114,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
             resp <- session.processTemplate(Full(template), req, req.path, 200)
           } yield resp
       }
+    }
 
     implicit def bindToResponse(bind: CssBindFunc): MVCResponse =
       new MVCResponse {

@@ -4,6 +4,7 @@ package snippet
 
 import olon.common.Empty
 import olon.common.Full
+import olon.common.Loggable
 import olon.http.S._
 import olon.http._
 import olon.util.Helpers._
@@ -43,7 +44,7 @@ import scala.xml._
   * @see
   *   olon.http.LiftRules#noticesEffects
   */
-object Msg extends DispatchSnippet {
+object Msg extends DispatchSnippet with Loggable {
   def dispatch: DispatchIt = { case _ =>
     render
   }
@@ -52,6 +53,7 @@ object Msg extends DispatchSnippet {
     * rendering of any messages for the given id.
     */
   def render(styles: NodeSeq): NodeSeq = {
+    logger.trace("Rendering styles " + styles.size + " nodes")
     attr("id") match {
       case Full(id) => {
         // Extract the currently set CSS
