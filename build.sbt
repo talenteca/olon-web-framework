@@ -61,6 +61,7 @@ lazy val libs = new {
   lazy val scala_parser =
     Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2")
 
+  // Scala XML version 2.2.0 has conflicts with NU validator and breaks tests
   lazy val scala_xml = Seq("org.scala-lang.modules" %% "scala-xml" % "2.1.0")
 
   lazy val rhino = Seq("org.mozilla" % "rhino" % "1.7.10")
@@ -111,8 +112,9 @@ lazy val libs = new {
   lazy val specs2MatchersProv =
     Seq("org.specs2" %% "specs2-matcher-extra" % versions.specs2 % Provided)
 
-  lazy val specs2Mock = Seq(
-    "org.specs2" %% "specs2-mock" % versions.specs2 % Test
+  // Mockito version 5.6.0 freezes the tests
+  lazy val mockito = Seq(
+    "org.mockito" % "mockito-core" % "4.11.0" % Test
   )
 
   lazy val json4s = Seq("org.json4s" %% "json4s-native" % "4.0.6" % Test)
@@ -123,7 +125,7 @@ ThisBuild / scalaVersion := versions.scala2Version
 ThisBuild / libraryDependencies ++=
   libs.specs2Core ++
     libs.specs2Matchers ++
-    libs.specs2Mock ++
+    libs.mockito ++
     libs.scalacheck
 
 ThisBuild / scalacOptions ++= Seq(

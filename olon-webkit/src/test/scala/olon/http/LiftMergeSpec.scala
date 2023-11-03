@@ -1,19 +1,19 @@
 package olon
 package http
 
+import org.mockito.Mockito._
 import org.specs2._
 
 import scala.xml._
 
 import mutable.Specification
 import matcher.XmlMatchers
-import mock.Mockito
 import common._
 import js.pageScript
 
-class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
-  val mockReq = mock[Req]
-  mockReq.contextPath returns "/context-path"
+class LiftMergeSpec extends Specification with XmlMatchers {
+  val mockReq = mock[Req]()
+  doReturn("/context-path").when(mockReq).contextPath;
 
   val testSession = new LiftSession("/context-path", "underlying id", Empty)
 

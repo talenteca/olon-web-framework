@@ -1,8 +1,8 @@
 package olon
 package http
 
+import org.mockito.Mockito._
 import org.specs2.matcher.XmlMatchers
-import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
@@ -16,7 +16,7 @@ import provider._
 
 /** System under specification for Req.
   */
-class ReqSpec extends Specification with XmlMatchers with Mockito {
+class ReqSpec extends Specification with XmlMatchers {
   "Req Specification".title
 
   private val iPhoneUserAgents =
@@ -91,7 +91,7 @@ class ReqSpec extends Specification with XmlMatchers with Mockito {
     }
 
     trait mockReq extends Scope {
-      val mockHttpRequest = mock[HTTPRequest]
+      val mockHttpRequest = mock[HTTPRequest]()
       def paramCalcInfo = ParamCalcInfo(
         Nil,
         Map.empty,

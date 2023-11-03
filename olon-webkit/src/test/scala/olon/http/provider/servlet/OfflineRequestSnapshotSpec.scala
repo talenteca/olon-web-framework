@@ -3,9 +3,8 @@ package olon.http.provider.servlet
 import olon.http.provider._
 import olon.mockweb.WebSpec
 import org.mockito.Mockito._
-import org.specs2.mock.Mockito
 
-object OfflineRequestSnapshotSpec extends WebSpec with Mockito {
+object OfflineRequestSnapshotSpec extends WebSpec {
 
   private[this] val X_SSL = "X-SSL"
   private[this] val xSSLHeader = HTTPParam(X_SSL, List("true")) :: Nil
@@ -65,7 +64,7 @@ object OfflineRequestSnapshotSpec extends WebSpec with Mockito {
       headers: List[HTTPParam] = Nil,
       params: List[HTTPParam] = Nil
   ) = {
-    val mockHttpRequest = mock[HTTPRequest]
+    val mockHttpRequest = mock[HTTPRequest]()
     val httpProvider = new HTTPProvider {
       override protected def context: HTTPContext = null
     }

@@ -1,10 +1,12 @@
 package olon
 package common
 
-import org.specs2.mock.Mockito
+import org.mockito.Answers
+import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
 import org.specs2.mutable.Specification
 
-class BoxLoggingSpec extends Specification with Mockito {
+class BoxLoggingSpec extends Specification {
   class MockBoxLoggingClass extends BoxLogging {
     var loggedErrors = List[(String, Option[Throwable])]()
     var loggedWarns = List[(String, Option[Throwable])]()
@@ -577,8 +579,23 @@ class BoxLoggingSpec extends Specification with Mockito {
       import olon.common.Logger
       import org.slf4j.{Logger => SLF4JLogger}
 
-      val mockLogger = mock[SLF4JLogger]
-      mockLogger.isErrorEnabled() returns true
+      val mockLogger = mock[SLF4JLogger]()
+      doReturn(true).when(mockLogger).isErrorEnabled()
+
+      var errorsWithString = 0
+      var errorsWithStringAndThrowable = 0
+
+      doAnswer({
+        errorsWithString = errorsWithString + 1
+        Answers.RETURNS_DEFAULTS
+      }).when(mockLogger)
+        .error(anyString())
+
+      doAnswer({
+        errorsWithStringAndThrowable = errorsWithStringAndThrowable + 1
+        Answers.RETURNS_DEFAULTS
+      }).when(mockLogger)
+        .error(anyString(), any[Throwable]())
 
       class MyLoggable extends LoggableBoxLogging {
         override val logger = new Logger {
@@ -593,15 +610,30 @@ class BoxLoggingSpec extends Specification with Mockito {
             .logFailure("Third")
         }
 
-        (there was one(mockLogger).error(any[String])) and
-          (there was one(mockLogger).error(any[String], any[Exception]))
+        errorsWithString === 1
+        errorsWithStringAndThrowable === 1
       }
     }
 
     "when logging with in SLF4J context" in {
       import org.slf4j.{Logger => SLF4JLogger}
 
-      val mockLogger = mock[SLF4JLogger]
+      val mockLogger = mock[SLF4JLogger]()
+
+      var errorsWithString = 0
+      var errorsWithStringAndThrowable = 0
+
+      doAnswer({
+        errorsWithString = errorsWithString + 1
+        Answers.RETURNS_DEFAULTS
+      }).when(mockLogger)
+        .error(anyString())
+
+      doAnswer({
+        errorsWithStringAndThrowable = errorsWithStringAndThrowable + 1
+        Answers.RETURNS_DEFAULTS
+      }).when(mockLogger)
+        .error(anyString(), any[Throwable]())
 
       class TestClass extends SLF4JBoxLogging {
         val logger = mockLogger
@@ -614,8 +646,8 @@ class BoxLoggingSpec extends Specification with Mockito {
             .logFailure("Third")
         }
 
-        there was one(mockLogger).error(any[String])
-        there was one(mockLogger).error(any[String], any[Exception])
+        errorsWithString === 1
+        errorsWithStringAndThrowable === 1
       }
     }
   }

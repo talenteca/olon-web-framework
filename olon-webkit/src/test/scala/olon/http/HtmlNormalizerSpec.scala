@@ -5,9 +5,8 @@ import org.specs2._
 
 import mutable.Specification
 import matcher.XmlMatchers
-import mock.Mockito
 
-class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
+class HtmlNormalizerSpec extends Specification with XmlMatchers {
   val eventAttributeMatcher = "(?s).*\\W(on[a-zA-Z]+)=.*".r
 
   "HtmlNormalizer when normalizing HTML and event handlers" should {
