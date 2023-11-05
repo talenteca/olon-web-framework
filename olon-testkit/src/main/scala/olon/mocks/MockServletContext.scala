@@ -291,8 +291,6 @@ class MockHttpSession extends HttpSession {
       def nextElement(): String = keys.next()
     }
 
-  def getSessionContext(): HttpSessionContext = null
-
   def getMaxInactiveInterval(): Int = maxii
 
   def setMaxInactiveInterval(i: Int): Unit = maxii = i

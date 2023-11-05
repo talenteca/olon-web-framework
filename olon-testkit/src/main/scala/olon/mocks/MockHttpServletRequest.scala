@@ -7,6 +7,7 @@ import jakarta.servlet.http._
 import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
+import java.net.URI
 import java.net.URL
 import java.security.Principal
 import java.text.ParseException
@@ -45,6 +46,13 @@ class MockHttpServletRequest(
     val url: String = null,
     var contextPath: String = ""
 ) extends HttpServletRequest {
+
+  def getProtocolRequestId(): String = ???
+
+  def getRequestId(): String = ???
+
+  def getServletConnection(): jakarta.servlet.ServletConnection = ???
+
   var attributes: Map[String, Object] = Map()
 
   var authType: String = null
@@ -282,7 +290,7 @@ class MockHttpServletRequest(
     */
   def processUrl(url: String): Unit = {
     if (url.toLowerCase.startsWith("http")) {
-      processUrl(new URL(url))
+      processUrl(URI.create(url).parseServerAuthority().toURL())
     } else if (url.startsWith("/")) {
       computeRealPath(url).split('?') match {
         case Array(path, query) => this.path = path; queryString = query

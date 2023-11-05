@@ -25,7 +25,6 @@ case class HTTPCookie(
     domain: Box[String],
     path: Box[String],
     maxAge: Box[Int],
-    version: Box[Int],
     secure_? : Box[Boolean],
     httpOnly: Box[Boolean] = Empty,
     sameSite: Box[SameSite.Value] = Empty
@@ -90,16 +89,6 @@ case class HTTPCookie(
     *   HTTPCookie
     */
   def setMaxAge(newMaxAge: Int): HTTPCookie = copy(maxAge = Box !! newMaxAge)
-
-  /** Returns a new HTTPCookie that preserve existing member values but sets the
-    * cookie version to newVersion
-    * @param newVersion
-    *   \- the new cookie version
-    * @return
-    *   HTTPCookie
-    */
-  def setVersion(newVersion: Int): HTTPCookie =
-    copy(version = Box !! newVersion)
 
   /** Returns a new HTTPCookie that preserve existing member values but sets the
     * cookie secure flag to newSecure

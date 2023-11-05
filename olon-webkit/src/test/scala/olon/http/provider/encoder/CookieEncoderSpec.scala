@@ -19,7 +19,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Full(true),
         httpOnly = Empty,
         sameSite = Empty
@@ -34,7 +33,6 @@ object CookieEncoderSpec extends Specification {
         domain = Full("test-domain.com"),
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Empty,
         httpOnly = Empty,
         sameSite = Empty
@@ -51,7 +49,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Full("/test-path"),
         maxAge = Empty,
-        version = Empty,
         secure_? = Empty,
         httpOnly = Empty,
         sameSite = Empty
@@ -68,7 +65,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Full(10),
-        version = Empty,
         secure_? = Empty,
         httpOnly = Empty,
         sameSite = Empty
@@ -85,7 +81,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Empty,
         httpOnly = Full(true),
         sameSite = Empty
@@ -100,7 +95,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Empty,
         httpOnly = Empty,
         sameSite = Full(SameSite.LAX)
@@ -115,7 +109,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Empty,
         httpOnly = Empty,
         sameSite = Full(SameSite.NONE)
@@ -130,7 +123,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Empty,
         httpOnly = Empty,
         sameSite = Full(SameSite.STRICT)
@@ -147,7 +139,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Full(true),
         httpOnly = Empty,
         sameSite = Full(SameSite.NONE)
@@ -164,7 +155,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Full(10),
-        version = Empty,
         secure_? = Full(true),
         httpOnly = Empty,
         sameSite = Full(SameSite.NONE)
@@ -183,7 +173,6 @@ object CookieEncoderSpec extends Specification {
         domain = Full("test-domain.com"),
         path = Full("/test-path"),
         maxAge = Full(10),
-        version = Empty,
         secure_? = Full(true),
         httpOnly = Full(false),
         sameSite = Full(SameSite.LAX)
@@ -204,7 +193,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Full(true),
         httpOnly = Full(true),
         sameSite = Empty
@@ -221,7 +209,6 @@ object CookieEncoderSpec extends Specification {
         domain = Empty,
         path = Empty,
         maxAge = Empty,
-        version = Empty,
         secure_? = Empty,
         httpOnly = Empty,
         sameSite = Empty
@@ -229,51 +216,6 @@ object CookieEncoderSpec extends Specification {
       CookieEncoder.encode(cookie) must_== "test-name="
     }
 
-    "must fail trying to convert an invalid name cookie" in {
-      val cookie = HTTPCookie("invalid-name=", "test-value")
-      CookieEncoder.encode(cookie) must throwA[IllegalArgumentException](
-        "Cookie name contains an invalid char: ="
-      )
-    }
-
-    "must fail trying to convert an invalid value cookie" in {
-      val cookie = HTTPCookie("test-name", "invalid-value\t")
-      CookieEncoder.encode(cookie) must throwA[IllegalArgumentException](
-        "Cookie value contains an invalid char: \t"
-      )
-    }
-
-    "must skip validation for old version cookies" in {
-      val cookie = HTTPCookie(
-        name = "invalid-name=",
-        value = Full("invalid-value\t"),
-        domain = Empty,
-        path = Empty,
-        maxAge = Empty,
-        version = Full(0),
-        secure_? = Empty,
-        httpOnly = Empty,
-        sameSite = Empty
-      )
-      CookieEncoder.encode(cookie) must_== "invalid-name==invalid-value\t"
-    }
-
-    "must validate new version cookies" in {
-      val cookie = HTTPCookie(
-        name = "invalid-name=",
-        value = Full("invalid-value\t"),
-        domain = Empty,
-        path = Empty,
-        maxAge = Empty,
-        version = Full(1),
-        secure_? = Empty,
-        httpOnly = Empty,
-        sameSite = Empty
-      )
-      CookieEncoder.encode(cookie) must throwA[IllegalArgumentException](
-        "Cookie name contains an invalid char: ="
-      )
-    }
   }
 
 }

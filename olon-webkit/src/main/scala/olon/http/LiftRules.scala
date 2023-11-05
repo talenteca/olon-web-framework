@@ -8,6 +8,7 @@ import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.StringReader
+import java.net.URI
 import java.util.Locale
 import java.util.ResourceBundle
 import java.util.TimeZone
@@ -2336,7 +2337,6 @@ abstract class GenericValidator extends XHtmlValidator with Loggable {
   import javax.xml.validation._
   import javax.xml._
   import XMLConstants._
-  import java.net.URL
   import javax.xml.transform.stream._
   import java.io.ByteArrayInputStream
 
@@ -2344,7 +2344,9 @@ abstract class GenericValidator extends XHtmlValidator with Loggable {
 
   protected def ngurl: String
 
-  private lazy val schema = tryo(sf.newSchema(new URL(ngurl)))
+  private lazy val schema = tryo(
+    sf.newSchema(URI.create(ngurl).parseServerAuthority().toURL())
+  )
 
   def apply(in: Node): List[XHTMLValidationError] = {
     (for {

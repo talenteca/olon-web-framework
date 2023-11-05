@@ -23,10 +23,6 @@ import java.util._
   */
 object CookieEncoder {
 
-  private val VALID_COOKIE_NAME_OCTETS = validCookieNameOctets();
-
-  private val VALID_COOKIE_VALUE_OCTETS = validCookieValueOctets();
-
   private val PATH = "Path"
 
   private val EXPIRES = "Expires"
@@ -62,10 +58,6 @@ object CookieEncoder {
   def encode(cookie: HTTPCookie): String = {
     val name = cookie.name
     val value = cookie.value.getOrElse("")
-    val skipValidation = isOldVersionCookie(cookie)
-    if (!skipValidation) {
-      validateCookie(name, value)
-    }
     val buf = new StringBuilder()
     add(buf, name, value);
     cookie.maxAge foreach { maxAge =>
@@ -100,46 +92,6 @@ object CookieEncoder {
     stripTrailingSeparator(buf)
   }
 
-  private def validateCookie(name: String, value: String): Unit = {
-    val posFirstInvalidCookieNameOctet = firstInvalidCookieNameOctet(name)
-    if (posFirstInvalidCookieNameOctet >= 0) {
-      throw new IllegalArgumentException(
-        "Cookie name contains an invalid char: " +
-          name.charAt(posFirstInvalidCookieNameOctet)
-      )
-    }
-    val unwrappedValue = unwrapValue(value);
-    if (unwrappedValue == null) {
-      throw new IllegalArgumentException(
-        "Cookie value wrapping quotes are not balanced: " +
-          value
-      );
-    }
-    val postFirstInvalidCookieValueOctet = firstInvalidCookieValueOctet(
-      unwrappedValue
-    )
-    if (postFirstInvalidCookieValueOctet >= 0) {
-      throw new IllegalArgumentException(
-        "Cookie value contains an invalid char: " +
-          unwrappedValue.charAt(postFirstInvalidCookieValueOctet)
-      );
-    }
-  }
-
-  /** Checks if the cookie is set with an old version 0.
-    *
-    * More info about the cookie version at
-    * https://javadoc.io/static/jakarta.servlet/jakarta.servlet-api/5.0.0/jakarta/servlet/http/Cookie.html#setVersion-int-
-    *
-    * @param cookie
-    * @return
-    *   true if the cookie version is 0, false if it has no value or a different
-    *   value than 0
-    */
-  private def isOldVersionCookie(cookie: HTTPCookie): Boolean = {
-    cookie.version map (_ == 0) getOrElse false
-  }
-
   private def appendDate(date: Date, sb: StringBuilder): StringBuilder = {
     val cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
     cal.setTime(date)
@@ -161,25 +113,6 @@ object CookieEncoder {
       sb.append('0');
     }
     return sb.append(value);
-  }
-
-  private def validCookieNameOctets() = {
-    val bits = new BitSet()
-    (32 until 127) foreach bits.set
-    val separators = Array('(', ')', '<', '>', '@', ',', ';', ':', '\\', '"',
-      '/', '[', ']', '?', '=', '{', '}', ' ', '\t')
-    separators.foreach(separator => bits.set(separator, false))
-    bits
-  }
-
-  private def validCookieValueOctets() = {
-    val bits = new BitSet()
-    bits.set(0x21);
-    (0x23 to 0x2b) foreach bits.set
-    (0x2d to 0x3a) foreach bits.set
-    (0x3c to 0x5b) foreach bits.set
-    (0x5d to 0x7e) foreach bits.set
-    bits
   }
 
   private def stripTrailingSeparator(buf: StringBuilder) = {
@@ -209,37 +142,6 @@ object CookieEncoder {
     sb.append(name);
     sb.append(';');
     sb.append(' ');
-  }
-
-  private def firstInvalidCookieNameOctet(cs: CharSequence): Int = {
-    return firstInvalidOctet(cs, VALID_COOKIE_NAME_OCTETS);
-  }
-
-  private def firstInvalidCookieValueOctet(cs: CharSequence): Int = {
-    return firstInvalidOctet(cs, VALID_COOKIE_VALUE_OCTETS);
-  }
-
-  private def firstInvalidOctet(cs: CharSequence, bits: BitSet): Int = {
-    (0 until cs.length()).foreach { i =>
-      val c = cs.charAt(i)
-      if (!bits.get(c)) {
-        return i;
-      }
-    }
-    -1;
-  }
-
-  private def unwrapValue(cs: CharSequence): CharSequence = {
-    val len = cs.length()
-    if (len > 0 && cs.charAt(0) == '"') {
-      if (len >= 2 && cs.charAt(len - 1) == '"') {
-        if (len == 2) "" else cs.subSequence(1, len - 1)
-      } else {
-        null
-      }
-    } else {
-      cs
-    }
   }
 
 }

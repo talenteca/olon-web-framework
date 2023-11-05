@@ -6,7 +6,7 @@ import org.specs2.matcher.XmlMatchers
 import org.specs2.mutable.Specification
 
 import java.net.InetAddress
-import java.net.URL
+import java.net.URI
 
 import util._
 import http._
@@ -30,7 +30,10 @@ object OneShot extends Specification with RequestKit with XmlMatchers {
   private val port_ =
     System.getProperty("olon.webapptest.oneshot.port", "8181").toInt
 
-  private lazy val baseUrl_ = new URL("http://%s:%s".format(host_, port_))
+  private lazy val baseUrl_ = URI
+    .create("http://%s:%s".format(host_, port_))
+    .parseServerAuthority()
+    .toURL()
 
   private lazy val jetty = new JettyTestServer(Full(baseUrl_))
 

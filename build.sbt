@@ -3,7 +3,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / pgpSigningKey := Some("csaltos@talenteca.io")
 
 ThisBuild / organization := "com.talenteca"
-ThisBuild / version := "4.0.0-RC1"
+ThisBuild / version := "5.0.0-RC1"
 ThisBuild / description := "Olon is a modern web framework based on the view first strategy (based on the Lift web framework)"
 ThisBuild / homepage := Some(
   url("https://github.com/talenteca/olon-web-framework")
@@ -23,7 +23,7 @@ lazy val versions = new {
 
   val slf4jVersion = "1.7.36"
 
-  val jetty = "11.0.18"
+  val jetty = "12.0.3"
 }
 
 lazy val libs = new {
@@ -73,7 +73,7 @@ lazy val libs = new {
   )
 
   lazy val servlet_api =
-    Seq("jakarta.servlet" % "jakarta.servlet-api" % "5.0.0" % Provided)
+    Seq("jakarta.servlet" % "jakarta.servlet-api" % "6.0.0" % Provided)
 
   lazy val jquery = Seq("org.webjars.bower" % "jquery" % "1.11.3" % Provided)
 
@@ -86,8 +86,8 @@ lazy val libs = new {
   lazy val log4j = Seq("log4j" % "log4j" % "1.2.17" % Provided)
 
   lazy val jetty = Seq(
-    "org.eclipse.jetty" % "jetty-server" % versions.jetty % Test,
-    "org.eclipse.jetty" % "jetty-webapp" % versions.jetty % Test
+    "org.eclipse.jetty" % "jetty-server" % versions.jetty % Test withSources (),
+    "org.eclipse.jetty.ee10" % "jetty-ee10-webapp" % versions.jetty % Test withSources ()
   )
 
   lazy val jwebunit =
@@ -134,6 +134,8 @@ ThisBuild / scalacOptions ++= Seq(
   "-language:implicitConversions",
   "-Ypatmat-exhaust-depth",
   "80",
+  "-Xfatal-warnings",
+  "-Wunused:imports",
   "-Ywarn-unused"
 )
 

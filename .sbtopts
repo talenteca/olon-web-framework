@@ -1,1 +1,1 @@
---mem 4096 -J-Xss8M -J-XX:+CMSClassUnloadingEnabled
+--mem 4096 -J-Xss8M

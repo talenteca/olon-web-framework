@@ -3,16 +3,22 @@ package webapptest
 
 import junit.framework.AssertionFailedError
 import net.sourceforge.jwebunit.junit.WebTester
+import org.eclipse.jetty.ee10.webapp.WebAppContext
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.webapp.WebAppContext
 
+import java.net.URI
 import java.net.URL
 
 import common.Box
 
 final class JettyTestServer(baseUrlBox: Box[URL]) {
 
-  def baseUrl = baseUrlBox getOrElse new URL("http://127.0.0.1:8080")
+  private val defaultUrl = URI
+    .create("http://127.0.0.1:8080")
+    .parseServerAuthority()
+    .toURL()
+
+  val baseUrl = baseUrlBox getOrElse defaultUrl
 
   private val (server_, context_) = {
     val server = new Server(baseUrl.getPort)
@@ -35,7 +41,7 @@ final class JettyTestServer(baseUrlBox: Box[URL]) {
   }
 
   def stop(): Unit = {
-    context_.shutdown()
+    context_.stop()
     server_.stop()
     server_.join()
   }
