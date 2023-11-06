@@ -1,7 +1,7 @@
 # CHANGELOG
 
 * 2023/11/05 Release Olon 5.0.0-RC1 with support Jetty 12 and Jakarta EE
-  Servlet API 6 (JDK 17+ is required). The cookie version field is dropped to
+  Servlet API 6 (JDK 11+ is required). The cookie version field is dropped to
   align with RFC 6265 cookies standard included at the new Jakarta EE Servlet
   API 6.
 

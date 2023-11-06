@@ -4,7 +4,7 @@
 
   * Supports Tomcat 10.1 and Jetty 12
   * Compatible with Jakarta EE 10 Servlet API 6
-  * JDK 17+ and Scala 2.13 are required
+  * JDK 11+ and Scala 2.13 are required
 
 ## Olon 4.0.0
 
