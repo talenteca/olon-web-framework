@@ -143,11 +143,11 @@ ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-language:implicitConversions",
-  "-Ypatmat-exhaust-depth",
+  // SCALA3 ignored option "-Ypatmat-exhaust-depth",
   "80",
   "-Xfatal-warnings",
   "-Wunused:imports",
-  "-Ywarn-unused"
+  // SCALA3 ignored option "-Ywarn-unused"
 )
 
 ThisBuild / scalafmtOnCompile := true
