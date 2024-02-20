@@ -110,6 +110,7 @@ object HLists {
           0
         case _ :+: rest =>
           1 + rest.length
+        case _ => ???
       }
     }
   }

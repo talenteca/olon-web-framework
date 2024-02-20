@@ -3,7 +3,7 @@ package common
 
 import java.util.{ArrayList => JavaArrayList}
 import java.util.{Iterator => JavaIterator}
-import scala.language.existentials
+// import scala.language.existentials
 import scala.reflect.Manifest
 
 /** A bridge to make using Lift `[[Box]]` from Java easier.
@@ -151,7 +151,7 @@ sealed trait BoxTrait extends OptionImplicits {
   def apply[T](in: Box[T]) = in match {
     case Full(x)     => legacyNullTest(x)
     case x: EmptyBox => x
-    case _           => Empty
+    case null        => Empty
   }
 
   /** Transform a `List` with zero or more elements to a `Box`, losing all but
@@ -268,8 +268,18 @@ sealed trait BoxTrait extends OptionImplicits {
     * res1: olon.common.Box[Int] = Full(5)
     * }}}
     */
-  def asA[B](in: T forSome { type T })(implicit m: Manifest[B]): Box[B] = {
+  def asA[B](in: Bar)(implicit m: Manifest[B], conv: in.T => Bar): Box[B] = {
     (Box !! in).asA[B]
+  }
+  // Temporary workaround for existential types,
+  // probably best to replace it with an additional type parameter
+  implicit def conv[Q](value0: Q): Bar = new Bar {
+    type T = Q
+    val value = value0
+  }
+  trait Bar {
+    type T
+    val value: T
   }
 }
 
@@ -1138,13 +1148,13 @@ object BoxOrRaw {
   implicit def boxToBoxOrRaw[T, Q](
       r: Box[Q]
   )(implicit ev: Q => T): BoxOrRaw[T] = {
-    BoxedBoxOrRaw(r.map(v => v: T))
+    BoxedBoxOrRaw(r.map(v => ev(v): T))
   }
 
   implicit def optionToBoxOrRaw[T, Q](
       r: Option[Q]
   )(implicit ev: Q => T): BoxOrRaw[T] = {
-    BoxedBoxOrRaw(r.map(v => v: T))
+    BoxedBoxOrRaw(r.map(v => ev(v): T))
   }
 
   implicit def borToBox[T](in: BoxOrRaw[T]): Box[T] = in.box

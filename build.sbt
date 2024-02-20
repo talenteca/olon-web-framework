@@ -49,9 +49,9 @@ lazy val libs = new {
 
   lazy val paranamer = Seq("com.thoughtworks.paranamer" % "paranamer" % "2.8")
 
-  lazy val scalap: ModuleMap = "org.scala-lang" % "scalap" % _
+  lazy val scalap = "org.scala-lang" % "scalap" % "2.13.10" // Experiment, we might want to rewrite for scala 3 using tastyp
 
-  lazy val scala_compiler: ModuleMap = "org.scala-lang" % "scala-compiler" % _
+  // lazy val scala_compiler: ModuleMap = "org.scala-lang" % "scala-compiler" % _  // Not necessary, since we will not be using scala.reflect
 
   lazy val slf4j_api = Seq("org.slf4j" % "slf4j-api" % versions.slf4jVersion)
 
@@ -59,7 +59,7 @@ lazy val libs = new {
     Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0")
 
   lazy val scala_parser =
-    Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2")
+    Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "2.0.0") // previous version was not released for scala 3
 
   // Scala XML version 2.2.0 has conflicts with NU validator and breaks tests
   lazy val scala_xml = Seq("org.scala-lang.modules" %% "scala-xml" % "2.1.0")
@@ -120,7 +120,7 @@ lazy val libs = new {
   lazy val json4s = Seq("org.json4s" %% "json4s-native" % "4.0.6" % Test)
 }
 
-ThisBuild / scalaVersion := versions.scala2Version
+ThisBuild / scalaVersion := versions.scala3Version
 
 ThisBuild / libraryDependencies ++=
   libs.specs2Core ++
@@ -132,11 +132,11 @@ ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-language:implicitConversions",
-  "-Ypatmat-exhaust-depth",
-  "80",
+  // "-Ypatmat-exhaust-depth",
+  // "80",
   "-Xfatal-warnings",
   "-Wunused:imports",
-  "-Ywarn-unused"
+  // "-Ywarn-unused" // replaced with -Wunused:all 
 )
 
 ThisBuild / scalafmtOnCompile := true
@@ -249,7 +249,7 @@ lazy val olon_json = Project("olon-json", file("olon-json"))
     description := "JSON Library",
     Test / parallelExecution := false,
     libraryDependencies ++=
-      Seq(libs.scalap(scalaVersion.value)) ++
+      Seq(libs.scalap) ++
         libs.paranamer ++
         libs.scala_xml ++
         libs.json4s
@@ -271,8 +271,7 @@ lazy val olon_util = Project("olon-util", file("olon-util"))
   .settings(
     description := "Utilities Library",
     Test / parallelExecution := false,
-    libraryDependencies ++= Seq(libs.scala_compiler(scalaVersion.value)) ++
-      libs.joda_time ++
+    libraryDependencies ++= libs.joda_time ++
       libs.joda_convert ++
       libs.commons_codec ++
       libs.htmlparser ++

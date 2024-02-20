@@ -131,7 +131,8 @@ trait BoxLogging {
       }
     }
 
-    private def logFailure(
+    // Most likely a bug in a compiler
+    private[common] def logFailure(
         message: String,
         logFn: (String, Option[Throwable]) => Unit
     ): Unit = {

@@ -31,7 +31,7 @@ sealed trait StringOrNodeSeq {
 object StringOrNodeSeq {
   implicit def strTo[T](str: T)(implicit ev: T => String): StringOrNodeSeq =
     new StringOrNodeSeq {
-      def nodeSeq: NodeSeq = Text(str)
+      def nodeSeq: NodeSeq = Text(ev(str))
     }
 
   /** This is written in terms of a `Seq[Node]` to make sure Scala converts
