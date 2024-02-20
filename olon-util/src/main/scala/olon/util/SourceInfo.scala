@@ -1,3 +1,5 @@
+// SCALA3 these traits are not used, considere to remove them instead of migrate
+// them
 package olon.util
 
 import olon.common.Box

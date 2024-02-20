@@ -271,9 +271,29 @@ sealed trait BoxTrait extends OptionImplicits {
     * res1: olon.common.Box[Int] = Full(5)
     * }}}
     */
+  // SCALA3 using `AnyRef` instead of an existencial type just for
+  // making the compiler happy
   def asA[B](in: AnyRef)(implicit m: Manifest[B]): Box[B] = {
     (Box !! in).asA[B]
   }
+
+  // SCALA3 Experimental alternative reference to the existencial type migration
+  /*
+  def asA[B](in: Bar)(implicit m: Manifest[B], conv: in.T => Bar): Box[B] = {
+    (Box !! in).asA[B]
+  }
+  // Temporary workaround for existential types,
+  // probably best to replace it with an additional type parameter
+  implicit def conv[Q](value0: Q): Bar = new Bar {
+    type T = Q
+    val value = value0
+  }
+  trait Bar {
+    type T
+    val value: T
+  }
+   */
+
 }
 
 /** Used as a return type for certain methods that should not be called. One

@@ -14,8 +14,10 @@ import scala.jdk.CollectionConverters._
 trait Formats { self: Formats =>
   val dateFormat: DateFormat
   val typeHints: TypeHints = NoTypeHints
-  val customSerializers: List[Serializer[_]] = Nil
-  val fieldSerializers: List[(Class[_], FieldSerializer[_])] = Nil
+  // SCALA3 using `?` instead of `_`
+  val customSerializers: List[Serializer[?]] = Nil
+  // SCALA3 using `?` instead of `_`
+  val fieldSerializers: List[(Class[?], FieldSerializer[?])] = Nil
 
   /** Support for the tuple decomposition/extraction that represents tuples as
     * JSON arrays. This provides better support for heterogenous arrays in JSON,
@@ -47,7 +49,8 @@ trait Formats { self: Formats =>
 
   /** Adds the specified custom serializer to this formats.
     */
-  def +(newSerializer: Serializer[_]): Formats = new Formats {
+  // SCALA3 using `?` instead of `_`
+  def +(newSerializer: Serializer[?]): Formats = new Formats {
     val dateFormat = Formats.this.dateFormat
     override val typeHintFieldName = self.typeHintFieldName
     override val parameterNameReader = self.parameterNameReader
@@ -58,7 +61,8 @@ trait Formats { self: Formats =>
 
   /** Adds the specified custom serializers to this formats.
     */
-  def ++(newSerializers: Iterable[Serializer[_]]): Formats =
+  // SCALA3 using `?` instead of `_`
+  def ++(newSerializers: Iterable[Serializer[?]]): Formats =
     newSerializers.foldLeft(this)(_ + _)
 
   /** Adds a field serializer for a given type to this formats.
@@ -74,17 +78,20 @@ trait Formats { self: Formats =>
     // The type inferencer infers an existential type below if we use
     // value :: list instead of list.::(value), and we get a feature
     // warning.
-    override val fieldSerializers: List[(Class[_], FieldSerializer[_])] =
-      self.fieldSerializers.::((mf.runtimeClass: Class[_], newSerializer))
+    // SCALA3 using `?` instead of `_`
+    override val fieldSerializers: List[(Class[?], FieldSerializer[?])] =
+      self.fieldSerializers.::((mf.runtimeClass: Class[?], newSerializer))
   }
 
+  // SCALA3 using `?` instead of `_`
   private[json] def fieldSerializer(
-      clazz: Class[_]
-  ): Option[FieldSerializer[_]] = {
+      clazz: Class[?]
+  ): Option[FieldSerializer[?]] = {
     import ClassDelta._
 
+    // SCALA3 using `?` instead of `_`
     val ord =
-      Ordering[Int].on[(Class[_], FieldSerializer[_])](x => delta(x._1, clazz))
+      Ordering[Int].on[(Class[?], FieldSerializer[?])](x => delta(x._1, clazz))
     fieldSerializers filter (_._1.isAssignableFrom(clazz)) match {
       case Nil => None
       case xs  => Some((xs min ord)._2)
@@ -136,17 +143,21 @@ trait Serializer[A] {
 trait TypeHints {
   import ClassDelta._
 
-  val hints: List[Class[_]]
+  // SCALA3 using `?` instead of `_`
+  val hints: List[Class[?]]
 
   /** Return hint for given type.
     */
-  def hintFor(clazz: Class[_]): String
+  // SCALA3 using `?` instead of `_`
+  def hintFor(clazz: Class[?]): String
 
   /** Return type for given hint.
     */
-  def classFor(hint: String): Option[Class[_]]
+  // SCALA3 using `?` instead of `_`
+  def classFor(hint: String): Option[Class[?]]
 
-  def containsHint_?(clazz: Class[_]) = hints exists (_ isAssignableFrom clazz)
+  // SCALA3 using `?` instead of `_`
+  def containsHint_?(clazz: Class[?]) = hints exists (_.isAssignableFrom(clazz))
   def deserialize: PartialFunction[(String, JObject), Any] = Map()
   def serialize: PartialFunction[Any, JObject] = Map()
 
@@ -161,11 +172,13 @@ trait TypeHints {
   private[TypeHints] case class CompositeTypeHints(
       override val components: List[TypeHints]
   ) extends TypeHints {
-    val hints: List[Class[_]] = components.flatMap(_.hints)
+    // SCALA3 using `?` instead of `_`
+    val hints: List[Class[?]] = components.flatMap(_.hints)
 
     /** Chooses most specific class.
       */
-    def hintFor(clazz: Class[_]): String = components
+    // SCALA3 using `?` instead of `_`
+    def hintFor(clazz: Class[?]): String = components
       .filter(_.containsHint_?(clazz))
       .map(th =>
         (
@@ -178,7 +191,8 @@ trait TypeHints {
       .head
       ._1
 
-    def classFor(hint: String): Option[Class[_]] = {
+    // SCALA3 using `?` instead of `_`
+    def classFor(hint: String): Option[Class[?]] = {
       def hasClass(h: TypeHints) =
         scala.util.control.Exception.allCatch opt (h.classFor(
           hint
@@ -200,7 +214,8 @@ trait TypeHints {
 }
 
 private[json] object ClassDelta {
-  def delta(class1: Class[_], class2: Class[_]): Int = {
+  // SCALA3 using `?` instead of `_`
+  def delta(class1: Class[?], class2: Class[?]): Int = {
     if (class1 == class2) 0
     else if (class1.getInterfaces.contains(class2)) 0
     else if (class2.getInterfaces.contains(class1)) 0
@@ -219,30 +234,36 @@ private[json] object ClassDelta {
   */
 case object NoTypeHints extends TypeHints {
   val hints = Nil
-  def hintFor(clazz: Class[_]) =
+  // SCALA3 using `?` instead of `_`
+  def hintFor(clazz: Class[?]) =
     sys.error("NoTypeHints does not provide any type hints.")
   def classFor(hint: String) = None
 }
 
 /** Use short class name as a type hint.
   */
-case class ShortTypeHints(hints: List[Class[_]]) extends TypeHints {
-  def hintFor(clazz: Class[_]) =
+// SCALA3 using `?` instead of `_`
+case class ShortTypeHints(hints: List[Class[?]]) extends TypeHints {
+  def hintFor(clazz: Class[?]) =
     clazz.getName.substring(clazz.getName.lastIndexOf(".") + 1)
   def classFor(hint: String) = hints find (hintFor(_) == hint)
 }
 
 /** Use full class name as a type hint.
   */
-case class FullTypeHints(hints: List[Class[_]]) extends TypeHints {
-  private val hintsToClass: ConcurrentScalaMap[String, Class[_]] =
-    new ConcurrentHashMap[String, Class[_]]().asScala ++= hints.map(clazz =>
+// SCALA3 using `?` instead of `_`
+case class FullTypeHints(hints: List[Class[?]]) extends TypeHints {
+  // SCALA3 using `?` instead of `_`
+  private val hintsToClass: ConcurrentScalaMap[String, Class[?]] =
+    new ConcurrentHashMap[String, Class[?]]().asScala ++= hints.map(clazz =>
       hintFor(clazz) -> clazz
     )
 
-  def hintFor(clazz: Class[_]) = clazz.getName
+  // SCALA3 using `?` instead of `_`
+  def hintFor(clazz: Class[?]) = clazz.getName
 
-  def classFor(hint: String): Option[Class[_]] = {
+  // SCALA3 using `?` instead of `_`
+  def classFor(hint: String): Option[Class[?]] = {
     hintsToClass.get(hint).orElse {
       val clazz = Thread.currentThread.getContextClassLoader.loadClass(hint)
       hintsToClass.putIfAbsent(hint, clazz).orElse(Some(clazz))

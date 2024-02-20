@@ -191,8 +191,9 @@ object Xml {
     }
   }
 
+  // SCALA3 using `x*` instead of `_*`
   private[json] class XmlNode(name: String, children: Seq[Node])
-      extends Elem(null, name, scala.xml.Null, TopScope, true, children: _*)
+      extends Elem(null, name, scala.xml.Null, TopScope, true, children*)
 
   private[json] class XmlElem(name: String, value: String)
       extends Elem(null, name, scala.xml.Null, TopScope, true, Text(value))

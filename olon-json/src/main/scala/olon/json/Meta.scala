@@ -13,13 +13,15 @@ import java.lang.reflect.{Constructor => JConstructor}
 import java.sql.Timestamp
 import java.util.Date
 
+// SCALA3 using `?` instead of `_`
 case class TypeInfo(
-    clazz: Class[_],
+    clazz: Class[?],
     parameterizedType: Option[ParameterizedType]
 )
 
+// SCALA3 using `?` instead of `_`
 trait ParameterNameReader {
-  def lookupParameterNames(constructor: JConstructor[_]): Iterable[String]
+  def lookupParameterNames(constructor: JConstructor[?]): Iterable[String]
 }
 
 private[json] object Meta {
@@ -41,10 +43,11 @@ private[json] object Meta {
     * Value("city")))), Arg("children", Col(classOf[List[_]],
     * Constructor("xx.Child", List(Value("name"), Value("age")))))))
     */
+  // SCALA3 using `?` instead of `_`
   sealed abstract class Mapping
   case class Arg(path: String, mapping: Mapping, optional: Boolean)
       extends Mapping
-  case class Value(targetType: Class[_]) extends Mapping
+  case class Value(targetType: Class[?]) extends Mapping
   case class Cycle(targetType: Type) extends Mapping
   case class Dict(mapping: Mapping) extends Mapping
   case class Col(targetType: TypeInfo, mapping: Mapping) extends Mapping
@@ -54,14 +57,14 @@ private[json] object Meta {
       choices: List[DeclaredConstructor]
   ) extends Mapping {
     def bestMatching(argNames: List[String]): Option[DeclaredConstructor] = {
-      val names = Set(argNames: _*)
+      // SCALA3 using `x*` instead of `_*`
+      val names = Set(argNames*)
       def countOptionals(args: List[Arg]) =
         args.foldLeft(0)((n, x) => if (x.optional) n + 1 else n)
       def score(args: List[Arg]) =
         args.foldLeft(0)((s, arg) =>
           if (names.contains(arg.path)) s + 1 else -100
         )
-
       if (choices.isEmpty) None
       else {
         val best =
@@ -80,25 +83,30 @@ private[json] object Meta {
     }
   }
 
-  case class DeclaredConstructor(constructor: JConstructor[_], args: List[Arg])
+  // SCALA3 using `?` instead of `_`
+  case class DeclaredConstructor(constructor: JConstructor[?], args: List[Arg])
 
   // Current constructor parsing context. (containingClass + allArgs could be replaced with Constructor)
+  // SCALA3 using `?` instead of `_`
   case class Context(
       argName: String,
-      containingClass: Class[_],
+      containingClass: Class[?],
       allArgs: List[(String, Type)]
   )
 
-  private val mappings = new Memo[(Type, Seq[Class[_]]), Mapping]
+  // SCALA3 using `?` instead of `_`
+  private val mappings = new Memo[(Type, Seq[Class[?]]), Mapping]
   private val unmangledNames = new Memo[String, String]
   private val paranamer = new CachingParanamer(new BytecodeReadingParanamer)
 
+  // SCALA3 using `?` instead of `_`
   object ParanamerReader extends ParameterNameReader {
-    def lookupParameterNames(constructor: JConstructor[_]): Iterable[String] =
+    def lookupParameterNames(constructor: JConstructor[?]): Iterable[String] =
       paranamer.lookupParameterNames(constructor)
   }
 
-  private[json] def mappingOf(clazz: Type, typeArgs: Seq[Class[_]] = Seq())(
+  // SCALA3 using `?` instead of `_`
+  private[json] def mappingOf(clazz: Type, typeArgs: Seq[Class[?]] = Seq())(
       implicit formats: Formats
   ): Mapping = {
     import Reflection._
@@ -153,7 +161,8 @@ private[json] object Meta {
               case c: Class[_] =>
                 c
               case p: ParameterizedType =>
-                p.getRawType.asInstanceOf[Class[_]]
+                // SCALA3 using `?` instead of `_`
+                p.getRawType.asInstanceOf[Class[?]]
               case x =>
                 fail("do not know how to get type parameter from " + x)
             }
@@ -200,15 +209,18 @@ private[json] object Meta {
             val raw = rawClassOf(pType)
             val info = TypeInfo(raw, Some(pType))
 
-            if (classOf[Set[_]].isAssignableFrom(raw))
+            // SCALA3 using `?` instead of `_`
+            if (classOf[Set[?]].isAssignableFrom(raw))
               (mkContainer(t, `* -> *`, 0, Col.apply(info, _)), false)
             else if (raw.isArray)
               (mkContainer(t, `* -> *`, 0, Col.apply(info, _)), false)
-            else if (classOf[Option[_]].isAssignableFrom(raw))
-              (mkContainer(t, `* -> *`, 0, identity _), true)
-            else if (classOf[Map[_, _]].isAssignableFrom(raw))
-              (mkContainer(t, `(*,*) -> *`, 1, Dict.apply _), false)
-            else if (classOf[Seq[_]].isAssignableFrom(raw))
+            else if (classOf[Option[?]].isAssignableFrom(raw))
+              // SCALA3 removing old trailing `_` trick for passing `identity` as a value
+              (mkContainer(t, `* -> *`, 0, identity), true)
+            else if (classOf[Map[?, ?]].isAssignableFrom(raw))
+              // SCALA3 removing old trailing `_` trick for passing `Dict.apply` as a value
+              (mkContainer(t, `(*,*) -> *`, 1, Dict.apply), false)
+            else if (classOf[Seq[?]].isAssignableFrom(raw))
               (mkContainer(t, `* -> *`, 0, Col.apply(info, _)), false)
             else if (
               tuples
@@ -268,7 +280,8 @@ private[json] object Meta {
     }
   }
 
-  private[json] def rawClassOf(t: Type): Class[_] = t match {
+  // SCALA3 using `?` instead of `_`
+  private[json] def rawClassOf(t: Type): Class[?] = t match {
     case c: Class[_]          => c
     case p: ParameterizedType => rawClassOf(p.getRawType)
     case x                    => fail("Raw type of " + x + " not known")
@@ -311,7 +324,8 @@ private[json] object Meta {
     case object `* -> *` extends Kind
     case object `(*,*) -> *` extends Kind
 
-    val primitives = Map[Class[_], Unit]() ++ (List[Class[_]](
+    // SCALA3 using `?` instead of `_`
+    val primitives = Map[Class[?], Unit]() ++ (List[Class[?]](
       classOf[String],
       classOf[Int],
       classOf[Long],
@@ -337,92 +351,102 @@ private[json] object Meta {
       classOf[JArray]
     ).map((_, ())))
 
+    // SCALA3 using `?` instead of `_`
     val tuples = Seq(
-      classOf[Tuple1[_]],
-      classOf[Tuple2[_, _]],
-      classOf[Tuple3[_, _, _]],
-      classOf[Tuple4[_, _, _, _]],
-      classOf[Tuple5[_, _, _, _, _]],
-      classOf[Tuple6[_, _, _, _, _, _]],
-      classOf[Tuple7[_, _, _, _, _, _, _]],
-      classOf[Tuple8[_, _, _, _, _, _, _, _]],
-      classOf[Tuple9[_, _, _, _, _, _, _, _, _]],
-      classOf[Tuple10[_, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple11[_, _, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple12[_, _, _, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple13[_, _, _, _, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple14[_, _, _, _, _, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple15[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple16[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple17[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple18[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]],
-      classOf[Tuple19[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]],
+      classOf[Tuple1[?]],
+      classOf[Tuple2[?, ?]],
+      classOf[Tuple3[?, ?, ?]],
+      classOf[Tuple4[?, ?, ?, ?]],
+      classOf[Tuple5[?, ?, ?, ?, ?]],
+      classOf[Tuple6[?, ?, ?, ?, ?, ?]],
+      classOf[Tuple7[?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple8[?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple9[?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple10[?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple11[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple12[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple13[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple14[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple15[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple16[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple17[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple18[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
+      classOf[Tuple19[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]],
       classOf[
-        Tuple20[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]
+        Tuple20[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]
       ],
       classOf[
-        Tuple21[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]
+        Tuple21[?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]
       ],
       classOf[Tuple22[
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?
       ]]
     )
 
-    val tupleConstructors: Map[Int, JConstructor[_]] = tuples.zipWithIndex
+    // SCALA3 using `?` instead of `_`
+    val tupleConstructors: Map[Int, JConstructor[?]] = tuples.zipWithIndex
       .map({ case (tupleClass, index) =>
         index -> tupleClass.getConstructors()(0)
       })
       .toMap
 
+    // SCALA3 using `?` instead of `_`
     private val primaryConstructorArgumentsMemo =
-      new Memo[Class[_], List[(String, Type)]]
-    private val declaredFieldsMemo = new Memo[Class[_], Map[String, Field]]
+      new Memo[Class[?], List[(String, Type)]]
 
+    // SCALA3 using `?` instead of `_`
+    private val declaredFieldsMemo = new Memo[Class[?], Map[String, Field]]
+
+    // SCALA3 using `?` instead of `_`
     def constructors(
         t: Type,
         names: ParameterNameReader,
         context: Option[Context]
-    ): List[(JConstructor[_], List[(String, Type)])] =
+    ): List[(JConstructor[?], List[(String, Type)])] =
       rawClassOf(t).getDeclaredConstructors
         .map(c => (c, constructorArgs(t, c, names, context)))
         .toList
 
+    // SCALA3 using `?` instead of `_`
     def constructorArgs(
         t: Type,
-        constructor: JConstructor[_],
+        constructor: JConstructor[?],
         nameReader: ParameterNameReader,
         context: Option[Context]
     ): List[(String, Type)] = {
-      def argsInfo(c: JConstructor[_], typeArgs: Map[TypeVariable[_], Type]) = {
+
+      // SCALA3 using `?` instead of `_`
+      def argsInfo(c: JConstructor[?], typeArgs: Map[TypeVariable[?], Type]) = {
         val Name = """^((?:[^$]|[$][^0-9]+)+)([$][0-9]+)?$""".r
         def clean(name: String) = name match {
           case Name(text, _) => text
         }
         try {
           val names = nameReader.lookupParameterNames(c).map(clean)
+          // SCALA3 using `?` instead of `_`
           val types = c.getGenericParameterTypes.toList.zipWithIndex map {
-            case (v: TypeVariable[_], idx) =>
+            case (v: TypeVariable[?], idx) =>
               val arg = typeArgs.getOrElse(v, v)
               if (arg == classOf[java.lang.Object])
                 context
@@ -445,11 +469,12 @@ private[json] object Meta {
       }
 
       t match {
-        case _: Class[_] => argsInfo(constructor, Map())
+        case _: Class[_]          => argsInfo(constructor, Map())
         case p: ParameterizedType =>
+          // SCALA3 using `?` instead of `_`
           val vars =
             Map() ++ rawClassOf(p).getTypeParameters.toList
-              .map(_.asInstanceOf[TypeVariable[_]])
+              .map(_.asInstanceOf[TypeVariable[?]])
               .zip(
                 p.getActualTypeArguments.toList
               ) // FIXME this cast should not be needed
@@ -458,9 +483,10 @@ private[json] object Meta {
       }
     }
 
-    def primaryConstructorArgs(c: Class[_])(implicit formats: Formats) = {
-      def findMostComprehensive(c: Class[_]): List[(String, Type)] = {
-        val ord = Ordering[Int].on[JConstructor[_]](_.getParameterTypes.size)
+    // SCALA3 using `?` instead of `_`
+    def primaryConstructorArgs(c: Class[?])(implicit formats: Formats) = {
+      def findMostComprehensive(c: Class[?]): List[(String, Type)] = {
+        val ord = Ordering[Int].on[JConstructor[?]](_.getParameterTypes.size)
         val primary = c.getDeclaredConstructors.max(ord)
         constructorArgs(c, primary, formats.parameterNameReader, None)
       }
@@ -468,7 +494,8 @@ private[json] object Meta {
       primaryConstructorArgumentsMemo.memoize(c, findMostComprehensive(_))
     }
 
-    def typeParameters(t: Type, k: Kind, context: Context): List[Class[_]] = {
+    // SCALA3 using `?` instead of `_`
+    def typeParameters(t: Type, k: Kind, context: Context): List[Class[?]] = {
       def term(i: Int) = t match {
         case ptype: ParameterizedType =>
           ptype.getActualTypeArguments()(i) match {
@@ -481,20 +508,30 @@ private[json] object Meta {
                   context.allArgs.map(_._1)
                 )
               else c
-            case p: ParameterizedType => p.getRawType.asInstanceOf[Class[_]]
-            case x => fail("do not know how to get type parameter from " + x)
+            case p: ParameterizedType =>
+              // SCALA3 using `?` instead of `_`
+              p.getRawType.asInstanceOf[Class[?]]
+            case x =>
+              fail("do not know how to get type parameter from " + x)
           }
         case clazz: Class[_] if (clazz.isArray) =>
           i match {
-            case 0 => clazz.getComponentType.asInstanceOf[Class[_]]
-            case _ => fail("Arrays only have one type parameter")
+            case 0 =>
+              // SCALA3 using `?` instead of `_`
+              clazz.getComponentType.asInstanceOf[Class[?]]
+            case _ =>
+              fail("Arrays only have one type parameter")
           }
         case clazz: GenericArrayType =>
           i match {
-            case 0 => clazz.getGenericComponentType.asInstanceOf[Class[_]]
-            case _ => fail("Arrays only have one type parameter")
+            case 0 =>
+              // SCALA3 using `?` instead of `_`
+              clazz.getGenericComponentType.asInstanceOf[Class[?]]
+            case _ =>
+              fail("Arrays only have one type parameter")
           }
-        case _ => fail("Unsupported Type: " + t + " (" + t.getClass + ")")
+        case _ =>
+          fail("Unsupported Type: " + t + " (" + t.getClass + ")")
       }
 
       k match {
@@ -537,10 +574,12 @@ private[json] object Meta {
       case _ => false
     }
 
-    def array_?(x: Any) = x != null && classOf[scala.Array[_]]
+    // SCALA3 using `?` instead of `_`
+    def array_?(x: Any) = x != null && classOf[scala.Array[?]]
       .isAssignableFrom(x.asInstanceOf[AnyRef].getClass)
 
-    def fields(clazz: Class[_]): List[(String, TypeInfo)] = {
+    // SCALA3 using `?` instead of `_`
+    def fields(clazz: Class[?]): List[(String, TypeInfo)] = {
       val fs = clazz.getDeclaredFields.toList
         .filterNot(f =>
           Modifier.isStatic(f.getModifiers) || Modifier.isTransient(
@@ -575,7 +614,8 @@ private[json] object Meta {
       f.get(a)
     }
 
-    def findField(clazz: Class[_], name: String): Field = try {
+    // SCALA3 using `?` instead of `_`
+    def findField(clazz: Class[?], name: String): Field = try {
       clazz.getDeclaredField(name)
     } catch {
       case e: NoSuchFieldException =>
@@ -583,14 +623,16 @@ private[json] object Meta {
         else findField(clazz.getSuperclass, name)
     }
 
-    def getDeclaredFields(clazz: Class[_]): Map[String, Field] = {
+    // SCALA3 using `?` instead of `_`
+    def getDeclaredFields(clazz: Class[?]): Map[String, Field] = {
       def extractDeclaredFields =
         clazz.getDeclaredFields.map(field => (field.getName, field)).toMap
       declaredFieldsMemo.memoize(clazz, _ => extractDeclaredFields)
     }
 
-    def mkJavaArray(x: Any, componentType: Class[_]) = {
-      val arr = x.asInstanceOf[scala.Array[_]]
+    // SCALA3 using `?` instead of `_`
+    def mkJavaArray(x: Any, componentType: Class[?]) = {
+      val arr = x.asInstanceOf[scala.Array[?]]
       val a = java.lang.reflect.Array.newInstance(componentType, arr.size)
       var i = 0
       while (i < arr.size) {

@@ -101,6 +101,7 @@ trait BoxLogging {
   protected def logBoxTrace(message: String, throwable: Option[Throwable]): Unit
 
   implicit class LogEmptyOrFailure[T](val box: Box[T]) extends AnyRef {
+
     private def doLog(
         message: String,
         logFn: (String, Option[Throwable]) => Unit,
@@ -109,19 +110,17 @@ trait BoxLogging {
       box match {
         case ParamFailure(failureMessage, exception, Full(chain), param) =>
           logFn(s"$message: $failureMessage with param $param", exception)
-        // SCALA3 FIXME
-        // chain.logFailure(
-        //  s"$failureMessage with param $param caused by",
-        //  logFn
-        // )
+          chain.logFailure(
+            s"$failureMessage with param $param caused by",
+            logFn
+          )
 
         case ParamFailure(failureMessage, exception, _, param) =>
           logFn(s"$message: $failureMessage with param $param", exception)
 
         case Failure(failureMessage, exception, Full(chain)) =>
           logFn(s"$message: $failureMessage", exception)
-        // SCALA3 FIXME
-        // chain.logFailure(s"$failureMessage caused by", logFn)
+          chain.logFailure(s"$failureMessage caused by", logFn)
 
         case Failure(failureMessage, exception, _) =>
           logFn(s"$message: $failureMessage", exception)
@@ -133,7 +132,9 @@ trait BoxLogging {
       }
     }
 
-    private def logFailure(
+    // SCALA3 making `logFailure` a package private level function to help
+    // the compiler understan it can be used from `doLog`
+    private[common] def logFailure(
         message: String,
         logFn: (String, Option[Throwable]) => Unit
     ): Unit = {

@@ -85,7 +85,7 @@ object JsonParser {
   // this array. Each number in the array corresponds to the 4-bit value that
   // one number in the hex string will represent. These are combined when
   // reading the unicode string.
-  private[this] final val HexChars: Array[Int] = {
+  private final val HexChars: Array[Int] = {
     val chars = new Array[Int](128)
     var i = 0
     while (i < 10) {
@@ -101,12 +101,12 @@ object JsonParser {
     chars
   }
   // The size of one hex character in bits.
-  private[this] final val hexCharSize = 4 // in bits
+  private final val hexCharSize = 4 // in bits
 
   private[json] def unquote(string: String): String =
     unquote(new JsonParser.Buffer(new java.io.StringReader(string), false))
 
-  private[this] def unquote(buf: JsonParser.Buffer): String = {
+  private def unquote(buf: JsonParser.Buffer): String = {
     def unquote0(buf: JsonParser.Buffer): String = {
       val builder = buf.builder
       builder.delete(0, builder.length())
@@ -172,10 +172,10 @@ object JsonParser {
 
   // Intermediate objects and arrays which can be grown mutably for performance.
   // These are finalized into immutable JObject and JArray.
-  private[this] case class IntermediateJObject(
+  private case class IntermediateJObject(
       fields: scala.collection.mutable.ListBuffer[JField]
   )
-  private[this] case class IntermediateJArray(
+  private case class IntermediateJArray(
       bits: scala.collection.mutable.ListBuffer[JValue]
   )
 
@@ -248,11 +248,11 @@ object JsonParser {
     root getOrElse JNothing
   }
 
-  private[this] final val EOF: Char = (-1).asInstanceOf[Char]
+  private final val EOF: Char = (-1).asInstanceOf[Char]
 
   private class ValStack(parser: Parser) {
     import java.util.ArrayDeque
-    private[this] val stack = new ArrayDeque[Any](32)
+    private val stack = new ArrayDeque[Any](32)
 
     def popAny = stack.poll
     def pop[A](expectedType: Class[A]) = convert(stack.poll, expectedType)
@@ -287,8 +287,8 @@ object JsonParser {
 
     // Maintains our current nesting context in the form of BlockMode, which
     // indicates if each context is an array or object.
-    private[this] val blocks = new ArrayDeque[BlockMode](32)
-    private[this] var fieldNameMode = true
+    private val blocks = new ArrayDeque[BlockMode](32)
+    private var fieldNameMode = true
 
     def fail(msg: String, cause: Exception = null) =
       throw new ParseException(msg + "\nNear: " + buf.near, cause)
@@ -427,11 +427,11 @@ object JsonParser {
     var curMark = -1
     var curMarkSegment = -1
     var eofIsFailure = false
-    private[this] val segments =
+    private val segments =
       scala.collection.mutable.ArrayBuffer(segmentPool.apply())
-    private[this] var segment: Array[Char] = segments.head.seg
-    private[this] var cur = 0 // Pointer which points current parsing location
-    private[this] var curSegmentIdx = 0 // Pointer which points current segment
+    private var segment: Array[Char] = segments.head.seg
+    private var cur = 0 // Pointer which points current parsing location
+    private var curSegmentIdx = 0 // Pointer which points current segment
 
     // Mark the current point so that future substring calls will extract the
     // value from this point to whatever point the buffer has advanced to.
@@ -459,7 +459,7 @@ object JsonParser {
       }
     }
 
-    private[this] final val emptyArray = new Array[Char](0)
+    private final val emptyArray = new Array[Char](0)
     // Slices from the last marked point to the current index. If intoBuilder is
     // true, appends it to the buffer's builder and returns an empty array. If
     // false, slices it into a new array and returns that array.
@@ -522,7 +522,7 @@ object JsonParser {
 
     // Reads the next available block from the reader. Returns -1 if there's
     // nothing more to read.
-    private[this] def read = {
+    private def read = {
       if (offset >= segment.length) {
         offset = 0
         val segmentToUse =
@@ -564,9 +564,9 @@ object JsonParser {
     import java.util.concurrent.ArrayBlockingQueue
     import java.util.concurrent.atomic.AtomicInteger
 
-    private[this] val maxNumOfSegments = 10000
-    private[this] val segmentCount = new AtomicInteger(0)
-    private[this] val segments =
+    private val maxNumOfSegments = 10000
+    private val segmentCount = new AtomicInteger(0)
+    private val segments =
       new ArrayBlockingQueue[Segment](maxNumOfSegments)
     private[json] def clear = segments.clear
 
@@ -576,7 +576,7 @@ object JsonParser {
       if (s != null) s else DisposableSegment(new Array(segmentSize))
     }
 
-    private[this] def acquire: Segment = {
+    private def acquire: Segment = {
       val curCount = segmentCount.get
       val createNew =
         if (segments.size == 0 && curCount < maxNumOfSegments)

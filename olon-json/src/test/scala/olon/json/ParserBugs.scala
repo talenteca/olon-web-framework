@@ -38,8 +38,11 @@ object ParserBugs extends Specification {
 
   private val discardParser = (p: JsonParser.Parser) => {
     var token: JsonParser.Token = null
-    do {
+    // SCALA3 converting a "do while" to a "while" with auxiliary flag
+    var exit = false
+    while (!exit) {
       token = p.nextToken
-    } while (token != JsonParser.End)
+      exit = token != JsonParser.End
+    }
   }
 }

@@ -631,11 +631,11 @@ object JsonAST {
     def withFilter(p: JValue => Boolean) = new WithFilter(this, p)
 
     final class WithFilter(self: JValue, p: JValue => Boolean) {
-      def map[A](f: JValue => A): List[A] = self filter p map f
-      def flatMap[A](f: JValue => List[A]) = self filter p flatMap f
+      def map[A](f: JValue => A): List[A] = self.filter(p) map f
+      def flatMap[A](f: JValue => List[A]) = self.filter(p) flatMap f
       def withFilter(q: JValue => Boolean): WithFilter =
         new WithFilter(self, x => p(x) && q(x))
-      def foreach[U](f: JValue => U): Unit = self filter p foreach f
+      def foreach[U](f: JValue => U): Unit = self.filter(p) foreach f
     }
 
     /** Concatenate this `JValue` with another `JValue`.
@@ -1190,7 +1190,7 @@ trait JsonDSL extends Implicits {
   implicit def map2jvalue[A](m: Map[String, A])(implicit
       ev: A => JValue
   ): JObject =
-    JObject(m.toList.map { case (k, v) => JField(k, v) })
+    JObject(m.toList.map { case (k, v) => JField(k, ev(v)) })
 
   implicit def option2jvalue[A](
       opt: Option[A]

@@ -32,7 +32,8 @@ object Extraction {
   def extract[A](
       json: JValue
   )(implicit formats: Formats, mf: Manifest[A]): A = {
-    def allTypes(mf: Manifest[_]): List[Class[_]] =
+    // SCALA3 using `?` instead of `_`
+    def allTypes(mf: Manifest[?]): List[Class[?]] =
       mf.runtimeClass :: (mf.typeArguments flatMap allTypes)
 
     try {
@@ -60,8 +61,9 @@ object Extraction {
     * JObject(JField("age",JInt(25)) :: JField("name",JString("joe")) :: Nil)
     * </pre>
     */
+  // SCALA3 using `?` instead of `_`
   def decompose(a: Any)(implicit formats: Formats): JValue = {
-    def prependTypeHint(clazz: Class[_], o: JObject) =
+    def prependTypeHint(clazz: Class[?], o: JObject) =
       JObject(
         JField(
           formats.typeHintFieldName,
@@ -69,7 +71,8 @@ object Extraction {
         ) :: o.obj
       )
 
-    def mkObject(clazz: Class[_], fields: List[JField]) =
+    // SCALA3 using `?` instead of `_`
+    def mkObject(clazz: Class[?], fields: List[JField]) =
       formats.typeHints.containsHint_?(clazz) match {
         case true  => prependTypeHint(clazz, JObject(fields))
         case false => JObject(fields)
@@ -90,7 +93,8 @@ object Extraction {
           )
         case x: Iterable[_] => JArray(x.toList map decompose)
         case x if (x.getClass.isArray) =>
-          JArray(x.asInstanceOf[Array[_]].toList map decompose)
+          // SCALA3 using `?` instead of `_`
+          JArray(x.asInstanceOf[Array[?]].toList map decompose)
         case x: Option[_] =>
           x.flatMap[JValue] { y => Some(decompose(y)) }.getOrElse(JNothing)
         case x: Product if formats.tuplesAsArrays && tuple_?(x.getClass) =>
@@ -102,7 +106,7 @@ object Extraction {
           }
           constructorArgs.collect { case (name, Some(f)) =>
             f.setAccessible(true)
-            JField(unmangleName(name), decompose(f get x))
+            JField(unmangleName(name), decompose(f.get(x)))
           } match {
             case args =>
               val fields =
@@ -183,6 +187,7 @@ object Extraction {
     }
 
     def submap(prefix: String): Map[String, String] =
+      // SCALA3 using `x*` instead of `_*`
       Map(
         ArraySeq.unsafeWrapArray(
           map
@@ -193,7 +198,7 @@ object Extraction {
             .map(t => (t._1.substring(prefix.length), t._2))
             .toList
             .toArray
-        ): _*
+        )*
       )
 
     val ArrayProp = new Regex("""^(\.([^\.\[]+))\[(\d+)\].*$""")
@@ -223,16 +228,18 @@ object Extraction {
     }
   }
 
-  private[this] def mkMapping(clazz: Class[_], typeArgs: Seq[Class[_]])(implicit
+  // SCALA3 using `?` instead of `_`
+  private def mkMapping(clazz: Class[?], typeArgs: Seq[Class[?]])(implicit
       formats: Formats
   ): Meta.Mapping = {
+    // SCALA3 using `?` instead of `_`
     if (
-      clazz == classOf[Option[_]] || clazz == classOf[
-        List[_]
-      ] || clazz == classOf[Set[_]] || clazz.isArray
+      clazz == classOf[Option[?]] || clazz == classOf[
+        List[?]
+      ] || clazz == classOf[Set[?]] || clazz.isArray
     ) {
       Col(TypeInfo(clazz, None), mkMapping(typeArgs.head, typeArgs.tail))
-    } else if (clazz == classOf[Map[_, _]]) {
+    } else if (clazz == classOf[Map[?, ?]]) {
       Dict(mkMapping(typeArgs.tail.head, typeArgs.tail.tail))
     } else if (formats.tuplesAsArrays && tuple_?(clazz)) {
       val childMappings = typeArgs.map(c => mkMapping(c, Nil)).toList
@@ -242,7 +249,8 @@ object Extraction {
     }
   }
 
-  private def extract0(json: JValue, clazz: Class[_], typeArgs: Seq[Class[_]])(
+  // SCALA3 using `?` instead of `_`
+  private def extract0(json: JValue, clazz: Class[?], typeArgs: Seq[Class[?]])(
       implicit formats: Formats
   ): Any = {
     val mapping = mkMapping(clazz, typeArgs)
@@ -274,7 +282,8 @@ object Extraction {
         }
       }
 
-      def setFields(a: AnyRef, json: JValue, constructor: JConstructor[_]) =
+      // SCALA3 using `?` instead of `_`
+      def setFields(a: AnyRef, json: JValue, constructor: JConstructor[?]) =
         json match {
           case o: JObject =>
             formats.fieldSerializer(a.getClass).map { serializer =>
@@ -301,10 +310,11 @@ object Extraction {
 
               fieldsToSet.foreach { case (name, typeInfo) =>
                 jsonFields.get(name).foreach { case (n, v) =>
+                  // SCALA3 using `?` instead of `_`
                   val typeArgs = typeInfo.parameterizedType
                     .map(
                       _.getActualTypeArguments
-                        .map(_.asInstanceOf[Class[_]])
+                        .map(_.asInstanceOf[Class[?]])
                         .toList
                         .zipWithIndex
                         .map { case (t, idx) =>
@@ -331,8 +341,9 @@ object Extraction {
           if (jconstructor.getDeclaringClass == classOf[java.lang.Object])
             fail("No information known about type")
 
+          // SCALA3 using `x*` instead of `_*`
           val instance = jconstructor.newInstance(
-            args.map(_.asInstanceOf[AnyRef]).toArray: _*
+            args.map(_.asInstanceOf[AnyRef]).toArray*
           )
           setFields(instance.asInstanceOf[AnyRef], json, jconstructor)
         } catch {
@@ -419,12 +430,13 @@ object Extraction {
         }
     }
 
+    // SCALA3 using `?` instead of `_`
     def newCollection(
         root: JValue,
         m: Mapping,
-        constructor: Array[_] => Any
+        constructor: Array[?] => Any
     ) = {
-      val array: Array[_] = root match {
+      val array: Array[?] = root match {
         case JArray(arr)      => arr.map(build(_, m)).toArray
         case JNothing | JNull => Array[AnyRef]()
         case x =>
@@ -459,7 +471,8 @@ object Extraction {
                 s"Cannot instantiate a tuple of length ${items.length} even though that should be a valid tuple length."
               )
             }
-          typedTupleConstructor.newInstance(builtItems: _*)
+          // SCALA3 using `x*` instead of `_*`
+          typedTupleConstructor.newInstance(builtItems*)
 
         case JArray(items) =>
           throw new IllegalArgumentException(
@@ -510,24 +523,27 @@ object Extraction {
         val custom = formats.customDeserializer(formats)
         val c = targetType.clazz
 
+        // SCALA3 using `?` instead of `_`
+        // SCALA3 using `x*` instead of `_*`
         if (custom.isDefinedAt(targetType, root)) custom(targetType, root)
-        else if (c == classOf[List[_]])
-          newCollection(root, m, a => List(ArraySeq.unsafeWrapArray(a): _*))
-        else if (c == classOf[Set[_]])
-          newCollection(root, m, a => Set(ArraySeq.unsafeWrapArray(a): _*))
+        else if (c == classOf[List[?]])
+          newCollection(root, m, a => List(ArraySeq.unsafeWrapArray(a)*))
+        else if (c == classOf[Set[?]])
+          newCollection(root, m, a => Set(ArraySeq.unsafeWrapArray(a)*))
         else if (c.isArray) newCollection(root, m, mkTypedArray(c))
-        else if (classOf[Seq[_]].isAssignableFrom(c))
-          newCollection(root, m, a => List(ArraySeq.unsafeWrapArray(a): _*))
-        else if (c == classOf[Option[_]]) newOption(root, m)
+        else if (classOf[Seq[?]].isAssignableFrom(c))
+          newCollection(root, m, a => List(ArraySeq.unsafeWrapArray(a)*))
+        else if (c == classOf[Option[?]]) newOption(root, m)
         else fail("Expected collection but got " + m + " for class " + c)
       case Dict(m) =>
         root match {
-          case JObject(xs) => Map(xs.map(x => (x.name, build(x.value, m))): _*)
+          case JObject(xs) => Map(xs.map(x => (x.name, build(x.value, m)))*)
           case x           => fail("Expected object but got " + x)
         }
     }
 
-    def mkTypedArray(c: Class[_])(a: Array[_]) = {
+    // SCALA3 using `?` instead of `_`
+    def mkTypedArray(c: Class[?])(a: Array[?]) = {
       import java.lang.reflect.Array.{newInstance => newArray}
 
       a.foldLeft((newArray(c.getComponentType, a.length), 0)) { (tuple, e) =>
@@ -563,10 +579,11 @@ object Extraction {
 
     build(json, mapping)
   }
-
+  
+  // SCALA3 using `?` instead of `_`
   private def convert(
       json: JValue,
-      targetType: Class[_],
+      targetType: Class[?],
       formats: Formats
   ): Any = json match {
     case JInt(x) if (targetType == classOf[Int]) => x.intValue
