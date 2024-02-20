@@ -89,7 +89,7 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
   }
 
   private val typeHoldingFailure = new ParameterizedType {
-    def getActualTypeArguments = Array(classOf[Failure])
+    def getActualTypeArguments() = Array(classOf[Failure])
     def getOwnerType = classOf[Box[Failure]]
     def getRawType = classOf[Box[Failure]]
   }

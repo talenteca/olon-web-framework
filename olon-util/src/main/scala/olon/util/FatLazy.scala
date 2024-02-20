@@ -41,7 +41,7 @@ class FatLazy[T](f: => T) {
     * default.
     */
   def defined_? = synchronized {
-    value != None
+    value.toOption != None
   }
 
   /** Set the instance to a new value and return that value

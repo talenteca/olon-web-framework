@@ -4,7 +4,7 @@ package util
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier._
-import scala.reflect.Manifest
+import scala.reflect.ClassTag
 
 import common._
 
@@ -84,7 +84,7 @@ trait ClassHelpers { self: ControlHelpers =>
       name: String,
       where: List[String],
       modifiers: List[String => String]
-  )(implicit m: Manifest[C]): Box[Class[C]] =
+  )(implicit m: ClassTag[C]): Box[Class[C]] =
     findClass(name, where, modifiers, m.runtimeClass.asInstanceOf[Class[C]])
 
   /** General method to in find a class according to its name, a list of
@@ -144,7 +144,7 @@ trait ClassHelpers { self: ControlHelpers =>
     *   a Box, either containing the found class or an Empty can.
     */
   def findType[C <: AnyRef](name: String, where: List[String])(implicit
-      m: Manifest[C]
+      m: ClassTag[C]
   ): Box[Class[C]] =
     findType[C](name, where, nameModifiers)
 
@@ -175,7 +175,7 @@ trait ClassHelpers { self: ControlHelpers =>
     */
   def findType[C <: AnyRef](
       where: List[(String, List[String])]
-  )(implicit m: Manifest[C]): Box[Class[C]] =
+  )(implicit m: ClassTag[C]): Box[Class[C]] =
     (for (
       (name, packages) <- where;
       klass <- findType[C](name, packages)

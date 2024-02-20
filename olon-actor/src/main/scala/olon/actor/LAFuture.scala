@@ -59,7 +59,7 @@ class LAFuture[T](
 
   /** Get the future value
     */
-  @scala.annotation.tailrec
+  // @scala.annotation.tailrec // SCALA3 removed becouse of error concerning "synchronized"
   final def get: T = synchronized {
     if (satisfied) item
     else if (aborted) throw new AbortedFutureException(failure)

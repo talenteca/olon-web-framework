@@ -79,7 +79,7 @@ trait CombParserHelpers {
     *   characters regardless of the case (uppercase or lowercase)
     */
   def acceptCI[ES](es: ES)(implicit ev: ES => List[Elem]): Parser[List[Elem]] =
-    es.foldRight[Parser[List[Elem]]](success(Nil)) { (x, pxs) =>
+    ev(es).foldRight[Parser[List[Elem]]](success(Nil)) { (x, pxs) =>
       acceptCIChar(x) ~ pxs ^^ mkList
     }
 

@@ -37,9 +37,10 @@ private[util] trait Props extends Logger {
     }
 
     val interpolated = for {
-      interpolateRegex(before, key, after) <- interpolateRegex.findAllMatchIn(
-        value.toString
-      )
+      case interpolateRegex(before, key, after) <- interpolateRegex // SCALA3 compiler asked us to add "case" here
+        .findAllMatchIn(
+          value.toString
+        )
     } yield {
       val lookedUp = lookup(key).getOrElse(("${" + key + "}"))
 

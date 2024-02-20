@@ -2,7 +2,7 @@ package olon
 
 package object json {
 
-  type JValue = JsonAST.JValue
+  type JValue = JsonAST.JValue[_]
   val JNothing = JsonAST.JNothing
   val JNull = JsonAST.JNull
   type JString = JsonAST.JString

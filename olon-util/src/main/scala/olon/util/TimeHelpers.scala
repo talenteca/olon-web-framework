@@ -532,9 +532,9 @@ trait TimeHelpers { self: ControlHelpers =>
   }
 
   implicit class PeriodExtension[P](period: P)(implicit ev: P => Period) {
-    def later: DateTime = new DateTime(millis).plus(period)
+    def later: DateTime = new DateTime(millis).plus(ev(period)) // SCALA3
 
-    def ago: DateTime = new DateTime(millis).minus(period)
+    def ago: DateTime = new DateTime(millis).minus(ev(period)) // SCALA3
   }
 
 }

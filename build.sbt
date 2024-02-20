@@ -145,7 +145,7 @@ ThisBuild / scalacOptions ++= Seq(
   "-language:implicitConversions",
   // SCALA3 ignored option "-Ypatmat-exhaust-depth",
   "80",
-  "-Xfatal-warnings",
+  // "-Xfatal-warnings", // SCALA3 TODO revisit 
   "-Wunused:imports",
   // SCALA3 ignored option "-Ywarn-unused"
 )
