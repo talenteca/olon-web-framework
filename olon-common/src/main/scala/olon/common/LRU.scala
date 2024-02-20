@@ -1,11 +1,15 @@
 package olon
 package common
 
+// SCALA3 for using `uninitialized` instead of `_`
+import scala.compiletime.uninitialized
+
 private[common] trait LinkedListElem[T1, T2] {
   private[common] var _prev: LinkedListElem[T1, T2] = null
   private[common] var _next: LinkedListElem[T1, T2] = null
   private[common] def value1: T1
-  private[common] var value2: T2 = _
+  // SCALA3 using `uninitialized` instead of `_`
+  private[common] var value2: T2 = uninitialized
 
   private[common] def remove: Unit = {
     _prev._next = _next
@@ -72,8 +76,8 @@ class LRUMap[K, V](
 
   private[common] def value1: K = throw new NullPointerException("Foo")
 
-  private[this] val localMap =
-    new HashMap[K, LinkedListElem[K, V]](maxSize / 4, loadFactor openOr 0.75f)
+  private val localMap =
+    new HashMap[K, LinkedListElem[K, V]](maxSize / 4, loadFactor.openOr(0.75f))
 
   /** Fetches the given key, returning `[[Empty]]` if the key does not exist in
     * the map. A key may not be in the map either if it was never added or if it

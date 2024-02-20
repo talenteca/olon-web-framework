@@ -110,6 +110,10 @@ object HLists {
           0
         case _ :+: rest =>
           1 + rest.length
+        // SCALA3 adding missing match case (why is not the same as the first
+        // case?)
+        case _: HNil =>
+          0
       }
     }
   }
@@ -128,20 +132,20 @@ object ExcludeThisType {
   def unexpected: Nothing = sys.error("Unexpected invocation")
 
   // Uses ambiguity to rule out the cases we're trying to exclude
-  implicit def nsub[A, B]: A ExcludeThisType B = null
+  implicit def nsub[A, B]: ExcludeThisType[A, B] = null
 
   implicit def `This type was excluded because it was explicitly excluded`[
       A,
       B >: A
-  ]: A ExcludeThisType B = unexpected
+  ]: ExcludeThisType[A, B] = unexpected
 
   implicit def `Ignore me, I only exist to cause the compiler to fail`[
       A,
       B >: A
-  ]: A ExcludeThisType B = unexpected
+  ]: ExcludeThisType[A, B] = unexpected
 
   // Type alias for context bound
   type exclude[T] = {
-    type other[U] = U ExcludeThisType T
+    type other[U] = ExcludeThisType[U, T]
   }
 }

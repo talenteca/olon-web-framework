@@ -62,15 +62,17 @@ object Logger {
     */
   var setup: Box[() => Unit] = Empty
 
-  def loggerNameFor(cls: Class[_]) = {
+  // SCALA3 using `?` instead of `_`
+  def loggerNameFor(cls: Class[?]) = {
     val className = cls.getName
-    if (className endsWith "$")
+    if (className.endsWith("$"))
       className.substring(0, className.length - 1)
     else
       className
   }
 
-  def apply(cls: Class[_]): Logger = if (ranSetup)
+  // SCALA3 using `?` instead of `_`
+  def apply(cls: Class[?]): Logger = if (ranSetup)
     new WrappedLogger(LoggerFactory.getLogger(loggerNameFor(cls)))
   else null
   def apply(name: String): Logger =
@@ -84,7 +86,8 @@ object Logger {
     */
   def logWith[F](mdcValues: (String, Any)*)(f: => F): F = {
     val old = SLF4JMDC.getCopyOfContextMap
-    MDC.put(mdcValues: _*)
+    // SCALA3 using `x*` instead of `_*`
+    MDC.put(mdcValues*)
     try {
       f
     } finally {
@@ -156,7 +159,8 @@ trait Logger {
     * `Failure`, trace the message concatenated with the `Failure`'s message. If
     * the `Failure` contains an `Exception`, trace that as well.
     */
-  def trace(msg: => AnyRef, box: Box[_]): Unit = {
+  // SCALA3 using `?` instead of `_`
+  def trace(msg: => AnyRef, box: Box[?]): Unit = {
     if (logger.isTraceEnabled) {
       box match {
         case Failure(fmsg, Full(e), _) =>
@@ -185,7 +189,8 @@ trait Logger {
     * debug the message concatenated with the `Failure`'s message. If the
     * `Failure` contains an `Exception`, debug that as well.
     */
-  def debug(msg: => AnyRef, box: Box[_]): Unit = {
+  // SCALA3 using `?` instead of `_`
+  def debug(msg: => AnyRef, box: Box[?]): Unit = {
     if (logger.isDebugEnabled) {
       box match {
         case Failure(fmsg, Full(e), _) =>
@@ -214,7 +219,8 @@ trait Logger {
     * info the message concatenated with the `Failure`'s message. If the
     * `Failure` contains an `Exception`, info that as well.
     */
-  def info(msg: => AnyRef, box: Box[_]): Unit = {
+  // SCALA3 using `?` instead of `_`
+  def info(msg: => AnyRef, box: Box[?]): Unit = {
     if (logger.isInfoEnabled) {
       box match {
         case Failure(fmsg, Full(e), _) =>
@@ -242,7 +248,8 @@ trait Logger {
     * warn the message concatenated with the `Failure`'s message. If the
     * `Failure` contains an `Exception`, warn that as well.
     */
-  def warn(msg: => AnyRef, box: Box[_]): Unit = {
+  // SCALA3 using `?` instead of `_`
+  def warn(msg: => AnyRef, box: Box[?]): Unit = {
     if (logger.isWarnEnabled) {
       box match {
         case Failure(fmsg, Full(e), _) =>
@@ -270,7 +277,8 @@ trait Logger {
     * error the message concatenated with the `Failure`'s message. If the
     * `Failure` contains an `Exception`, error that as well.
     */
-  def error(msg: => AnyRef, box: Box[_]): Unit = {
+  // SCALA3 using `?` instead of `_`
+  def error(msg: => AnyRef, box: Box[?]): Unit = {
     if (logger.isErrorEnabled) {
       box match {
         case Failure(fmsg, Full(e), _) =>

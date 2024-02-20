@@ -20,7 +20,8 @@ trait Tryo {
     *   exception <li>a Failure if f throws an exception <li>Empty if the
     *   exception class is in the ignore list </ul>
     */
-  def tryo[T](ignore: List[Class[_]], onError: Box[Throwable => Unit])(
+  // SCALA3 changing `Class[_]` for `Class[?]`
+  def tryo[T](ignore: List[Class[?]], onError: Box[Throwable => Unit])(
       f: => T
   ): Box[T] = {
     try {
@@ -93,7 +94,8 @@ trait Tryo {
     *   exception <li>a Failure if f throws an exception <li>Empty if the
     *   exception class is in the ignore list </ul>
     */
-  def tryo[T](ignore: List[Class[_]])(f: => T): Box[T] = tryo(ignore, Empty)(f)
+  // SCALA3 changing `Class[_]` for `Class[?]`
+  def tryo[T](ignore: List[Class[?]])(f: => T): Box[T] = tryo(ignore, Empty)(f)
 
   /** Wraps a "try" block around the function f. Takes only one Class of
     * exception to ignore
@@ -107,6 +109,7 @@ trait Tryo {
     *   exception <li>a Failure if f throws an exception <li>Empty if the
     *   exception class is in the ignore list </ul>
     */
-  def tryo[T](ignore: Class[_])(f: => T): Box[T] = tryo(List(ignore), Empty)(f)
+  // SCALA3 changing `Class[_]` for `Class[?]`
+  def tryo[T](ignore: Class[?])(f: => T): Box[T] = tryo(List(ignore), Empty)(f)
 
 }

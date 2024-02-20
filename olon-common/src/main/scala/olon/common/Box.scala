@@ -117,7 +117,9 @@ private[common] sealed trait OptionImplicits {
 /** Implementation for the `[[Box$ Box]]` singleton.
   */
 sealed trait BoxTrait extends OptionImplicits {
-  val primitiveMap: Map[Class[_], Class[_]] = Map(
+
+  // SCALA3 using `Class[?]` instead of `Class[_]`
+  val primitiveMap: Map[Class[?], Class[?]] = Map(
     java.lang.Boolean.TYPE -> classOf[java.lang.Boolean],
     java.lang.Character.TYPE -> classOf[java.lang.Character],
     java.lang.Byte.TYPE -> classOf[java.lang.Byte],
@@ -151,7 +153,8 @@ sealed trait BoxTrait extends OptionImplicits {
   def apply[T](in: Box[T]) = in match {
     case Full(x)     => legacyNullTest(x)
     case x: EmptyBox => x
-    case _           => Empty
+    // SCALA3 adding explicit `case null` instead of the generic `case _`
+    case null => Empty
   }
 
   /** Transform a `List` with zero or more elements to a `Box`, losing all but
@@ -268,7 +271,7 @@ sealed trait BoxTrait extends OptionImplicits {
     * res1: olon.common.Box[Int] = Full(5)
     * }}}
     */
-  def asA[B](in: T forSome { type T })(implicit m: Manifest[B]): Box[B] = {
+  def asA[B](in: AnyRef)(implicit m: Manifest[B]): Box[B] = {
     (Box !! in).asA[B]
   }
 }
@@ -954,7 +957,7 @@ sealed case class Failure(
       "An Failure Box was opened.  Failure Message: " + msg +
         ".  The justification for allowing the openOrThrowException was " + justification
     ) {
-      override def getCause() = exception openOr null
+      override def getCause() = exception.openOr(null)
     }
 
   override def map[B](f: A => B): Box[B] = this
@@ -984,7 +987,7 @@ sealed case class Failure(
   def exceptionChain: List[Throwable] = {
     import scala.collection.mutable.ListBuffer
     val ret = new ListBuffer[Throwable]()
-    var e: Throwable = exception openOr null
+    var e: Throwable = exception.openOr(null)
 
     while (e ne null) {
       ret += e
@@ -1052,7 +1055,8 @@ object ParamFailure {
   def apply[T](msg: String, param: T) =
     new ParamFailure(msg, Empty, Empty, param)
 
-  def unapply(in: Box[_]): Option[(String, Box[Throwable], Box[Failure], Any)] =
+  // SCALA3 using `Box[?]` instead of `Box[_]`
+  def unapply(in: Box[?]): Option[(String, Box[Throwable], Box[Failure], Any)] =
     in match {
       case pf: ParamFailure[_] =>
         Some((pf.msg, pf.exception, pf.chain, pf.param))
@@ -1138,13 +1142,15 @@ object BoxOrRaw {
   implicit def boxToBoxOrRaw[T, Q](
       r: Box[Q]
   )(implicit ev: Q => T): BoxOrRaw[T] = {
-    BoxedBoxOrRaw(r.map(v => v: T))
+    // SCALA3 calling explicitly to `ev(v)` conversion instead of just `v`
+    BoxedBoxOrRaw(r.map(v => ev(v): T))
   }
 
   implicit def optionToBoxOrRaw[T, Q](
       r: Option[Q]
   )(implicit ev: Q => T): BoxOrRaw[T] = {
-    BoxedBoxOrRaw(r.map(v => v: T))
+    // SCALA3 calling explicitly to `ev(v)` conversion instead of just `v`
+    BoxedBoxOrRaw(r.map(v => ev(v): T))
   }
 
   implicit def borToBox[T](in: BoxOrRaw[T]): Box[T] = in.box

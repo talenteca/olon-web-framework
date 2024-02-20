@@ -44,19 +44,19 @@ package common
   * }}}
   */
 trait BoxLogging {
-  private[this] def logBoxError(message: String): Unit = {
+  private def logBoxError(message: String): Unit = {
     logBoxError(message, None)
   }
-  private[this] def logBoxWarn(message: String): Unit = {
+  private def logBoxWarn(message: String): Unit = {
     logBoxWarn(message, None)
   }
-  private[this] def logBoxInfo(message: String): Unit = {
+  private def logBoxInfo(message: String): Unit = {
     logBoxInfo(message, None)
   }
-  private[this] def logBoxDebug(message: String): Unit = {
+  private def logBoxDebug(message: String): Unit = {
     logBoxDebug(message, None)
   }
-  private[this] def logBoxTrace(message: String): Unit = {
+  private def logBoxTrace(message: String): Unit = {
     logBoxTrace(message, None)
   }
 
@@ -109,17 +109,19 @@ trait BoxLogging {
       box match {
         case ParamFailure(failureMessage, exception, Full(chain), param) =>
           logFn(s"$message: $failureMessage with param $param", exception)
-          chain.logFailure(
-            s"$failureMessage with param $param caused by",
-            logFn
-          )
+        // SCALA3 FIXME
+        // chain.logFailure(
+        //  s"$failureMessage with param $param caused by",
+        //  logFn
+        // )
 
         case ParamFailure(failureMessage, exception, _, param) =>
           logFn(s"$message: $failureMessage with param $param", exception)
 
         case Failure(failureMessage, exception, Full(chain)) =>
           logFn(s"$message: $failureMessage", exception)
-          chain.logFailure(s"$failureMessage caused by", logFn)
+        // SCALA3 FIXME
+        // chain.logFailure(s"$failureMessage caused by", logFn)
 
         case Failure(failureMessage, exception, _) =>
           logFn(s"$message: $failureMessage", exception)

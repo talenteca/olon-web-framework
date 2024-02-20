@@ -41,13 +41,14 @@ object ContentParser {
     */
   def toInputStreamParser(
       simpleParser: String => Box[NodeSeq]
-  ): InputStream => Box[NodeSeq] = { is: InputStream =>
-    for {
-      bytes <- Helpers.tryo(Helpers.readWholeStream(is))
-      elems <- simpleParser(new String(bytes, "UTF-8"))
-    } yield {
-      elems
-    }
+  ): InputStream => Box[NodeSeq] = {
+    is: InputStream =>
+      for {
+        bytes <- Helpers.tryo(Helpers.readWholeStream(is))
+        elems <- simpleParser(new String(bytes, "UTF-8"))
+      } yield {
+        elems
+      }
   }
 
   /** Default surround function used by `ContentParser.basic` and the built-it

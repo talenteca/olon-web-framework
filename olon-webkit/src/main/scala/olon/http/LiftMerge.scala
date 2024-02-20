@@ -206,42 +206,43 @@ private[http] trait LiftMerge {
               case other =>
                 other
             }
-            .map { normalizedResults: NodeAndEventJs =>
-              node match {
-                case e: Elem
-                    if e.label == "node" &&
-                      e.prefix == "lift_deferred" =>
-                  val deferredNodes: Seq[NodesAndEventJs] = {
-                    for {
-                      idAttribute <- e.attributes("id").take(1)
-                      id = idAttribute.text
-                      nodes <- processedSnippets.get(id)
-                    } yield {
-                      normalizeMergeAndExtractEvents(nodes, startingState)
+            .map {
+              normalizedResults: NodeAndEventJs =>
+                node match {
+                  case e: Elem
+                      if e.label == "node" &&
+                        e.prefix == "lift_deferred" =>
+                    val deferredNodes: Seq[NodesAndEventJs] = {
+                      for {
+                        idAttribute <- e.attributes("id").take(1)
+                        id = idAttribute.text
+                        nodes <- processedSnippets.get(id)
+                      } yield {
+                        normalizeMergeAndExtractEvents(nodes, startingState)
+                      }
+                    }.toSeq
+
+                    deferredNodes.foldLeft(soFar.append(normalizedResults))(
+                      _ append _
+                    )
+
+                  case _ =>
+                    if (headChild) {
+                      headChildren ++= normalizedResults.node
+                    } else if (headInBodyChild) {
+                      addlHead ++= normalizedResults.node
+                    } else if (tailInBodyChild) {
+                      addlTail ++= normalizedResults.node
+                    } else if (_bodyChild && !bodyHead && !bodyTail) {
+                      bodyChildren ++= normalizedResults.node
                     }
-                  }.toSeq
 
-                  deferredNodes.foldLeft(soFar.append(normalizedResults))(
-                    _ append _
-                  )
-
-                case _ =>
-                  if (headChild) {
-                    headChildren ++= normalizedResults.node
-                  } else if (headInBodyChild) {
-                    addlHead ++= normalizedResults.node
-                  } else if (tailInBodyChild) {
-                    addlTail ++= normalizedResults.node
-                  } else if (_bodyChild && !bodyHead && !bodyTail) {
-                    bodyChildren ++= normalizedResults.node
-                  }
-
-                  if (bodyHead || bodyTail) {
-                    soFar.append(normalizedResults.js)
-                  } else {
-                    soFar.append(normalizedResults)
-                  }
-              }
+                    if (bodyHead || bodyTail) {
+                      soFar.append(normalizedResults.js)
+                    } else {
+                      soFar.append(normalizedResults)
+                    }
+                }
             } getOrElse {
             soFar
           }

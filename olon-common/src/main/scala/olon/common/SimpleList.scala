@@ -109,37 +109,41 @@ final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
     ret
   }
 
-  def toArray[X](in: Array[X with Object]): Array[X with Object] = {
+  // SCALA3 using `&` instead of `with`
+  def toArray[X](in: Array[X & Object]): Array[X & Object] = {
     val clz = in.getClass.getComponentType()
     val len = underlying.length
     val ret = java.lang.reflect.Array
       .newInstance(clz, len)
-      .asInstanceOf[Array[X with Object]]
-
+      .asInstanceOf[Array[X & Object]]
     var pos = 0
     var hd = underlying
     while (pos < len) {
-      ret(pos) = clz.cast(hd.head).asInstanceOf[X with Object]
+      ret(pos) = clz.cast(hd.head).asInstanceOf[X & Object]
       hd = hd.tail
       pos += 1
     }
-
     ret
   }
 
-  def retainAll(jc: JavaCollection[_]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def retainAll(jc: JavaCollection[?]): Boolean =
     throw new UnsupportedOperationException()
 
-  def removeAll(jc: JavaCollection[_]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def removeAll(jc: JavaCollection[?]): Boolean =
     throw new UnsupportedOperationException()
 
-  def addAll(jc: JavaCollection[_ <: T]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def addAll(jc: JavaCollection[? <: T]): Boolean =
     throw new UnsupportedOperationException()
 
-  def addAll(index: Int, jc: JavaCollection[_ <: T]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def addAll(index: Int, jc: JavaCollection[? <: T]): Boolean =
     throw new UnsupportedOperationException()
 
-  def containsAll(jc: JavaCollection[_]): Boolean = {
+  // SCALA3 using `?` instead of `_`
+  def containsAll(jc: JavaCollection[?]): Boolean = {
     val it = jc.iterator()
 
     import scala.annotation._
@@ -177,8 +181,9 @@ final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
     */
   def this() = this(Vector())
 
+  // SCALA3 using `x*` instead of `_*`
   def this(jl: JavaList[T]) =
-    this(Vector(jl.toArray().toList.asInstanceOf[List[T]]: _*))
+    this(Vector(jl.toArray().toList.asInstanceOf[List[T]]*))
 
   /** Append an item to this vector. This operation is effectively O(1) and
     * returns the updated vector.
@@ -263,35 +268,39 @@ final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
     ret
   }
 
-  def toArray[X](in: Array[X with Object]): Array[X with Object] = {
+  // SCALA3 using `&` instead of `with`
+  def toArray[X](in: Array[X & Object]): Array[X & Object] = {
     val clz = in.getClass.getComponentType()
     val len = underlying.length
     val ret = java.lang.reflect.Array
       .newInstance(clz, len)
-      .asInstanceOf[Array[X with Object]]
-
+      .asInstanceOf[Array[X & Object]]
     var pos = 0
     underlying.foreach { e =>
-      ret(pos) = clz.cast(e).asInstanceOf[X with Object]
+      ret(pos) = clz.cast(e).asInstanceOf[X & Object]
       pos += 1
     }
-
     ret
   }
 
-  def retainAll(jc: JavaCollection[_]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def retainAll(jc: JavaCollection[?]): Boolean =
     throw new UnsupportedOperationException()
 
-  def removeAll(jc: JavaCollection[_]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def removeAll(jc: JavaCollection[?]): Boolean =
     throw new UnsupportedOperationException()
 
-  def addAll(jc: JavaCollection[_ <: T]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def addAll(jc: JavaCollection[? <: T]): Boolean =
     throw new UnsupportedOperationException()
 
-  def addAll(index: Int, jc: JavaCollection[_ <: T]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def addAll(index: Int, jc: JavaCollection[? <: T]): Boolean =
     throw new UnsupportedOperationException()
 
-  def containsAll(jc: JavaCollection[_]): Boolean = {
+  // SCALA3 using `?` instead of `_`
+  def containsAll(jc: JavaCollection[?]): Boolean = {
     val it = jc.iterator()
 
     import scala.annotation._
