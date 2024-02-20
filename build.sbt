@@ -3,7 +3,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / pgpSigningKey := Some("csaltos@talenteca.io")
 
 ThisBuild / organization := "com.talenteca"
-ThisBuild / version := "5.0.0-RC1"
+ThisBuild / version := "6.0.0-SNAPSHOT"
 ThisBuild / description := "Olon is a modern web framework based on the view first strategy (based on the Lift web framework)"
 ThisBuild / homepage := Some(
   url("https://github.com/talenteca/olon-web-framework")
@@ -15,7 +15,7 @@ ThisBuild / organizationName := "Talenteca"
 
 lazy val versions = new {
 
-  val scala3Version = "3.3.1"
+  val scala3Version = "3.4.1-RC1"
 
   val scala2Version = "2.13.12"
 
@@ -49,17 +49,26 @@ lazy val libs = new {
 
   lazy val paranamer = Seq("com.thoughtworks.paranamer" % "paranamer" % "2.8")
 
-  lazy val scalap: ModuleMap = "org.scala-lang" % "scalap" % _
+  // SCALA3 Using old scalap for Scala 2 as an experiment only, we might want to
+  // rewrite for Scala 3 using tastyp
+  lazy val scalap = "org.scala-lang" % "scalap" % versions.scala2Version
 
-  lazy val scala_compiler: ModuleMap = "org.scala-lang" % "scala-compiler" % _
+  // SCALA3 Using old scala-compiler for Scala 2 as an experiment only, we might
+  // want to rewrite for Scala 3 compiler
+  lazy val scala_compiler = "org.scala-lang" % "scala-compiler" % versions.scala2Version
 
   lazy val slf4j_api = Seq("org.slf4j" % "slf4j-api" % versions.slf4jVersion)
 
   lazy val scala_parallel_collections =
     Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0")
 
+  // SCALA3 Previous versions for scala-parser-combinators were not
+  // released for Scala 3
   lazy val scala_parser =
-    Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2")
+    Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "2.0.0")
+  // SCALA2
+  // lazy val scala_parser =
+  //   Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2")
 
   // Scala XML version 2.2.0 has conflicts with NU validator and breaks tests
   lazy val scala_xml = Seq("org.scala-lang.modules" %% "scala-xml" % "2.1.0")
@@ -120,7 +129,9 @@ lazy val libs = new {
   lazy val json4s = Seq("org.json4s" %% "json4s-native" % "4.0.6" % Test)
 }
 
-ThisBuild / scalaVersion := versions.scala2Version
+// SCALA3 for now using only Scala 3 until migration is complete, later please
+// try to add multi Scala version support
+ThisBuild / scalaVersion := versions.scala3Version
 
 ThisBuild / libraryDependencies ++=
   libs.specs2Core ++
@@ -249,7 +260,7 @@ lazy val olon_json = Project("olon-json", file("olon-json"))
     description := "JSON Library",
     Test / parallelExecution := false,
     libraryDependencies ++=
-      Seq(libs.scalap(scalaVersion.value)) ++
+      Seq(libs.scalap) ++
         libs.paranamer ++
         libs.scala_xml ++
         libs.json4s
@@ -271,7 +282,7 @@ lazy val olon_util = Project("olon-util", file("olon-util"))
   .settings(
     description := "Utilities Library",
     Test / parallelExecution := false,
-    libraryDependencies ++= Seq(libs.scala_compiler(scalaVersion.value)) ++
+    libraryDependencies ++= Seq(libs.scala_compiler) ++
       libs.joda_time ++
       libs.joda_convert ++
       libs.commons_codec ++
