@@ -2,7 +2,7 @@ package olon
 package actor
 
 import scala.collection.mutable.ArrayBuffer
-
+import  scala.compiletime.uninitialized
 import common._
 
 /** A container that contains a calculated value or may contain one in the
@@ -12,7 +12,7 @@ class LAFuture[T](
     val scheduler: LAScheduler = LAScheduler,
     context: Box[LAFuture.Context] = Empty
 ) {
-  private var item: T = _
+  private var item: T = uninitialized
   private var failure: Box[Nothing] = Empty
   private var satisfied = false
   private var aborted = false
@@ -59,7 +59,9 @@ class LAFuture[T](
 
   /** Get the future value
     */
-  @scala.annotation.tailrec
+  // SCALA3 temporary deactivating tailrec anotation because `synchronized`
+  // breaks tail recursion
+  // @scala.annotation.tailrec
   final def get: T = synchronized {
     if (satisfied) item
     else if (aborted) throw new AbortedFutureException(failure)
@@ -302,13 +304,13 @@ object LAFuture {
     this.apply(() => f, scheduler, context)
   }
 
-  private val threadInfo = new ThreadLocal[List[LAFuture[_] => Unit]]
+  private val threadInfo = new ThreadLocal[List[LAFuture[?] => Unit]]
 
   /** Notify all the observers that we created a future.
     *
     * @param future
     */
-  private def notifyObservers(future: LAFuture[_]): Unit = {
+  private def notifyObservers(future: LAFuture[?]): Unit = {
     val observers = threadInfo.get()
     if (null eq observers) {} else {
       observers.foreach(_(future))
@@ -344,7 +346,7 @@ object LAFuture {
     * @return
     *   the value computed by toDo
     */
-  def observeCreation[T](observation: LAFuture[_] => Unit)(toDo: => T): T = {
+  def observeCreation[T](observation: LAFuture[?] => Unit)(toDo: => T): T = {
     val old = threadInfo.get()
     threadInfo.set(if (null eq old) List(observation) else observation :: old)
     try {
@@ -438,7 +440,7 @@ object LAFuture {
       onAllFuturesCompleted = { (result, values) =>
         result.satisfy(values.toList.flatten)
       },
-      future: _*
+      future*
     )
   }
 
@@ -464,7 +466,7 @@ object LAFuture {
         (result: LAFuture[Box[List[T]]], values: ArrayBuffer[Box[Box[T]]]) =>
           result.satisfy(Full(values.toList.flatten.flatten))
       },
-      future: _*
+      future*
     )
   }
 
@@ -472,14 +474,14 @@ object LAFuture {
       f: () => T,
       context: Box[LAFuture.Context]
   ): () => T = {
-    context.map(_.around(f)) openOr f
+    context.map(_.around(f)).openOr(f)
   }
 
   private def inContext[A, T](
       f: (A) => T,
       context: Box[LAFuture.Context]
   ): (A) => T = {
-    context.map(_.around(f)) openOr f
+    context.map(_.around(f)).openOr(f)
   }
 
   /** Allows to wrap function in another function providing some additional

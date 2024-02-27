@@ -81,7 +81,7 @@ class LAFutureSpec extends Specification {
       }
 
       "collect empty list immediately" in {
-        val collectResult = LAFuture.collect(Nil: _*)
+        val collectResult = LAFuture.collect(Nil*)
         collectResult.isSatisfied shouldEqual true
         collectResult.get(timeout) shouldEqual Nil
       }
@@ -132,7 +132,7 @@ class LAFutureSpec extends Specification {
       }
 
       "collectAll empty list immediately" in {
-        val collectResult = LAFuture.collectAll(Nil: _*)
+        val collectResult = LAFuture.collectAll(Nil*)
         collectResult.isSatisfied shouldEqual true
         collectResult.get(timeout) shouldEqual Nil
       }

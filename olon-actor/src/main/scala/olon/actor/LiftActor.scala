@@ -3,6 +3,8 @@ package actor
 
 import common._
 
+import scala.compiletime.uninitialized
+
 trait ILAExecute {
   def execute(f: () => Unit): Unit
   def shutdown(): Unit
@@ -71,7 +73,7 @@ object LAScheduler extends LAScheduler with Loggable {
   }
 
   @volatile
-  var exec: ILAExecute = _
+  var exec: ILAExecute = uninitialized
 
   /** Execute some code on another thread
     *
@@ -99,15 +101,15 @@ object LAScheduler extends LAScheduler with Loggable {
 }
 
 trait SpecializedLiftActor[T] extends SimpleActor[T] {
-  @volatile private[this] var processing = false
-  private[this] val baseMailbox: MailboxItem = new SpecialMailbox
-  @volatile private[this] var msgList: List[T] = Nil
-  @volatile private[this] var priorityMsgList: List[T] = Nil
-  @volatile private[this] var startCnt = 0
+  @volatile private var processing = false
+  private val baseMailbox: MailboxItem = new SpecialMailbox
+  @volatile private var msgList: List[T] = Nil
+  @volatile private var priorityMsgList: List[T] = Nil
+  @volatile private var startCnt = 0
 
   private class MailboxItem(val item: T) {
-    var next: MailboxItem = _
-    var prev: MailboxItem = _
+    var next: MailboxItem = uninitialized
+    var prev: MailboxItem = uninitialized
 
     /*
     def find(f: MailboxItem => Boolean): Box[MailboxItem] =
@@ -346,7 +348,7 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
   * real actor) you gain the ability to run these kinds of tests.
   */
 class MockSpecializedLiftActor[T] extends SpecializedLiftActor[T] {
-  private[this] var messagesReceived: List[T] = Nil
+  private var messagesReceived: List[T] = Nil
 
   /** Send a message to the mock actor, which will be recorded and not processed
     * by the message handler.
@@ -384,7 +386,7 @@ trait LiftActor
     with GenericActor[Any]
     with ForwardableActor[Any, Any] {
   @volatile
-  private[this] var responseFuture: LAFuture[Any] = null
+  private var responseFuture: LAFuture[Any] = null
 
   protected final def forwardMessageTo(
       msg: Any,

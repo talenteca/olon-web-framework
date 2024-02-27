@@ -84,10 +84,10 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       Full(1).openOrThrowException("This is a test") must_== 1
     }
     "return its value when opened with openOr(default value)" in {
-      Full(1) openOr 0 must_== 1
+      Full(1).openOr(0) must_== 1
     }
     "return itself when or'ed with another Box" in {
-      Full(1) or Full(2) must_== Full(1)
+      Full(1).or(Full(2)) must_== Full(1)
     }
     "define an 'exists' method returning true if the Box value satisfies the function" in {
       Full(1) exists { _ > 0 } must beTrue
@@ -129,10 +129,10 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       } must_== Full("full")
     }
     "define a 'flatMap' method transforming its value in another Box. If the value is transformed in an Empty box, the total result is an Empty box" in {
-      Full(0) flatMap {
-        x: Int =>
+      val result = Full(0) flatMap { x: Int =>
           if (x > 0) Full("full") else Empty
-      } must beEmpty
+      }
+      result.must(beEmpty)
     }
     "define a 'flatten' method if it contains another Box." in {
       "If the inner box is a Full box, the final result is identical to that box" in {
