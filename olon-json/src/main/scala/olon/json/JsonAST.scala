@@ -258,7 +258,9 @@ object JsonAST {
         _.values
       }
 
-    private def typePredicate[A <: JValue[?]](clazz: Class[A])(json: JValue[?]) =
+    private def typePredicate[A <: JValue[?]](
+        clazz: Class[A]
+    )(json: JValue[?]) =
       json match {
         case x if x.getClass == clazz => true
         case _                        => false

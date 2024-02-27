@@ -91,7 +91,7 @@ object Extraction {
           JObject(
             (x map { case (k: String, v) => JField(k, decompose(v)) }).toList
           )
-        case x: Iterable[_] => JArray(x.toList map decompose)
+        case x: Iterable[_]            => JArray(x.toList map decompose)
         case x if (x.getClass.isArray) =>
           // SCALA3 using `?` instead of `_`
           JArray(x.asInstanceOf[Array[?]].toList map decompose)
@@ -579,7 +579,7 @@ object Extraction {
 
     build(json, mapping)
   }
-  
+
   // SCALA3 using `?` instead of `_`
   private def convert(
       json: JValue,

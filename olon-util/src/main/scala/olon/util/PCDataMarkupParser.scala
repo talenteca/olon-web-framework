@@ -322,7 +322,8 @@ class PCDataXmlParser(val input: Source)
   ent ++= HtmlEntities()
   import scala.xml._
 
-  def curInpt = curInput // SCALA3 we could not override the var here, but we could not access the var outside of this class either (as it is "protected")
+  def curInpt =
+    curInput // SCALA3 we could not override the var here, but we could not access the var outside of this class either (as it is "protected")
 
   /** parse attribute and create namespace scope, metadata [41] Attributes ::= {
     * S Name Eq AttValue }
