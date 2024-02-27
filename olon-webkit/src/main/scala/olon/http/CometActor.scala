@@ -589,7 +589,7 @@ trait BaseCometActor
     * mechanism. If you use the jsonSend call, you will get a
     * JObject(JField("command", cmd), JField("param", params))
     */
-  def receiveJson(): PartialFunction[JsonAST.JValue, JsCmd] = Map()
+  def receiveJson(): PartialFunction[JsonAST.JValue[?], JsCmd] = Map()
 
   /** The JavaScript call that you use to send the data to the server. For
     * example: &lt;button onclick={jsonSend("Hello",

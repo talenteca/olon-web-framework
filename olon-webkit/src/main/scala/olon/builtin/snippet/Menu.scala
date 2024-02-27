@@ -466,7 +466,6 @@ object Menu extends DispatchSnippet with Loggable {
     for {
       name <- S.attr("name").toList
     } yield {
-      type T = Q forSome { type Q }
 
       // Builds a link for the given loc
       def buildLink[T](loc: Loc[T]) = {
@@ -486,6 +485,7 @@ object Menu extends DispatchSnippet with Loggable {
         SiteMap.findAndTestLoc(name)
       ) match {
         case (_, Full(param), Full(loc: Loc[_] with ConvertableLoc[_])) => {
+          type T // SCALA 3 - existential type replaced with an abstract type
           val typedLoc = loc.asInstanceOf[Loc[T] with ConvertableLoc[T]]
 
           (for {

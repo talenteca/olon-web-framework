@@ -39,7 +39,7 @@ class LiftServlet extends Loggable {
 
   def destroy = {
     try {
-      LiftRules.ending = true
+      LiftRules.realInstance.ending = true
 
       tryo {
         SessionMaster.shutDownAllSessions()
@@ -48,7 +48,7 @@ class LiftServlet extends Loggable {
       val cur = millis
 
       // wait 10 seconds or until the request count is zero
-      while (LiftRules.reqCnt.get > 0 && (millis - cur) < 10000L) {
+      while (LiftRules.realInstance.reqCnt.get > 0 && (millis - cur) < 10000L) {
         Thread.sleep(20)
       }
 
@@ -63,7 +63,7 @@ class LiftServlet extends Loggable {
         LAPinger.shutdown
       }
 
-      LiftRules.runUnloadHooks()
+      LiftRules.realInstance.runUnloadHooks()
       logger.debug("Destroyed Lift handler.")
       // super.destroy
     } catch {
@@ -72,7 +72,7 @@ class LiftServlet extends Loggable {
   }
 
   def init = {
-    LiftRules.ending = false
+    LiftRules.realInstance.ending = false
   }
 
   def getLiftSession(request: Req): LiftSession =
@@ -146,9 +146,9 @@ class LiftServlet extends Loggable {
     try {
       def doIt: Boolean = {
         if (
-          LiftRules.lockedSecurityRules.logInDevMode &&
+          LiftRules.realInstance.lockedSecurityRules.logInDevMode &&
           Props.devMode &&
-          LiftRules.lockedSecurityRules.https.isDefined &&
+          LiftRules.realInstance.lockedSecurityRules.https.isDefined &&
           !req.hostAndPath.startsWith("https")
         ) {
           logger.warn(s"""
@@ -234,7 +234,7 @@ class LiftServlet extends Loggable {
     }
 
     def process(req: Req) = {
-      if (LiftRules.ending)
+      if (LiftRules.realInstance.ending)
         notFoundOrIgnore(req, Empty)
       else
         Empty
@@ -371,8 +371,8 @@ class LiftServlet extends Loggable {
           "This is a full box here, checked on previous line"
         )
         f match {
-          case Full(v)                => Full(v)
-          case Empty                  => LiftRules.notFoundOrIgnore(req, Empty)
+          case Full(v) => Full(v)
+          case Empty   => LiftRules.realInstance.notFoundOrIgnore(req, Empty)
           case f: olon.common.Failure => Full(req.createNotFound(f))
         }
       } else {
@@ -482,7 +482,10 @@ class LiftServlet extends Loggable {
     val toMatch = req
 
     val dispatch: (Boolean, Box[LiftResponse]) =
-      NamedPF.find(toMatch, LiftRules.dispatchTable(req.request)) match {
+      NamedPF.find(
+        toMatch,
+        LiftRules.realInstance.dispatchTable(req.request)
+      ) match {
         case Full(pf) =>
           LiftSession.onBeginServicing.foreach(_(liftSession, req))
           val ret: (Boolean, Box[LiftResponse]) =
@@ -517,7 +520,13 @@ class LiftServlet extends Loggable {
                       )
 
                     case Empty =>
-                      (true, LiftRules.notFoundOrIgnore(req, Full(liftSession)))
+                      (
+                        true,
+                        LiftRules.realInstance.notFoundOrIgnore(
+                          req,
+                          Full(liftSession)
+                        )
+                      )
 
                     case f: olon.common.Failure =>
                       (
@@ -675,7 +684,7 @@ class LiftServlet extends Loggable {
 
             val what2 = what.flatMap {
               case js: JsCmd       => List(js)
-              case jv: JValue      => List(jv)
+              case jv: JValue[?]   => List(jv)
               case n: NodeSeq      => List(n)
               case js: JsCommands  => List(js)
               case r: LiftResponse => List(r)
@@ -683,8 +692,8 @@ class LiftServlet extends Loggable {
             }
 
             val ret: LiftResponse = what2 match {
-              case (json: JsObj) :: Nil => JsonResponse(json)
-              case (jv: JValue) :: Nil  => JsonResponse(jv)
+              case (json: JsObj) :: Nil   => JsonResponse(json)
+              case (jv: JValue[?]) :: Nil => JsonResponse(jv)
               case (js: JsCmd) :: xs => {
                 (JsCommands(S.noticesToJsCmd :: Nil) &
                   (js :: (xs.collect { case js: JsCmd =>

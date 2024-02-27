@@ -959,7 +959,7 @@ class LiftSession(
   private[http] def hasFuncsForOwner(owner: String): Boolean = {
     import scala.jdk.CollectionConverters._
 
-    !nmessageCallback.asScala.find(_._2.owner == owner).isEmpty
+    !nmessageCallback.asScala.find(_._2.owner.toOption == Some(owner)).isEmpty
   }
 
   private def shutDown() = {
@@ -1116,7 +1116,8 @@ class LiftSession(
             try {
               f() match {
                 case Full(r) => Full(checkRedirect(r))
-                case _       => LiftRules.notFoundOrIgnore(request, Full(this))
+                case _ =>
+                  LiftRules.realInstance.notFoundOrIgnore(request, Full(this))
               }
             } finally {
               notices = S.getAllNotices
@@ -1599,7 +1600,7 @@ class LiftSession(
    */
   private def findSnippetInstance(cls: String): Box[AnyRef] =
     S.snippetForClass(cls) or
-      (LiftRules.snippet(cls) or
+      (LiftRules.realInstance.snippet(cls) or
         LiftSession
           .findSnippetClass(cls)
           .flatMap(c =>
@@ -2290,7 +2291,7 @@ class LiftSession(
         SHtml
           .jsonCall(
             JsRaw("x"),
-            (p: JsonAST.JValue) => {
+            (p: JsonAST.JValue[?]) => {
               in ! p
               JsCmds.Noop
             }
@@ -2328,7 +2329,7 @@ class LiftSession(
     */
   def clientActorFor(
       in: LiftActor,
-      xlate: JsonAST.JValue => Box[Any]
+      xlate: JsonAST.JValue[?] => Box[Any]
   ): JsExp = {
     testStatefulFeature {
       AnonFunc(
@@ -2336,7 +2337,7 @@ class LiftSession(
         SHtml
           .jsonCall(
             JsRaw("x"),
-            (p: JsonAST.JValue) => {
+            (p: JsonAST.JValue[?]) => {
               in.!(xlate(p) match {
                 case Full(v) => v
                 case Empty =>
@@ -2448,7 +2449,7 @@ class LiftSession(
                   partialUpdate(
                     JsCmds.JsSchedule(JsCmds.JsTry(jsExp.cmd, false))
                   )
-                case jv: JsonAST.JValue => {
+                case jv: JsonAST.JValue[?] => {
                   val s: String = json.prettyRender(jv)
                   partialUpdate(
                     JsCmds.JsSchedule(
@@ -2523,7 +2524,7 @@ class LiftSession(
               processOrDefer(true)(
                 processSurroundAndInclude(
                   page,
-                  nodeFuture.get(15000).openOr(NodeSeq.Empty)
+                  nodeFuture.get(15000).openOr[NodeSeq](NodeSeq.Empty)
                 )
               )
           }
@@ -2552,7 +2553,9 @@ class LiftSession(
             case DataAttributeProcessorAnswerFork(nodeFunc) =>
               processOrDefer(true)(nodeFunc())
             case DataAttributeProcessorAnswerFuture(nodeFuture) =>
-              processOrDefer(true)(nodeFuture.get(15000).openOr(NodeSeq.Empty))
+              processOrDefer(true)(
+                nodeFuture.get(15000).openOr[NodeSeq](NodeSeq.Empty)
+              )
           }
 
         case v: Elem =>
@@ -3121,22 +3124,22 @@ class LiftSession(
 
       val renderVersion = RenderVersion.get
 
-      val jvmanifest: Manifest[JValue] = implicitly
+      val jvmanifest: Manifest[JValue[?]] = implicitly
 
       val map = Map(info.map(i => i.name -> i): _*)
 
-      def fixIt(in: Any): JValue = {
+      def fixIt(in: Any): JValue[?] = {
         in match {
-          case jv: JValue => jv
-          case a          => Extraction.decompose(a)
+          case jv: JValue[?] => jv
+          case a             => Extraction.decompose(a)
         }
       }
 
-      def localFunc(in: JValue): JsCmd = {
+      def localFunc(in: JValue[?]): JsCmd = {
         LAScheduler.execute(() => {
           executeInScope(currentReq, renderVersion)(for {
-            JString(guid) <- in \ "guid"
-            JString(name) <- in \ "name"
+            case JString(guid) <- in \ "guid"
+            case JString(name) <- in \ "name"
             func <- map.get(name)
             payload = in \ "payload"
             reified <-
@@ -3228,7 +3231,7 @@ class LiftSession(
 
                       }
 
-                      def send(value: JValue): Unit = {
+                      def send(value: JValue[?]): Unit = {
                         if (!done_?) {
                           ca ! ItemMsg(guid, value)
                         }
@@ -3266,7 +3269,7 @@ class LiftSession(
     }
   }
 
-  private case class ItemMsg(guid: String, item: JValue)
+  private case class ItemMsg(guid: String, item: JValue[?])
   private case class DoneMsg(guid: String)
   private case class FailMsg(guid: String, msg: String)
 
@@ -3462,7 +3465,7 @@ trait RoundTripHandlerFunc {
     * @param value
     *   the data to send back.
     */
-  def send(value: JValue): Unit
+  def send(value: JValue[?]): Unit
 
   /** Send some JavaScript to execute on the client side
     * @param value

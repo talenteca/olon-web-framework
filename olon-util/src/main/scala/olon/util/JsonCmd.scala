@@ -30,15 +30,9 @@ object JsonCommand {
       in: JValue[String]
   ): Option[
     (String, Option[String], JValue[?])
-  ] = // SCALA3 TODO this is just a quickfix
-    val y = (in \ "command") match {
-      case JString(s) => Some(JString(s))
-      case _          => None
-    }
-    val withFiltr = y.withFilter(_ => true)
+  ] =
     for {
-      JString(command) <-
-        y // SCALA3, before the quickfix, it was "(in \ "command")" instead of y
+      case JString(command) <- (in \ "command") // SCALA3 added "case" to force the compiler to use withFilter
       params <- in \ "params"
       if params != JNothing
     } yield {

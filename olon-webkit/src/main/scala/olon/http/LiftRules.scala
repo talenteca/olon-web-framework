@@ -228,7 +228,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * By default, use prettyRender for dev mode and compactRender for other
     * modes.
     */
-  val jsonOutputConverter = new FactoryMaker[JsonAST.JValue => String]({
+  val jsonOutputConverter = new FactoryMaker[JsonAST.JValue[?] => String]({
     import json.{prettyRender, compactRender}
 
     if (Props.devMode) {
@@ -1223,27 +1223,26 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   /** If a deferred snippet has a failure during render, what should we display?
     */
   val deferredSnippetFailure: FactoryMaker[Failure => NodeSeq] =
-    new FactoryMaker(() => {
-      failure: Failure =>
-        {
-          if (Props.devMode)
-            <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{
-              failure.msg
-            }{
-              failure.exception match {
-                case Full(e) =>
-                  <pre>{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
-                case _ => NodeSeq.Empty
-              }
-            }<i>note: this error is displayed in the browser because
+    new FactoryMaker(() => { (failure: Failure) =>
+      {
+        if (Props.devMode)
+          <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{
+            failure.msg
+          }{
+            failure.exception match {
+              case Full(e) =>
+                <pre>{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
+              case _ => NodeSeq.Empty
+            }
+          }<i>note: this error is displayed in the browser because
         your application is running in "development" mode.If you
         set the system property run.mode=production, this error will not
         be displayed, but there will be errors in the output logs.
         </i>
         </div>
-          else NodeSeq.Empty
-        }
-    }) {}
+        else NodeSeq.Empty
+      }
+    }) // {}
 
   /** If a deferred snippet has a failure during render, what should we display?
     */
@@ -1594,7 +1593,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   def performTransform(in: LiftResponse): LiftResponse =
     responseTransformers.toList.foldLeft(in) {
-      case (in, pf: PartialFunction[_, _]) =>
+      case (in, pf: PartialFunction[LiftResponse, _]) =>
         if (pf.isDefinedAt(in)) pf(in) else in
       case (in, f) => f(in)
     }

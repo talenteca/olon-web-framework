@@ -60,7 +60,7 @@ lazy val libs = new {
   lazy val slf4j_api = Seq("org.slf4j" % "slf4j-api" % versions.slf4jVersion)
 
   lazy val scala_parallel_collections =
-    Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0")
+    Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4")
 
   // SCALA3 Previous versions for scala-parser-combinators were not
   // released for Scala 3
@@ -148,6 +148,7 @@ ThisBuild / scalacOptions ++= Seq(
   // "-Xfatal-warnings", // SCALA3 TODO revisit 
   "-Wunused:imports",
   // SCALA3 ignored option "-Ywarn-unused"
+  "-Wconf:any:silent" // SCALA3 TODO temporary option
 )
 
 ThisBuild / scalafmtOnCompile := true
@@ -316,12 +317,7 @@ lazy val olon_webkit = Project("olon-webkit", file("olon-webkit"))
         libs.jquery ++
         libs.jasmineCore ++
         libs.jasmineAjax ++ {
-          CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((2, scalaMajor)) if scalaMajor >= 13 =>
-              libs.scala_parallel_collections
-            case _ =>
-              Seq.empty
-          }
+        libs.scala_parallel_collections
         },
     Test / initialize := {
       System.setProperty(

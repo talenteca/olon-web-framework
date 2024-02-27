@@ -2975,7 +2975,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @return
     *   ( JsonCall, JsCmd )
     */
-  def createJsonFunc(f: PFPromoter[JValue, JsCmd]): (JsonCall, JsCmd) =
+  def createJsonFunc(f: PFPromoter[JValue[?], JsCmd]): (JsonCall, JsCmd) =
     createJsonFunc(Empty, Empty, f)
 
   /** Build a handler for incoming JSON commands based on the new Json Parser
@@ -2991,7 +2991,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def createJsonFunc(
       onError: JsCmd,
-      f: PFPromoter[JValue, JsCmd]
+      f: PFPromoter[JValue[?], JsCmd]
   ): (JsonCall, JsCmd) =
     createJsonFunc(Empty, Full(onError), f)
 
@@ -3012,7 +3012,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def createJsonFunc(
       name: Box[String],
       onError: Box[JsCmd],
-      pfp: PFPromoter[JValue, JsCmd]
+      pfp: PFPromoter[JValue[?], JsCmd]
   ): (JsonCall, JsCmd) = {
     functionLifespan(true) {
       val key = formFuncName

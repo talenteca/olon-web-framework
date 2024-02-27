@@ -1372,7 +1372,8 @@ trait ScreenWizardRendered extends Loggable {
         }
       }
 
-      val myNotices = notices.filter(fi => fi._3.isDefined && fi._3 == curId)
+      val myNotices =
+        notices.filter(fi => fi._3.isDefined && fi._3.toOption == Some(curId))
 
       def bindLabel(): CssBindFunc = {
         val basicLabel = sel(_.label, ".%s [for]") #> curId & nsSetChildren(
@@ -1798,7 +1799,7 @@ trait LiftScreen
       override protected def __nameSalt = randomString(20)
     }
 
-  protected def createSnapshot = {
+  def createScreenSnapshot: ScreenSnapshot = {
     val prev = PrevSnapshot.get
     new ScreenSnapshot(ScreenVars.get, prev)
   }
@@ -2022,8 +2023,8 @@ trait LiftScreen
     else {
       validate match {
         case Nil =>
-          val snapshot = createSnapshot
-          PrevSnapshot.set(Full(snapshot))
+          val snapshot = createScreenSnapshot
+          PrevSnapshot.set(Full[ScreenSnapshot](snapshot))
           finish()
           redirectBack()
         case xs => {

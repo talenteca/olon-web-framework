@@ -107,11 +107,11 @@ class MockHttpServletRequest(
   /** Sets the body to the given json value. Also sets the contentType to
     * "application/json"
     */
-  def body_=(jval: JValue): Unit = body_=(jval, "application/json")
+  def body_=(jval: JValue[?]): Unit = body_=(jval, "application/json")
 
   /** Sets the body to the given json value and content type.
     */
-  def body_=(jval: JValue, contentType: String): Unit = {
+  def body_=(jval: JValue[?], contentType: String): Unit = {
     import json.JsonAST
 
     body = JsonAST.prettyRender(jval).getBytes(charEncoding)
