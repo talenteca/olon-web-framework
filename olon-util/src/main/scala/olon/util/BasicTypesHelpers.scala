@@ -37,7 +37,8 @@ object BasicTypesHelpers
 
 /** This trait adds functionality to Scala standard types
   */
-trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
+// SCALA3 Using `&` instead of `with` type operator
+trait BasicTypesHelpers { self: StringHelpers & ControlHelpers =>
 
   /** This decorator class adds a ternary operator to a Boolean value
     * @param b
@@ -175,7 +176,8 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     * another
     */
   final implicit class PartialFunctionWrapper[A](
-      around: PartialFunction[A, _]
+      // SCLALA3 using `?` instead of `_`
+      around: PartialFunction[A, ?]
   ) {
 
     /** Allows you to put a guard around a partial function such that the
@@ -212,7 +214,7 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
       case i: Int                   => i != 0
       case lo: Long                 => lo != 0
       case n: Number                => n.intValue != 0
-      case s: String                => asBoolean(s) openOr false
+      case s: String                => asBoolean(s).openOr(false)
       case None                     => false
       case Empty | Failure(_, _, _) => false
       case Full(n)                  => toBoolean(n)

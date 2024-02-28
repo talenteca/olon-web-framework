@@ -41,7 +41,8 @@ class FatLazy[T](f: => T) {
     * default.
     */
   def defined_? = synchronized {
-    value != None
+    // SCALA3 calling to explicit `Option` conversion prior comparisson
+    value.toOption != None
   }
 
   /** Set the instance to a new value and return that value

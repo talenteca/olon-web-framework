@@ -24,6 +24,8 @@ class TimeHelpersSpec
     with TimeAmountsGen {
   "TimeHelpers Specification".title
 
+  private val EPOCH_TIME = new Date(0)
+
   "A TimeSpan" can {
     "be created from a number of milliseconds" in forAllTimeZones {
       TimeSpan(3000) must_== TimeSpan(3 * 1000)
@@ -44,10 +46,10 @@ class TimeHelpersSpec
       3.weeks must_== TimeSpan(3 * 7 * 24 * 60 * 60 * 1000)
     }
     "be converted implicitly to a date starting from the epoch time" in forAllTimeZones {
-      3.seconds.after(new Date(0)) must beTrue
+      3.seconds.after(EPOCH_TIME) must beTrue
     }
     "be converted to a date starting from the epoch time, using the date method" in forAllTimeZones {
-      3.seconds.after(new Date(0)) must beTrue
+      3.seconds.after(EPOCH_TIME) must beTrue
     }
     "be implicitly converted to a Long" in forAllTimeZones {
       (3.seconds == 3000L) must_== true
@@ -126,7 +128,7 @@ class TimeHelpersSpec
       year(today.setTimezone(utc).setYear(2008).getTime) must_== 2008
     }
     "provide a millisToDays function returning the number of days since the epoch time" in forAllTimeZones {
-      millisToDays(new Date(0).getTime) must_== 0
+      millisToDays(EPOCH_TIME.getTime) must_== 0
       millisToDays(
         today.setYear(1970).setMonth(0).setDay(1).getTime.getTime
       ) must_== 0 // the epoch time
@@ -174,8 +176,8 @@ class TimeHelpersSpec
         internetDateFormatter.format(now)
       ).getTime.toLong must beCloseTo(now.getTime.toLong, 1000L)
     }
-    "provide a parseInternetDate function returning new Date(0) if the input date cant be parsed" in forAllTimeZones {
-      parseInternetDate("unparsable") must_== new Date(0)
+    "provide a parseInternetDate function returning EPOCH_TIME if the input date cant be parsed" in forAllTimeZones {
+      parseInternetDate("unparsable") must_== EPOCH_TIME
     }
     "provide a toInternetDate function formatting a date to the internet format" in forAllTimeZones {
       toInternetDate(now) must beMatching(

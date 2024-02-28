@@ -176,15 +176,17 @@ trait Html5Writer {
         writer.append("]]>")
       }
 
-      case scala.xml.PCData(data) => {
+      // SCALA3 Removing duplicated match pattern case
+      /*case scala.xml.PCData(data) => {
         writer.append("<![CDATA[")
         writer.append(data)
         writer.append("]]>")
-      }
+      }*/
 
       case Unparsed(data) => writer.append(data)
 
-      case a: Atom[_] if a.getClass eq classOf[Atom[_]] =>
+      // SCALA3 Using `?` instead of `_`
+      case a: Atom[_] if a.getClass eq classOf[Atom[?]] =>
         escape(a.data.toString, writer, !convertAmp)
 
       case Comment(comment) if !stripComment => {
@@ -236,7 +238,8 @@ trait Html5Writer {
                 writer.append(sb)
               }
               case Unparsed(text) => writer.append(text)
-              case a: Atom[_] if a.getClass eq classOf[Atom[_]] =>
+              // SCALA3 Using `?` instead of `_`
+              case a: Atom[_] if a.getClass eq classOf[Atom[?]] =>
                 writer.append(a.data.toString)
 
               case _ =>
@@ -318,8 +321,8 @@ object Html5Constants {
   /** Is the tag a non-replaceable tag?
     */
   def nonReplaceable_?(t: String): Boolean =
-    (t equalsIgnoreCase "script") ||
-      (t equalsIgnoreCase "style")
+    (t.equalsIgnoreCase("script")) ||
+      (t.equalsIgnoreCase("style"))
 }
 
 /** A utility that supports parsing of HTML5 file. The Parser hooks up

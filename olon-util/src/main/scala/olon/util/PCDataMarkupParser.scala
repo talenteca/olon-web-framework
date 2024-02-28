@@ -275,9 +275,10 @@ object HtmlEntities {
     case (name, value) => (name, value.toChar)
   }
 
+  // SCALA3 Using `x*` instead of `x: _*`
   val revMap: Map[Char, String] = Map(entList.map { case (name, value) =>
     (value.toChar, name)
-  }: _*)
+  }*)
 
   val entities = entList.map { case (name, value) =>
     (name, new ParsedEntityDecl(name, new IntDef(value.toChar.toString)))
@@ -288,7 +289,8 @@ object HtmlEntities {
 
 /** Extends the Markup Parser to do the right thing (tm) with PCData blocks
   */
-trait PCDataMarkupParser[PCM <: MarkupParser with MarkupHandler]
+// SCALA3 using `&` instead of the `with` type operator
+trait PCDataMarkupParser[PCM <: MarkupParser & MarkupHandler]
     extends MarkupParser { self: PCM =>
 
   /** '&lt;! CharData ::= [CDATA[ ( {char} - {char}"]]&gt;"{char} ) ']]&gt;'
@@ -321,6 +323,9 @@ class PCDataXmlParser(val input: Source)
   val preserveWS = true
   ent ++= HtmlEntities()
   import scala.xml._
+
+  // SCALA3 we could not override the var here, but we could not access the var outside of this class either (as it is "protected")
+  def _curInput = curInput
 
   /** parse attribute and create namespace scope, metadata [41] Attributes ::= {
     * S Name Eq AttValue }
@@ -416,7 +421,7 @@ object PCDataXmlParser {
   private def apply(source: Source): Box[NodeSeq] = {
     for {
       p <- tryo { new PCDataXmlParser(source) }
-      _ = while (p.ch != '<' && p.curInput.hasNext)
+      _ = while (p.ch != '<' && p._curInput.hasNext)
         p.nextch() // side effects, baby
       bd <- tryo(p.document())
       doc <- Box !! bd
@@ -539,7 +544,8 @@ object AltXML {
 
       case up: Unparsed => up.buildString(sb)
 
-      case a: Atom[_] if a.getClass eq classOf[Atom[_]] =>
+      // SCALA3 Using `?` instead of `_`
+      case a: Atom[_] if a.getClass eq classOf[Atom[?]] =>
         escape(a.data.toString, sb, !convertAmp)
 
       case c: Comment if !stripComment =>
@@ -641,7 +647,8 @@ object AltXML {
 
       case up: Unparsed => up.buildString(sb)
 
-      case a: Atom[_] if a.getClass eq classOf[Atom[_]] =>
+      // SCALA3 Using `?` instead of `_`
+      case a: Atom[_] if a.getClass eq classOf[Atom[?]] =>
         escape(a.data.toString, sb, !convertAmp)
 
       case c: Comment if !stripComment =>

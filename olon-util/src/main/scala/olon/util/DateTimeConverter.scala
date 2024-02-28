@@ -57,7 +57,7 @@ object DefaultDateTimeConverter extends DateTimeConverter {
   def parseDate(s: String) = tryo { dateFormat.parse(s) }
 
   /** Tries Helpers.hourFormat and Helpers.timeFormat */
-  def parseTime(s: String) = tryo { hourFormat.parse(s) } or tryo {
+  def parseTime(s: String) = tryo { hourFormat.parse(s) }.or(tryo {
     timeFormat.parse(s)
-  }
+  })
 }

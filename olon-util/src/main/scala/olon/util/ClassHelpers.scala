@@ -15,8 +15,9 @@ object ClassHelpers extends ClassHelpers with ControlHelpers
   */
 trait ClassHelpers { self: ControlHelpers =>
 
+  // SCALA3 Removing `_` for passing function as a value
   private val nameModifiers =
-    List[String => String](StringHelpers.camelify _, n => n)
+    List[String => String](StringHelpers.camelify, n => n)
 
   /** This operator transforms its arguments into a List
     * @return
@@ -212,7 +213,8 @@ trait ClassHelpers { self: ControlHelpers =>
     * @return
     *   true if clz is assignable from any of the matching classes
     */
-  def containsClass[C](clz: Class[C], toMatch: List[Class[_]]): Boolean =
+  // SCALA3 using `?` instead of `_`
+  def containsClass[C](clz: Class[C], toMatch: List[Class[?]]): Boolean =
     if (toMatch eq null) false
     else toMatch.exists(_.isAssignableFrom(clz))
 
@@ -226,13 +228,15 @@ trait ClassHelpers { self: ControlHelpers =>
     * @return
     *   true if the method exists on the class and is callable
     */
-  def classHasControllerMethod(clz: Class[_], name: String): Boolean = {
-    tryo {
+  // SCALA3 using `?` instead of `_`
+  def classHasControllerMethod(clz: Class[?], name: String): Boolean = {
+    val result = tryo {
       clz match {
         case null => false
         case _    => callableMethod_?(clz.getDeclaredMethod(name))
       }
-    } openOr false
+    }
+    result.openOr(false)
   }
 
   /** Invoke a controller method (parameterless, public) on a class
@@ -246,7 +250,8 @@ trait ClassHelpers { self: ControlHelpers =>
     *   the result of the method invocation or throws the root exception causing
     *   an error
     */
-  def invokeControllerMethod(clz: Class[_], meth: String) = {
+  // SCALA3 using `?` instead of `_`
+  def invokeControllerMethod(clz: Class[?], meth: String) = {
     try {
       clz.getMethod(meth).invoke(clz.getDeclaredConstructor().newInstance())
     } catch {
@@ -302,15 +307,17 @@ trait ClassHelpers { self: ControlHelpers =>
       meth: String,
       params: Array[AnyRef]
   ): Box[Any] = {
-    _invokeMethod(clz, inst, meth, params, Empty) or
-      _invokeMethod(clz, inst, StringHelpers.camelify(meth), params, Empty) or
-      _invokeMethod(
-        clz,
-        inst,
-        StringHelpers.camelifyMethod(meth),
-        params,
-        Empty
+    _invokeMethod(clz, inst, meth, params, Empty).or(
+      _invokeMethod(clz, inst, StringHelpers.camelify(meth), params, Empty).or(
+        _invokeMethod(
+          clz,
+          inst,
+          StringHelpers.camelifyMethod(meth),
+          params,
+          Empty
+        )
       )
+    )
   }
 
   /** Invoke the given method for the given class, with some parameters and
@@ -333,28 +340,31 @@ trait ClassHelpers { self: ControlHelpers =>
     * @return
     *   a Box containing the value returned by the method
     */
+  // SCALA3 Using `?` instead of `_`
   def invokeMethod[C](
       clz: Class[C],
       inst: AnyRef,
       meth: String,
       params: Array[AnyRef],
-      ptypes: Array[Class[_]]
+      ptypes: Array[Class[?]]
   ): Box[Any] = {
-    _invokeMethod(clz, inst, meth, params, Full(ptypes)) or
+    _invokeMethod(clz, inst, meth, params, Full(ptypes)).or(
       _invokeMethod(
         clz,
         inst,
         StringHelpers.camelify(meth),
         params,
         Full(ptypes)
-      ) or
-      _invokeMethod(
-        clz,
-        inst,
-        StringHelpers.camelifyMethod(meth),
-        params,
-        Full(ptypes)
+      ).or(
+        _invokeMethod(
+          clz,
+          inst,
+          StringHelpers.camelifyMethod(meth),
+          params,
+          Full(ptypes)
+        )
       )
+    )
   }
 
   /** Invoke the given method for the given class, with the given params. The
@@ -376,12 +386,13 @@ trait ClassHelpers { self: ControlHelpers =>
     * @return
     *   a Box containing the value returned by the method
     */
+  // SCALA3 Using `?` instead of `_`
   private def _invokeMethod[C](
       clz: Class[C],
       inst: AnyRef,
       meth: String,
       params: Array[AnyRef],
-      ptypes: Box[Array[Class[_]]]
+      ptypes: Box[Array[Class[?]]]
   ): Box[Any] = {
     // try to find a method matching the given parameters
     def possibleMethods: List[Method] = {
@@ -402,11 +413,13 @@ trait ClassHelpers { self: ControlHelpers =>
           methodCache(key)
         } else {
 
+          // SCALA3 using `?` instead of `_`
+          // SCALA3 using `x*` instead of `x: _*`
           val ret =
             try {
-              val classes: Array[Class[_]] =
-                ptypes openOr params.map(_.getClass)
-              List(clz.getMethod(meth, classes: _*))
+              val classes: Array[Class[?]] =
+                ptypes.openOr(params.map(_.getClass))
+              List(clz.getMethod(meth, classes*))
             } catch {
               case _: NullPointerException  => Nil
               case _: NoSuchMethodException => alternateMethods
@@ -429,9 +442,10 @@ trait ClassHelpers { self: ControlHelpers =>
      }
      }
      */
+    // SCALA3 using `x*` instead of `x: _*`
     possibleMethods.iterator
       .filter(m => inst != null || isStatic(m.getModifiers))
-      .map((m: Method) => tryo { m.invoke(inst, params: _*) })
+      .map((m: Method) => tryo { m.invoke(inst, params*) })
       .find((x: Box[Any]) =>
         x match {
           case Full(_)                                          => true
@@ -499,13 +513,14 @@ trait ClassHelpers { self: ControlHelpers =>
     }
   }
 
-  def classHierarchy(in: Class[_]): List[Class[_]] = {
+  // SCALA3 using `?` instead of `_`
+  def classHierarchy(in: Class[?]): List[Class[?]] = {
     import scala.collection.mutable._
-    val ret: ListBuffer[Class[_]] = new ListBuffer
-    var c: Class[_] = in
+    val ret: ListBuffer[Class[?]] = new ListBuffer
+    var c: Class[?] = in
     ret += c
     while (c.getSuperclass != null) {
-      val sc: Class[_] = c.getSuperclass
+      val sc: Class[?] = c.getSuperclass
       ret += sc
       c = sc
     }

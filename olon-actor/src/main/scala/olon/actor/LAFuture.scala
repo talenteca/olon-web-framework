@@ -13,6 +13,7 @@ class LAFuture[T](
     val scheduler: LAScheduler = LAScheduler,
     context: Box[LAFuture.Context] = Empty
 ) {
+  // SCALA3 using `uninitialized` instead of `_`
   private var item: T = uninitialized
   private var failure: Box[Nothing] = Empty
   private var satisfied = false

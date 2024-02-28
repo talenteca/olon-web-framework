@@ -27,9 +27,10 @@ private[util] trait Props extends Logger {
       .map(interpolate)
   }
 
-  private[this] val interpolateRegex = """(.*?)\Q${\E(.*?)\Q}\E([^$]*)""".r
+  // SCALA3 Using `private` instead of `private[this]`
+  private val interpolateRegex = """(.*?)\Q${\E(.*?)\Q}\E([^$]*)""".r
 
-  private[this] def interpolate(value: String): String = {
+  private def interpolate(value: String): String = {
     def lookup(key: String) = {
       lockedInterpolationValues
         .flatMap(_.get(key))
@@ -37,9 +38,11 @@ private[util] trait Props extends Logger {
     }
 
     val interpolated = for {
-      interpolateRegex(before, key, after) <- interpolateRegex.findAllMatchIn(
-        value.toString
-      )
+      // SCALA3 Adding `case` for explicit pattern matching
+      case interpolateRegex(before, key, after) <- interpolateRegex
+        .findAllMatchIn(
+          value.toString
+        )
     } yield {
       val lookedUp = lookup(key).getOrElse(("${" + key + "}"))
 
@@ -58,15 +61,17 @@ private[util] trait Props extends Logger {
   def getInt(name: String): Box[Int] =
     get(name).map(toInt) // toInt(props.get(name))
   def getInt(name: String, defVal: Int): Int =
-    getInt(name) openOr defVal // props.get(name).map(toInt(_)) getOrElse defVal
+    getInt(name).openOr(
+      defVal
+    ) // props.get(name).map(toInt(_)) getOrElse defVal
   def getLong(name: String): Box[Long] = get(name).flatMap(asLong)
   def getLong(name: String, defVal: Long): Long = getLong(
     name
-  ) openOr defVal // props.get(name).map(toLong(_)) getOrElse defVal
+  ).openOr(defVal) // props.get(name).map(toLong(_)) getOrElse defVal
   def getBool(name: String): Box[Boolean] = get(name).map(toBoolean)
   def getBool(name: String, defVal: Boolean): Boolean = getBool(
     name
-  ) openOr defVal // props.get(name).map(toBoolean(_)) getOrElse defVal
+  ).openOr(defVal) // props.get(name).map(toBoolean(_)) getOrElse defVal
   def get(name: String, defVal: String): String = get(name) getOrElse defVal
 
   /** Determine whether the specified properties exist.
@@ -82,7 +87,8 @@ private[util] trait Props extends Logger {
     * any of the specified values are not keys for available properties.
     */
   def requireOrDie(what: String*): Unit = {
-    require(what: _*).toList match {
+    // SCALA3 Using `x*` instead of `x: _*`
+    require(what*).toList match {
       case Nil =>
       case bad =>
         throw new Exception(
@@ -209,7 +215,8 @@ private[util] trait Props extends Logger {
     *   impact).
     */
   class RunModeProperty[T](name: String, initialValue: T) extends Logger {
-    @volatile private[this] var value = initialValue
+    // SCALA3 Using `private` instead of `private[this]`
+    @volatile private var value = initialValue
 
     def get = value
 
@@ -407,11 +414,12 @@ private[util] trait Props extends Logger {
     } match {
       // if we've got a propety file, create name/value pairs and turn them into a Map
       case Full(prop) =>
+        // SCALA3 using `x*` instead of `x: _*`
         Map(ArraySeq.unsafeWrapArray(prop.entrySet.toArray.flatMap {
           case s: JMap.Entry[_, _] =>
             List((s.getKey.toString, s.getValue.toString))
           case _ => Nil
-        }): _*)
+        })*)
 
       case _ =>
         error(
@@ -425,9 +433,11 @@ private[util] trait Props extends Logger {
   // None before they've first been looked up/modified/whatever, Some after.
   // We use this to lazy-load `props`, so that `whereToLook` can be updated
   // by the user.
-  private[this] var providersAccumulator: Option[List[PropProvider]] = None
+  // SCALA3 Using `private` instead of `private[this]`
+  private var providersAccumulator: Option[List[PropProvider]] = None
 
-  private[this] def providers = {
+  // SCALA3 Using `private` instead of `private[this]`
+  private def providers = {
     providersAccumulator getOrElse {
       val baseProviders = List(props)
       providersAccumulator = Some(baseProviders)
@@ -435,14 +445,18 @@ private[util] trait Props extends Logger {
       baseProviders
     }
   }
-  private[this] def providers_=(newProviders: List[PropProvider]) = {
+  // SCALA3 Using `private` instead of `private[this]`
+  private def providers_=(newProviders: List[PropProvider]) = {
     providersAccumulator = Some(newProviders)
   }
 
-  private[this] var interpolationValues: List[InterpolationValues] = Nil
+  // SCALA3 Using `private` instead of `private[this]`
+  private var interpolationValues: List[InterpolationValues] = Nil
 
-  private[this] lazy val lockedProviders = providers
-  private[this] lazy val lockedInterpolationValues = interpolationValues
+  // SCALA3 Using `private` instead of `private[this]`
+  private lazy val lockedProviders = providers
+  // SCALA3 Using `private` instead of `private[this]`
+  private lazy val lockedInterpolationValues = interpolationValues
 }
 
 /** Configuration management utilities.

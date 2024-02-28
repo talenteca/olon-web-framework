@@ -11,7 +11,8 @@ object StringPromotable {
       override val toString = in.toJsCmd
     }
 
-  implicit def jsCmdToStrPromo(in: (_, ToJsCmd)): StringPromotable =
+  // SCALA3 Using `?` instead of `_`
+  implicit def jsCmdToStrPromo(in: (?, ToJsCmd)): StringPromotable =
     new StringPromotable {
       override val toString = in._2.toJsCmd
     }

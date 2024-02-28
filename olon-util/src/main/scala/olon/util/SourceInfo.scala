@@ -128,7 +128,8 @@ trait FieldConverter {
     * @return
     *   the JSON representation of the field
     */
-  def asJson(v: T): Box[JValue]
+  // SCALA3 Using internal type `T` for `JValue` type parameter
+  def asJson(v: T): Box[JValue[T]]
 
   /** If the field can represent a sequence of SourceFields, get that
     * @param v

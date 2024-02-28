@@ -88,9 +88,10 @@ object BundleBuilder {
               }
             }._2
 
+          // SCALA3 using `x*` instead of `x: _*`
           val res: Map[String, NodeSeq] = Map(map.map { case (name, lst) =>
             name -> choose(lst)
-          }.toSeq: _*)
+          }.toSeq*)
 
           List(new ResourceBundle {
             def getKeys(): Enumeration[String] = {

@@ -72,6 +72,7 @@ object LAScheduler extends LAScheduler with Loggable {
     }
   }
 
+  // SCALA3 using `uninitialized` instead of `_`
   @volatile
   var exec: ILAExecute = uninitialized
 
@@ -108,6 +109,7 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
   @volatile private var startCnt = 0
 
   private class MailboxItem(val item: T) {
+    // SCALA3 using `uninitialized` instead of `_`
     var next: MailboxItem = uninitialized
     var prev: MailboxItem = uninitialized
 

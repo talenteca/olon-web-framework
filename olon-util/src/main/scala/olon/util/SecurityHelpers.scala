@@ -18,7 +18,8 @@ object SecurityHelpers extends StringHelpers with IoHelpers with SecurityHelpers
   * SHA-256, MD5 hashes (can be hex encoded) </ul>
   */
 trait SecurityHelpers {
-  self: StringHelpers with IoHelpers =>
+  // SCALA3 using `&` instead of the `with` type operator
+  self: StringHelpers & IoHelpers =>
 
   /** short alias for java.security.SecureRandom */
   private val _random = new SecureRandom

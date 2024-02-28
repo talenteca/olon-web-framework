@@ -13,8 +13,9 @@ import common._
 
 object HttpHelpers extends ListHelpers with StringHelpers
 
+// SCALA3 Using `&` instead of the `with` type operator
 trait HttpHelpers {
-  self: ListHelpers with StringHelpers =>
+  self: ListHelpers & StringHelpers =>
 
   /** The list of known suffixes used to split the URI into path parts and
     * suffixes.

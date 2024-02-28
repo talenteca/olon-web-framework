@@ -27,7 +27,7 @@ trait ListHelpers {
     */
   def delta[T, Res](old: Box[Seq[T]], newList: Seq[T])(
       f: DeltaInfo[T] => Res
-  ): List[Res] = delta(old openOr Nil, newList)(f)
+  ): List[Res] = delta(old.openOr(Nil), newList)(f)
 
   /** Compute the deltas between two sequences of a given type. Apply the
     * function based on the differences between the two lists. The resulting

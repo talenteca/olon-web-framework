@@ -26,7 +26,8 @@ object RE {
   }
 
   class SuperString(val str: String) {
-    def substring(re: REDoer[_]) = re.=~(str).matchStr
+    // SCALA3 Using `?` instead of `_`
+    def substring(re: REDoer[?]) = re.=~(str).matchStr
   }
 
   implicit def strToSuperStr(in: String): SuperString = new SuperString(in)

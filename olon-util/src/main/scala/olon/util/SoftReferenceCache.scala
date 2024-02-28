@@ -40,7 +40,7 @@ object SoftReferenceCache {
       }
     })
     thread.setDaemon(true)
-    thread setContextClassLoader null
+    thread.setContextClassLoader(null)
     thread.start
   }
 
@@ -54,7 +54,8 @@ object SoftReferenceCache {
     while (!terminated) {
       tryo {
         // Wait 30 seconds for something to appear in the queue.
-        val sftVal = refQueue.remove(30000).asInstanceOf[SoftValue[_, _]];
+        // SCALA3 using `?` instead of `_`
+        val sftVal = refQueue.remove(30000).asInstanceOf[SoftValue[?, ?]];
         if (sftVal != null) {
           sftVal.cache.remove(sftVal.key);
         }

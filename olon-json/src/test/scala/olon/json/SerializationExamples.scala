@@ -297,6 +297,8 @@ object CustomSerializerExamples extends Specification {
   import JsonAST._
   import java.util.regex.Pattern
 
+  private val EPOCH_TIME = new Date(0)
+
   class IntervalSerializer
       extends CustomSerializer[Interval](_ =>
         (
@@ -391,7 +393,7 @@ object CustomSerializerExamples extends Specification {
   }
 
   "Date serialization example" in {
-    val d = new Date(0)
+    val d = EPOCH_TIME
     val dser = swrite(d)
     dser mustEqual """{"$dt":"1970-01-01T00:00:00.000Z"}"""
     read[Date](dser) mustEqual d

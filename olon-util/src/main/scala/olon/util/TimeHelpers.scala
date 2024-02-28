@@ -21,6 +21,9 @@ object TimeHelpers extends TimeHelpers with ControlHelpers with ClassHelpers
   * utility functions (get the date for today, get year/month/day number,...)
   */
 trait TimeHelpers { self: ControlHelpers =>
+
+  private val EPOCH_TIME = new Date(0L)
+
   // Logger must be lazy, since we cannot instantiate until after boot is complete
   private lazy val logger = Logger(classOf[TimeHelpers])
 
@@ -489,9 +492,12 @@ trait TimeHelpers { self: ControlHelpers =>
     *   a date from a string using the internet format. Return the Epoch date if
     *   the parse is unsuccesful
     */
-  def parseInternetDate(dateString: String): Date = tryo {
-    internetDateFormatter.parse(dateString)
-  } openOr new Date(0L)
+  def parseInternetDate(dateString: String): Date = {
+    val result = tryo {
+      internetDateFormatter.parse(dateString)
+    }
+    result.openOr(EPOCH_TIME)
+  }
 
   /** @return a date formatted with the internet format */
   def toInternetDate(in: Date): String = internetDateFormatter.format(in)
@@ -521,7 +527,7 @@ trait TimeHelpers { self: ControlHelpers =>
         case Some(v)                               => toDate(v)
         case v :: _                                => toDate(v)
         case s: String =>
-          tryo(internetDateFormatter.parse(s)) or tryo(dateFormatter.parse(s))
+          tryo(internetDateFormatter.parse(s)).or(tryo(dateFormatter.parse(s)))
         case o => toDate(o.toString)
       }
     } catch {
@@ -532,9 +538,9 @@ trait TimeHelpers { self: ControlHelpers =>
   }
 
   implicit class PeriodExtension[P](period: P)(implicit ev: P => Period) {
-    def later: DateTime = new DateTime(millis).plus(period)
+    def later: DateTime = new DateTime(millis).plus(ev(period))
 
-    def ago: DateTime = new DateTime(millis).minus(period)
+    def ago: DateTime = new DateTime(millis).minus(ev(period))
   }
 
 }

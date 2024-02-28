@@ -26,9 +26,11 @@ object JsonCommand {
   implicit def iterableToOption[X](in: Iterable[X]): Option[X] =
     in.toSeq.headOption
 
-  def unapply(in: JValue): Option[(String, Option[String], JValue)] =
+  // SCALA3 adding JValue generic parameter type
+  def unapply(in: JValue[?]): Option[(String, Option[String], JValue[?])] =
     for {
-      JString(command) <- in \ "command"
+      // SCALA3 Adding case for patching pattern matching code sugaring
+      case JString(command) <- in \ "command"
       params <- in \ "params"
       if params != JNothing
     } yield {

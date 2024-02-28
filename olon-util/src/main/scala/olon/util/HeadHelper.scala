@@ -72,35 +72,38 @@ object HeadHelper {
     } else {
       def xform(in: NodeSeq, inBody: Boolean): NodeSeq = in flatMap {
         case e: Elem if !inBody && e.label == "body" =>
+          // SCALA3 Using `x*` instead of `x: _*`
           Elem(
             e.prefix,
             e.label,
             e.attributes,
             e.scope,
             e.minimizeEmpty,
-            xform(e.child, true): _*
+            xform(e.child, true)*
           )
 
         case e: Elem if inBody && e.label == "head" => NodeSeq.Empty
 
         case e: Elem if e.label == "head" =>
+          // SCALA3 Using `x*` instead of `x: _*`
           Elem(
             e.prefix,
             e.label,
             e.attributes,
             e.scope,
             e.minimizeEmpty,
-            removeHtmlDuplicates(e.child ++ headInBody): _*
+            removeHtmlDuplicates(e.child ++ headInBody)*
           )
 
         case e: Elem =>
+          // SCALA3 Using `x*` instead of `x: _*`
           Elem(
             e.prefix,
             e.label,
             e.attributes,
             e.scope,
             e.minimizeEmpty,
-            xform(e.child, inBody): _*
+            xform(e.child, inBody)*
           )
 
         case g: Group =>

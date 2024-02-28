@@ -16,7 +16,8 @@ trait HasCalcDefaultValue[T] {
 }
 
 trait MemoizeVar[K, V] {
-  protected def coreVar: AnyVar[LRU[K, Box[V]], _]
+  // SCALA3 Using `?` instead of `_`
+  protected def coreVar: AnyVar[LRU[K, Box[V]], ?]
 
   protected def buildLRU = new LRU[K, Box[V]](cacheSize)
 
@@ -142,7 +143,7 @@ trait AnyVarTrait[T, MyType <: AnyVarTrait[T, MyType]]
     */
   private val settingDefault = new ThreadGlobal[Boolean]
 
-  protected def settingDefault_? : Boolean = settingDefault.box openOr false
+  protected def settingDefault_? : Boolean = settingDefault.box.openOr(false)
 
   type CleanUpParam
 
@@ -172,7 +173,8 @@ trait AnyVarTrait[T, MyType <: AnyVarTrait[T, MyType]]
 
   private def testInitialized: Unit = doSync {
     if (!wasInitialized(name, initedKey)) {
-      registerCleanupFunc(_onShutdown _)
+      // SCALA3 removing `_` for function pass as a value
+      registerCleanupFunc(_onShutdown)
     }
   }
 
@@ -269,5 +271,6 @@ abstract class NonCleanAnyVar[T](dflt: => T)
 }
 
 object AnyVar {
-  implicit def whatVarIs[T](in: AnyVar[T, _]): T = in.is
+  // SCALA3 Using `?` instead of `_`
+  implicit def whatVarIs[T](in: AnyVar[T, ?]): T = in.is
 }

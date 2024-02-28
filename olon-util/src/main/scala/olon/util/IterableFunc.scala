@@ -15,7 +15,7 @@ object IterableFunc {
       it: NodeSeq => C
   )(implicit ev: C => Iterable[NodeSeq]): IterableFunc =
     new IterableFunc {
-      def apply(in: NodeSeq): Seq[NodeSeq] = it(in).toSeq
+      def apply(in: NodeSeq): Seq[NodeSeq] = ev(it(in)).toSeq
     }
 
   implicit def itNodeSeqPromotable(it: NodeSeq => NodeSeq): IterableFunc =

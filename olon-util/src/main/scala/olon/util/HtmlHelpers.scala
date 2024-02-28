@@ -100,7 +100,7 @@ trait HtmlHelpers extends CssBindImplicits {
   def findBox[T](nodes: Seq[Node])(f: Elem => Box[T]): Box[T] = {
     nodes.view.flatMap {
       case Group(g) => findBox(g)(f)
-      case e: Elem  => f(e) or findBox(e.child)(f)
+      case e: Elem  => f(e).or(findBox(e.child)(f))
       case _        => Empty
     }.headOption
   }
@@ -225,12 +225,14 @@ trait HtmlHelpers extends CssBindImplicits {
                 element.copy(attributes =
                   removeAttribute("id", element.attributes)
                 ),
-                stripDuplicateId _
+                // SCALA3 Removing `_` for passing function as a value
+                stripDuplicateId
               )
             } else {
               ids += id.text
 
-              processElement(element, stripDuplicateId _)
+              // SCALA3 Removing `_` for passing function as a value
+              processElement(element, stripDuplicateId)
             }
           }
 

@@ -71,9 +71,11 @@ final case class PrependKidsSubNode() extends SubNode with WithKids {
   def transform(original: NodeSeq, newNs: NodeSeq): NodeSeq = newNs ++ original
 }
 
-final case object DontMergeAttributes extends SubNode
+// SCALA3 removing `final` redundant modifier
+case object DontMergeAttributes extends SubNode
 
-final case object DontMergeClass extends SubNode
+// SCALA3 removing `final` redundant modifier
+case object DontMergeClass extends SubNode
 
 final case class SurroundKids() extends SubNode with WithKids {
   def transform(original: NodeSeq, newNs: NodeSeq): NodeSeq = {
@@ -82,13 +84,14 @@ final case class SurroundKids() extends SubNode with WithKids {
     val res: NodeSeq = newNs.flatMap {
       case e: Elem if !changed =>
         changed = true
+        // SCALA3 Using `x*` instead of `x: _*`
         new Elem(
           e.prefix,
           e.label,
           e.attributes,
           e.scope,
           e.minimizeEmpty,
-          e.child ++ original: _*
+          e.child ++ original*
         )
       case x => x
     }

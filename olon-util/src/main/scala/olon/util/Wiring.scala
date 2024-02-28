@@ -2,6 +2,7 @@ package olon
 package util
 
 import java.lang.ref.WeakReference
+import scala.compiletime.uninitialized
 
 import Helpers.TimeSpan
 
@@ -11,11 +12,13 @@ trait Dependent {
 
   /** If the predicate cell changes, the Dependent will be notified
     */
-  def predicateChanged(which: Cell[_]): Unit
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit
 
   /** The Cell notifies the Dependent of the dependency
     */
-  def youDependOnMe(who: Cell[_]): Unit = synchronized {
+  // SCALA3 Using `?` instead of `_`
+  def youDependOnMe(who: Cell[?]): Unit = synchronized {
     _iDependOn =
       new WeakReference(who.asInstanceOf[Object]) :: _iDependOn.filter(
         _.get match {
@@ -27,7 +30,8 @@ trait Dependent {
 
   /** The Cell notifies the Dependent of the removed dependency
     */
-  def youDontDependOnMe(who: Cell[_]): Unit = synchronized {
+  // SCALA3 Using `?` instead of `_`
+  def youDontDependOnMe(who: Cell[?]): Unit = synchronized {
     val tList = _iDependOn.filter(_.get match {
       case null => false
       case x    => x ne who
@@ -38,13 +42,14 @@ trait Dependent {
 
   /** Get a list of all the cells this Dependency depends on
     */
-  protected def whoDoIDependOn: Seq[Cell[_]] = synchronized {
+  // SCALA3 Using `?` instead of `_`
+  protected def whoDoIDependOn: Seq[Cell[?]] = synchronized {
     _iDependOn
       .flatMap(_.get match {
         case null => Nil
         case x    => List(x)
       })
-      .asInstanceOf[List[Cell[_]]]
+      .asInstanceOf[List[Cell[?]]]
   }
 
   private var _iDependOn: List[WeakReference[Object]] = Nil
@@ -154,7 +159,8 @@ final case class DynamicCell[T](f: () => T) extends Cell[T] {
   /** If the predicate cell changes, the Dependent will be notified. This Cell
     * has no predicates, so this is just Unit
     */
-  def predicateChanged(which: Cell[_]): Unit = {}
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = {}
 
 }
 
@@ -194,7 +200,8 @@ final class ValueCell[A](initialValue: A) extends Cell[A] with LiftValue[A] {
   /** If the predicate cell changes, the Dependent will be notified. A ValueCell
     * cannot have predicates
     */
-  def predicateChanged(which: Cell[_]): Unit = {}
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = {}
 
   override def toString(): String = synchronized {
     "ValueCell(" + value + ")"
@@ -228,7 +235,8 @@ final case class SeqCell[T](cells: Cell[T]*) extends Cell[Seq[T]] {
 
   /** If the predicate cell changes, the Dependent will be notified
     */
-  def predicateChanged(which: Cell[_]): Unit = notifyDependents()
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = notifyDependents()
 }
 
 /** The companion object for FuncCell (function cells)
@@ -268,12 +276,14 @@ object FuncCell {
 }
 
 final case class FuncCell1[A, Z](a: Cell[A], f: A => Z) extends Cell[Z] {
-  private var value: Z = _
+  // SCALA3 using `uninitialized` instead of `_`
+  private var value: Z = uninitialized
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
     */
-  def predicateChanged(which: Cell[_]): Unit = {
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = {
     notifyDependents()
   }
 
@@ -292,12 +302,14 @@ final case class FuncCell1[A, Z](a: Cell[A], f: A => Z) extends Cell[Z] {
 
 final case class FuncCell2[A, B, Z](a: Cell[A], b: Cell[B], f: (A, B) => Z)
     extends Cell[Z] {
-  private var value: Z = _
+  // SCALA3 using `uninitialized` instead of `_`
+  private var value: Z = uninitialized
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
     */
-  def predicateChanged(which: Cell[_]): Unit = notifyDependents()
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = notifyDependents()
 
   a.addDependent(this)
   b.addDependent(this)
@@ -320,12 +332,14 @@ final case class FuncCell3[A, B, C, Z](
     c: Cell[C],
     f: (A, B, C) => Z
 ) extends Cell[Z] {
-  private var value: Z = _
+  // SCALA3 using `uninitialized` instead of `_`
+  private var value: Z = uninitialized
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
     */
-  def predicateChanged(which: Cell[_]): Unit = notifyDependents()
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = notifyDependents()
 
   a.addDependent(this)
   b.addDependent(this)
@@ -351,12 +365,14 @@ final case class FuncCell4[A, B, C, D, Z](
     d: Cell[D],
     f: (A, B, C, D) => Z
 ) extends Cell[Z] {
-  private var value: Z = _
+  // SCALA3 using `uninitialized` instead of `_`
+  private var value: Z = uninitialized
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
     */
-  def predicateChanged(which: Cell[_]): Unit = {
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = {
     notifyDependents()
   }
 
@@ -387,12 +403,14 @@ final case class FuncCell5[A, B, C, D, E, Z](
     e: Cell[E],
     f: (A, B, C, D, E) => Z
 ) extends Cell[Z] {
-  private var value: Z = _
+  // SCALA3 using `uninitialized` instead of `_`
+  private var value: Z = uninitialized
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
     */
-  def predicateChanged(which: Cell[_]): Unit = {
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = {
     notifyDependents()
   }
 

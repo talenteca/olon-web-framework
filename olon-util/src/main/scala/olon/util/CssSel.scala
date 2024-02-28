@@ -213,7 +213,8 @@ private class SelectorMap(binds: List[CssBind])
         )
         .foldLeft(elem) {
           case (elem, (bind, AttrSubNode(attr))) => {
-            val calced = bind.calculate(elem).map(findElemIfThereIsOne _)
+            // SCALA3 Removing `_` for passing function as a value
+            val calced = bind.calculate(elem).map(findElemIfThereIsOne)
             val filtered = elem.attributes.filter {
               case up: UnprefixedAttribute => up.key != attr
               case _                       => true
@@ -231,7 +232,8 @@ private class SelectorMap(binds: List[CssBind])
 
           case (elem, (bind, AttrAppendSubNode(attr))) => {
             val org: NodeSeq = elem.attribute(attr).getOrElse(NodeSeq.Empty)
-            val calced = bind.calculate(elem).toList.map(findElemIfThereIsOne _)
+            // SCALA3 Removing `_` for passing function as a value
+            val calced = bind.calculate(elem).toList.map(findElemIfThereIsOne)
 
             if (calced.isEmpty) {
               elem
@@ -256,13 +258,14 @@ private class SelectorMap(binds: List[CssBind])
 
               val newAttr = new UnprefixedAttribute(attr, flat, filtered)
 
+              // SCALA3 using `x*` instead of `x: _*`
               new Elem(
                 elem.prefix,
                 elem.label,
                 newAttr,
                 elem.scope,
                 elem.minimizeEmpty,
-                elem.child: _*
+                elem.child*
               )
 
             }
@@ -270,7 +273,8 @@ private class SelectorMap(binds: List[CssBind])
 
           case (elem, (bind, AttrRemoveSubNode(attr))) => {
             val org: NodeSeq = elem.attribute(attr).getOrElse(NodeSeq.Empty)
-            val calced = bind.calculate(elem).toList.map(findElemIfThereIsOne _)
+            // SCALA3 Removing `_` for passing function as a value
+            val calced = bind.calculate(elem).toList.map(findElemIfThereIsOne)
 
             if (calced.isEmpty || org.isEmpty) {
               // if either is empty, then return the Elem unmodified
@@ -282,7 +286,8 @@ private class SelectorMap(binds: List[CssBind])
               }
 
               val flat: Box[NodeSeq] = if (attr == "class") {
-                val set = Set(calced.map(_.text): _*)
+                // SCALA3 using `x*` instead of `x: _*`
+                val set = Set(calced.map(_.text)*)
                 SuperString(org.text)
                   .charSplit(' ')
                   .toList
@@ -301,13 +306,14 @@ private class SelectorMap(binds: List[CssBind])
                 case _       => filtered
               }
 
+              // SCALA3 using `x*` instead of `x: _*`
               new Elem(
                 elem.prefix,
                 elem.label,
                 newAttr,
                 elem.scope,
                 elem.minimizeEmpty,
-                elem.child: _*
+                elem.child*
               )
 
             }
@@ -560,23 +566,25 @@ private class SelectorMap(binds: List[CssBind])
                   realE.minimizeEmpty
                 )
               case 1 =>
+                // SCALA3 Using `x*` instead of `x: _*`
                 new Elem(
                   realE.prefix,
                   realE.label,
                   realE.attributes,
                   realE.scope,
                   realE.minimizeEmpty,
-                  todo.transform(realE.child, calced.head): _*
+                  todo.transform(realE.child, calced.head)*
                 )
               case _ if this.id.isEmpty =>
                 calced.map(kids =>
+                  // Using `x*` instead of `x: _*`
                   new Elem(
                     realE.prefix,
                     realE.label,
                     realE.attributes,
                     realE.scope,
                     realE.minimizeEmpty,
-                    todo.transform(realE.child, kids): _*
+                    todo.transform(realE.child, kids)*
                   )
                 )
 
@@ -584,22 +592,24 @@ private class SelectorMap(binds: List[CssBind])
                 val noId = removeId(realE.attributes)
                 calced.toList.zipWithIndex.map {
                   case (kids, 0) =>
+                    // SCALA3 Using `x*` instead of `x: _*`
                     new Elem(
                       realE.prefix,
                       realE.label,
                       realE.attributes,
                       realE.scope,
                       realE.minimizeEmpty,
-                      todo.transform(realE.child, kids): _*
+                      todo.transform(realE.child, kids)*
                     )
                   case (kids, _) =>
+                    // SCALA3 Using `x*` instead of `x: _*`
                     new Elem(
                       realE.prefix,
                       realE.label,
                       noId,
                       realE.scope,
                       realE.minimizeEmpty,
-                      todo.transform(realE.child, kids): _*
+                      todo.transform(realE.child, kids)*
                     )
                 }
               }
@@ -610,7 +620,8 @@ private class SelectorMap(binds: List[CssBind])
               if x.isInstanceOf[EmptyBox] ||
                 x == Full(DontMergeClass) ||
                 x == Full(DontMergeAttributes) => {
-            val calced = bind.calculate(realE).map(findElemIfThereIsOne _)
+            // SCALA3 Removing `_` for passing function as a value
+            val calced = bind.calculate(realE).map(findElemIfThereIsOne)
             val skipClassMerge =
               x == Full(DontMergeClass) || x == Full(DontMergeAttributes)
 
@@ -619,14 +630,15 @@ private class SelectorMap(binds: List[CssBind])
               case 1 => {
                 calced.head match {
                   case Group(g) => g
-                  case e: Elem =>
+                  case e: Elem  =>
+                    // SCALA3 using `x*` instead of `x: _*`
                     new Elem(
                       e.prefix,
                       e.label,
                       mergeAll(e.attributes, false, skipClassMerge),
                       e.scope,
                       e.minimizeEmpty,
-                      e.child: _*
+                      e.child*
                     )
                   case x => x
                 }
@@ -658,13 +670,14 @@ private class SelectorMap(binds: List[CssBind])
                       val newIds = targetId filter (_ => keepId) map (i =>
                         ids - i
                       ) getOrElse (ids)
+                      // SCALA3 using `x*` instead of `x: _*`
                       val newElem = new Elem(
                         e.prefix,
                         e.label,
                         mergeAll(e.attributes, !keepId, skipClassMerge),
                         e.scope,
                         e.minimizeEmpty,
-                        e.child: _*
+                        e.child*
                       )
                       (newIds, newElem :: result)
                     }
@@ -748,13 +761,14 @@ private class SelectorMap(binds: List[CssBind])
     } else {
       lb.toList.filterNot(_.selectThis_?) match {
         case Nil =>
+          // SCALA3 using `x*` instead of `x: _*`
           new Elem(
             e.prefix,
             e.label,
             e.attributes,
             e.scope,
             e.minimizeEmpty,
-            run(e.child, onlySel, depth + 1): _*
+            run(e.child, onlySel, depth + 1)*
           )
         case csb =>
           // do attributes first, then the body
@@ -762,13 +776,14 @@ private class SelectorMap(binds: List[CssBind])
             case (Nil, rules) => slurp.applyRule(rules, e, onlySel, depth)
             case (attrs, Nil) => {
               val elem = slurp.applyAttributeRules(attrs, e)
+              // SCALA3 using `x*` instead of `x: _*`
               new Elem(
                 elem.prefix,
                 elem.label,
                 elem.attributes,
                 elem.scope,
                 e.minimizeEmpty,
-                run(elem.child, onlySel, depth + 1): _*
+                run(elem.child, onlySel, depth + 1)*
               )
             }
 
@@ -881,12 +896,15 @@ trait CssBind extends CssSel {
 
   def apply(in: NodeSeq): NodeSeq = css match {
     case Full(_) => selectorMap(in)
-    case _ => Helpers.errorDiv(<div>
+    case _ =>
+      Helpers
+        .errorDiv(<div>
         Syntax error in CSS selector definition:
-        {stringSelector openOr "N/A"}
+        {stringSelector.openOr("N/A")}
         .
         The selector will not be applied.
-      </div>) openOr NodeSeq.Empty
+      </div>)
+        .openOr(NodeSeq.Empty)
   }
 
   /** Is this CssBind a SelectThis bind?
@@ -1009,9 +1027,10 @@ object CanBind extends CssBindImplicits {
     )
   }
 
-  implicit def jsCmdPairTransform: CanBind[(_, ToJsCmd)] =
-    new CanBind[(_, ToJsCmd)] {
-      def apply(str: => (_, ToJsCmd))(ns: NodeSeq): Seq[NodeSeq] = List(
+  // SCALA3 Using `?` instead of `_`
+  implicit def jsCmdPairTransform: CanBind[(?, ToJsCmd)] =
+    new CanBind[(?, ToJsCmd)] {
+      def apply(str: => (?, ToJsCmd))(ns: NodeSeq): Seq[NodeSeq] = List(
         Text(str._2.toJsCmd)
       )
     }

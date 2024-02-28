@@ -79,7 +79,7 @@ trait CombParserHelpers {
     *   characters regardless of the case (uppercase or lowercase)
     */
   def acceptCI[ES](es: ES)(implicit ev: ES => List[Elem]): Parser[List[Elem]] =
-    es.foldRight[Parser[List[Elem]]](success(Nil)) { (x, pxs) =>
+    ev(es).foldRight[Parser[List[Elem]]](success(Nil)) { (x, pxs) =>
       acceptCIChar(x) ~ pxs ^^ mkList
     }
 
@@ -137,14 +137,16 @@ trait CombParserHelpers {
   /** @return
     *   a parser which tries the permutations of a list of parsers
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def permute[T](p: (Parser[T])*): Parser[List[T]] =
-    permute((lst: List[Parser[T]]) => lst.permute, p: _*)
+    permute((lst: List[Parser[T]]) => lst.permute, p*)
 
   /** @return
     *   a parser which tries the permutations of a list and sublists of parsers
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def permuteAll[T](p: (Parser[T])*): Parser[List[T]] =
-    permute((lst: List[Parser[T]]) => lst.permuteAll, p: _*)
+    permute((lst: List[Parser[T]]) => lst.permuteAll, p*)
 
   /** @param func
     *   list permutation function. Returns all permutations on the list or all

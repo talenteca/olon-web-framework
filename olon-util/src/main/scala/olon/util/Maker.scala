@@ -17,7 +17,8 @@ trait Injector {
 /** An implementation of Injector that has an implementation
   */
 trait SimpleInjector extends Injector {
-  private val diHash: CHash[String, Function0[_]] = new CHash
+  // SCALA3 using `?` instead of `_`
+  private val diHash: CHash[String, Function0[?]] = new CHash
 
   /** Perform the injection for the given type. You can call: inject[Date] or
     * inject[List[Map[String, PaymentThing]]]. The appropriate Manifest will be
@@ -60,11 +61,11 @@ trait SimpleInjector extends Injector {
 
     /** Vend an instance
       */
-    implicit def vend: T = make openOr default.is.apply()
+    implicit def vend: T = make.openOr(default.is.apply())
 
     /** Make a Box of the instance.
       */
-    override implicit def make: Box[T] = super.make or Full(default.is.apply())
+    override implicit def make: Box[T] = super.make.or(Full(default.is.apply()))
   }
 }
 
@@ -159,7 +160,7 @@ class MakerStack[T](subMakers: PValueHolder[Maker[T]]*)
     extends StackableMaker[T] {
   private val _sub: List[PValueHolder[Maker[T]]] = subMakers.toList
 
-  override implicit def make: Box[T] = super.make or find(_sub)
+  override implicit def make: Box[T] = super.make.or(find(_sub))
 }
 
 /** A Vendor is a Maker that also guarantees that it will return a value
