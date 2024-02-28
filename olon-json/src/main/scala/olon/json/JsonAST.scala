@@ -108,7 +108,10 @@ object JsonAST {
       }
     }
 
-    private def findDirectByName(xs: List[JValue[?]], name: String): List[JValue[?]] =
+    private def findDirectByName(
+        xs: List[JValue[?]],
+        name: String
+    ): List[JValue[?]] =
       xs.flatMap {
         case JObject(l) =>
           l.collect {
@@ -255,7 +258,9 @@ object JsonAST {
         _.values
       }
 
-    private def typePredicate[A <: JValue[?]](clazz: Class[A])(json: JValue[?]) =
+    private def typePredicate[A <: JValue[?]](
+        clazz: Class[A]
+    )(json: JValue[?]) =
       json match {
         case x if x.getClass == clazz => true
         case _                        => false
@@ -426,10 +431,10 @@ object JsonAST {
       * }
       * }}}
       */
-    def transformField(f: PartialFunction[JField, JField]): JValue[?] = mapField {
-      x =>
+    def transformField(f: PartialFunction[JField, JField]): JValue[?] =
+      mapField { x =>
         if (f.isDefinedAt(x)) f(x) else x
-    }
+      }
 
     /** Return a new `JValue` resulting from applying the given partial function
       * to each value within this `JValue`.
@@ -473,8 +478,9 @@ object JsonAST {
       *   given `PartialFunction`, when defined. If the `PartialFunction` is
       *   undefined, leaves the child values untouched.
       */
-    def transform(f: PartialFunction[JValue[?], JValue[?]]): JValue[?] = map { x =>
-      if (f.isDefinedAt(x)) f(x) else x
+    def transform(f: PartialFunction[JValue[?], JValue[?]]): JValue[?] = map {
+      x =>
+        if (f.isDefinedAt(x)) f(x) else x
     }
 
     /** Return a new `JValue` resulting from replacing the value at the
@@ -649,12 +655,12 @@ object JsonAST {
     def ++(other: JValue[?]) = {
       def append(value1: JValue[?], value2: JValue[?]): JValue[?] =
         (value1, value2) match {
-          case (JNothing, x)            => x
-          case (x, JNothing)            => x
-          case (JArray(xs), JArray(ys)) => JArray(xs ::: ys)
-          case (JArray(xs), v: JValue[?])  => JArray(xs ::: List(v))
-          case (v: JValue[?], JArray(xs))  => JArray(v :: xs)
-          case (x, y)                   => JArray(x :: y :: Nil)
+          case (JNothing, x)              => x
+          case (x, JNothing)              => x
+          case (JArray(xs), JArray(ys))   => JArray(xs ::: ys)
+          case (JArray(xs), v: JValue[?]) => JArray(xs ::: List(v))
+          case (v: JValue[?], JArray(xs)) => JArray(v :: xs)
+          case (x, y)                     => JArray(x :: y :: Nil)
         }
       append(this, other)
     }
@@ -1173,26 +1179,28 @@ trait Implicits {
   */
 object JsonDSL extends JsonDSL
 trait JsonDSL extends Implicits {
-  implicit def seq2jvalue[A](s: Iterable[A])(implicit ev: A => JValue[?]): JArray =
+  implicit def seq2jvalue[A](s: Iterable[A])(implicit
+      ev: A => JValue
+  ): JArray =
     JArray(s.toList.map { a =>
-      val v: JValue[?] = ev(a); v
+      val v: JValue = ev(a); v
     })
 
   implicit def map2jvalue[A](m: Map[String, A])(implicit
-      ev: A => JValue[?]
+      ev: A => JValue
   ): JObject =
     JObject(m.toList.map { case (k, v) => JField(k, ev(v)) })
 
   implicit def option2jvalue[A](
       opt: Option[A]
-  )(implicit ev: A => JValue[?]): JValue[?] = opt match {
+  )(implicit ev: A => JValue): JValue = opt match {
     case Some(x) => ev(x)
     case None    => JNothing
   }
 
   implicit def symbol2jvalue(x: Symbol): JString = JString(x.name)
   implicit def pair2jvalue[A](t: (String, A))(implicit
-      ev: A => JValue[?]
+      ev: A => JValue
   ): JObject =
     JObject(List(JField(t._1, ev(t._2))))
   implicit def list2jvalue(l: List[JField]): JObject = JObject(l)
@@ -1200,25 +1208,25 @@ trait JsonDSL extends Implicits {
     o.obj
   )
   implicit def pair2Assoc[A](t: (String, A))(implicit
-      ev: A => JValue[?]
+      ev: A => JValue
   ): JsonAssoc[A] =
     new JsonAssoc(t)
 
-  class JsonAssoc[A](left: (String, A))(implicit ev: A => JValue[?]) {
-    def ~[B <: JValue[?]](right: (String, B)) = {
-      val l: JValue[?] = ev(left._2)
-      val r: JValue[?] = right._2
+  class JsonAssoc[A](left: (String, A))(implicit ev: A => JValue) {
+    def ~[B <: JValue](right: (String, B)) = {
+      val l: JValue = ev(left._2)
+      val r: JValue = right._2
       JObject(JField(left._1, l) :: JField(right._1, r) :: Nil)
     }
 
     def ~(right: JObject) = {
-      val l: JValue[?] = ev(left._2)
+      val l: JValue = ev(left._2)
       JObject(JField(left._1, l) :: right.obj)
     }
   }
 
   class JsonListAssoc(left: List[JField]) {
-    def ~(right: (String, JValue[?])) = JObject(
+    def ~(right: (String, JValue)) = JObject(
       left ::: List(JField(right._1, right._2))
     )
     def ~(right: JObject) = JObject(left ::: right.obj)

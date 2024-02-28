@@ -175,6 +175,7 @@ object JsonParser {
   private case class IntermediateJObject(
       fields: scala.collection.mutable.ListBuffer[JField]
   )
+
   private case class IntermediateJArray(
       bits: scala.collection.mutable.ListBuffer[JValue]
   )

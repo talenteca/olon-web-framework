@@ -2,7 +2,8 @@ package olon
 
 package object json {
 
-  type JValue = JsonAST.JValue
+  // SCALA3 adding JValue generic parameter type
+  type JValue = JsonAST.JValue[?]
   val JNothing = JsonAST.JNothing
   val JNull = JsonAST.JNull
   type JString = JsonAST.JString
