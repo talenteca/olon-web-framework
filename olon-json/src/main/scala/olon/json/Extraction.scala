@@ -61,8 +61,8 @@ object Extraction {
     * JObject(JField("age",JInt(25)) :: JField("name",JString("joe")) :: Nil)
     * </pre>
     */
-  // SCALA3 using `?` instead of `_`
   def decompose(a: Any)(implicit formats: Formats): JValue = {
+    // SCALA3 using `?` instead of `_`
     def prependTypeHint(clazz: Class[?], o: JObject) =
       JObject(
         JField(

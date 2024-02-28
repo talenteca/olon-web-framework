@@ -2,7 +2,8 @@ package olon
 package actor
 
 import scala.collection.mutable.ArrayBuffer
-import  scala.compiletime.uninitialized
+import scala.compiletime.uninitialized
+
 import common._
 
 /** A container that contains a calculated value or may contain one in the

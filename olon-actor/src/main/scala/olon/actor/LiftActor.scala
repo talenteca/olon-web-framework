@@ -1,9 +1,9 @@
 package olon
 package actor
 
-import common._
-
 import scala.compiletime.uninitialized
+
+import common._
 
 trait ILAExecute {
   def execute(f: () => Unit): Unit

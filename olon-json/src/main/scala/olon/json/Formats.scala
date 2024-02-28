@@ -104,12 +104,14 @@ trait Formats { self: Formats =>
         acc.orElse(x.serialize)
     }
 
-  def customDeserializer(implicit format: Formats) =
+  def customDeserializer(implicit format: Formats) = {
     customSerializers.foldLeft(
       Map(): PartialFunction[(TypeInfo, JValue), Any]
     ) { (acc, x) =>
       acc.orElse(x.deserialize)
     }
+  }
+
 }
 
 /** Conversions between String and Date.
