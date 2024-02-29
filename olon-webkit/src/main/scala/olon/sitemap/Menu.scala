@@ -210,7 +210,8 @@ object Menu extends MenuSingleton {
 
     /** Convert the Menuable into a Menu instance
       */
-    lazy val toMenu: Menu = Menu(toLoc, submenus: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    lazy val toMenu: Menu = Menu(toLoc, submenus*)
 
     /** Convert the ParamMenuable into a Loc so you can access the well typed
       * currentValue
@@ -379,7 +380,8 @@ object Menu extends MenuSingleton {
 
     /** Convert the Menuable into a Menu instance
       */
-    lazy val toMenu: Menu = Menu(toLoc, submenus: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    lazy val toMenu: Menu = Menu(toLoc, submenus*)
 
     /** Convert the ParamsMenuable into a Loc so you can access the well typed
       * currentValue
@@ -629,6 +631,7 @@ object Menu extends MenuSingleton {
 
     /** Convert a Menuable into a Menu when you need a Menu.
       */
+    // SCALA3 using `x*` instead of `x: _*`
     implicit def toMenu(able: Menuable): Menu =
       Menu(
         Loc(
@@ -637,7 +640,7 @@ object Menu extends MenuSingleton {
           able.linkText,
           able.params
         ),
-        able.submenus: _*
+        able.submenus*
       )
   }
 }
@@ -710,7 +713,8 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
   /** Rebuild the menu by mutating the child menu items. This mutation can be
     * changing, adding or removing
     */
-  def rebuild(f: List[Menu] => List[Menu]): Menu = Menu(loc, f(kids.toList): _*)
+  // SCALA3 using `x*` instead of `x: _*`
+  def rebuild(f: List[Menu] => List[Menu]): Menu = Menu(loc, f(kids.toList)*)
 
   private[sitemap] def validate: Unit = {
     _parent.foreach(p =>

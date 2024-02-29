@@ -506,11 +506,12 @@ object RedirectResponse {
 
   /** Construct an instnace of RedirectResponse
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def apply(uri: String, cookies: HTTPCookie*): RedirectResponse =
     new RedirectResponse(
       uri,
-      S.request or CurrentReq.box openOr Req.nil,
-      cookies: _*
+      S.request.or(CurrentReq.box).openOr(Req.nil),
+      cookies*
     )
 
 }
@@ -534,11 +535,12 @@ object SeeOtherResponse {
 
   /** Construct an instnace of SeeOtherResponse
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def apply(uri: String, cookies: HTTPCookie*): SeeOtherResponse =
     new SeeOtherResponse(
       uri,
-      S.request or CurrentReq.box openOr Req.nil,
-      cookies: _*
+      S.request.or(CurrentReq.box).openOr(Req.nil),
+      cookies*
     )
 }
 
@@ -556,30 +558,36 @@ case class SeeOtherResponse(uri: String, request: Req, cookies: HTTPCookie*)
 }
 
 object DoRedirectResponse {
+  // SCALA3 using `x*` instead of `x: _*`
   def apply(url: String): LiftResponse =
-    RedirectResponse.apply(url, List[HTTPCookie](): _*)
+    RedirectResponse.apply(url, List[HTTPCookie]()*)
 }
 
 object RedirectWithState {
+  
+  // SCALA3 using `x*` instead of `x: _*`
   def apply(
       uri: String,
       state: RedirectState,
       cookies: HTTPCookie*
-  ): RedirectWithState =
+  ): RedirectWithState = {
     this.apply(
       uri,
-      S.request or CurrentReq.box openOr Req.nil,
+      S.request.or(CurrentReq.box).openOr(Req.nil),
       state,
-      cookies: _*
+      cookies*
     )
+  }
 
   def apply(
       uri: String,
       req: Req,
       state: RedirectState,
       cookies: HTTPCookie*
-  ): RedirectWithState =
-    new RedirectWithState(uri, req, state, cookies: _*)
+  ): RedirectWithState = {
+    // SCALA3 using `x*` instead of `x: _*`
+    new RedirectWithState(uri, req, state, cookies*)
+  }
 
   def unapply(in: Any): Option[(String, RedirectState, Seq[HTTPCookie])] =
     in match {
@@ -588,17 +596,21 @@ object RedirectWithState {
     }
 }
 
+// SCALA3 using `x*` instead of `x: _*`
 class RedirectWithState(
     override val uri: String,
     val req: Req,
     val state: RedirectState,
     override val cookies: HTTPCookie*
-) extends RedirectResponse(uri, req, cookies: _*)
+) extends RedirectResponse(uri, req, cookies*)
 
+// SCALA3 using `x*` instead of `x: _*`
 object RedirectState {
   def apply(f: () => Unit, msgs: (String, NoticeType.Value)*): RedirectState =
-    new RedirectState(Full(f), msgs: _*)
+    new RedirectState(Full(f), msgs*)
 }
+
+// SCALA3 using `x*` instead of `x: _*`
 case class RedirectState(
     func: Box[() => Unit],
     msgs: (String, NoticeType.Value)*
@@ -610,12 +622,14 @@ object MessageState {
   ): MessageState =
     MessageState(msg)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def apply(msgs: (String, NoticeType.Value)*): MessageState =
-    new MessageState(msgs: _*)
+    new MessageState(msgs*)
 }
 
+// SCALA3 using `x*` instead of `x: _*`
 class MessageState(override val msgs: (String, NoticeType.Value)*)
-    extends RedirectState(Empty, msgs: _*)
+    extends RedirectState(Empty, msgs*)
 
 /** Stock XHTML doctypes available to the lift programmer.
   */

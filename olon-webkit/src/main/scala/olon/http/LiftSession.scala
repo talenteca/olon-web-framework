@@ -1273,7 +1273,8 @@ class LiftSession(
       case RedirectWithState(uri, state, cookies) =>
         state.msgs.foreach(m => S.message(m._1, m._2))
         notices = S.getAllNotices
-        RedirectResponse(attachRedirectFunc(uri, state.func), cookies: _*)
+        // SCALA3 using `x*` instead of `x: _*`
+        RedirectResponse(attachRedirectFunc(uri, state.func), cookies*)
       case _ => resp
     }
 
@@ -2556,13 +2557,14 @@ class LiftSession(
           }
 
         case v: Elem =>
+          // SCALA3 using `x*` instead of `x: _*`
           Elem(
             v.prefix,
             v.label,
             processAttributes(v.attributes, this.allowAttributeProcessing.is),
             v.scope,
             v.minimizeEmpty,
-            processSurroundAndInclude(page, v.child): _*
+            processSurroundAndInclude(page, v.child)*
           )
 
         case pcd: scala.xml.PCData => pcd
@@ -3123,7 +3125,8 @@ class LiftSession(
 
       val jvmanifest: Manifest[JValue] = implicitly
 
-      val map = Map(info.map(i => i.name -> i): _*)
+      // SCALA3 using `x*` instead of `x: _*`
+      val map = Map(info.map(i => i.name -> i)*)
 
       def fixIt(in: Any): JValue = {
         in match {
@@ -3252,6 +3255,7 @@ class LiftSession(
 
       lazy val build: (String, JsExp) = "_call_server" -> theFunc
 
+      // SCALA3 using `x*` instead of `x: _*`
       JsObj(
         build :: info
           .map(info => info.name -> JsRaw(s"""
@@ -3261,7 +3265,7 @@ class LiftSession(
           |  return promise;
           |}
           |""".stripMargin))
-          .toList: _*
+          .toList*
       )
     }
   }
@@ -3394,13 +3398,14 @@ private object SnippetNode {
           )
         } yield {
           val (par, nonLift) = liftAttrsAndParallel(elm.attributes)
+          // SCALA3 using `x*` instead of `x: _*`
           val newElm = new Elem(
             elm.prefix,
             elm.label,
             nonLift,
             elm.scope,
             elm.minimizeEmpty,
-            elm.child: _*
+            elm.child*
           )
           (
             newElm,

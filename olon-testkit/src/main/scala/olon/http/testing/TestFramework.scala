@@ -406,8 +406,10 @@ trait GetPosterHelper {
     */
   def get(url: String, params: (String, Any)*)(implicit
       capture: (String, HttpClient, HttpMethodBase) => ResponseType
-  ): ResponseType =
-    get(url, theHttpClient, Nil, params: _*)(capture)
+  ): ResponseType = {
+    // SCALA3 using `x*` instead of `x: _*`
+    get(url, theHttpClient, Nil, params*)(capture)
+  }
 
   /** Perform an HTTP DELETE with a newly minted httpClient
     *
@@ -418,8 +420,10 @@ trait GetPosterHelper {
     */
   def delete(url: String, params: (String, Any)*)(implicit
       capture: (String, HttpClient, HttpMethodBase) => ResponseType
-  ): ResponseType =
-    delete(url, theHttpClient, Nil, params: _*)(capture)
+  ): ResponseType = {
+    // SCALA3 using `x*` instead of `x: _*`
+    delete(url, theHttpClient, Nil, params*)(capture)
+  }
 
   /** Perform an HTTP POST with a newly minted httpClient
     *
@@ -430,8 +434,10 @@ trait GetPosterHelper {
     */
   def post(url: String, params: (String, Any)*)(implicit
       capture: (String, HttpClient, HttpMethodBase) => ResponseType
-  ): ResponseType =
-    post(url, theHttpClient, Nil, params: _*)(capture)
+  ): ResponseType = {
+    // SCALA3 using `x*` instead of `x: _*`
+    post(url, theHttpClient, Nil, params*)(capture)
+  }
 
   /** Perform an HTTP POST with a newly minted httpClient
     *
@@ -638,7 +644,8 @@ object TestHelpers {
   ): Seq[(String, String)] = {
     val p = Pattern.compile("""lift_toWatch\[\'([^\']*)\'] \= \'([0-9]*)""")
     val re = new REMatcher(body, p)
-    val np = re.eachFound.foldLeft(Map(old: _*))((a, b) => a + ((b(1), b(2))))
+    // SCALA3 using `x*` instead of `x: _*`
+    val np = re.eachFound.foldLeft(Map(old*))((a, b) => a + ((b(1), b(2))))
     np.iterator.toList
   }
 
@@ -928,7 +935,7 @@ abstract class BaseResponse(
   /** The content type header of the response
     */
   lazy val contentType: String = headers
-    .filter { case (name, _) => name equalsIgnoreCase "content-type" }
+    .filter { case (name, _) => name.equalsIgnoreCase("content-type") }
     .toList
     .headOption
     .map(_._2.head) getOrElse ""
@@ -1019,13 +1026,13 @@ abstract class BaseResponse(
 class CompleteFailure(val serverName: String, val exception: Box[Throwable])
     extends TestResponse {
   override def toString =
-    serverName + (exception.map(e => " Exception: " + e.getMessage) openOr "")
+    serverName + (exception.map(e => " Exception: " + e.getMessage).openOr(""))
 
   def headers: Map[String, List[String]] =
-    throw (exception openOr new java.io.IOException("HTTP Failure"))
+    throw (exception.openOr(new java.io.IOException("HTTP Failure")))
 
   def xml: Box[Elem] =
-    throw (exception openOr new java.io.IOException("HTTP Failure"))
+    throw (exception.openOr(new java.io.IOException("HTTP Failure")))
 
   def !@(msg: => String)(implicit errorFunc: ReportFailure): SelfType =
     errorFunc.fail(msg)
@@ -1070,8 +1077,8 @@ class CompleteFailure(val serverName: String, val exception: Box[Throwable])
   ): SelfType = errorFunc.fail(msg)
 
   def foreach(f: HttpResponse => Unit): Unit =
-    throw (exception openOr new java.io.IOException("HTTP Failure"))
+    throw (exception.openOr(new java.io.IOException("HTTP Failure")))
 
   def filter(f: HttpResponse => Unit): HttpResponse =
-    throw (exception openOr new java.io.IOException("HTTP Failure"))
+    throw (exception.openOr(new java.io.IOException("HTTP Failure")))
 }

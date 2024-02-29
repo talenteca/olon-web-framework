@@ -17,9 +17,10 @@ object AuthRole {
     }
   )
 
+  // SCALA3 using `x*` instead of `x: _*`
   def apply(roleName: String, roles: Role*): Role = new Role {
     def name = roleName
-  }.addRoles(roles: _*)
+  }.addRoles(roles*)
 }
 
 /** A Role may be assigned to a resource denominated by a path. A subject that

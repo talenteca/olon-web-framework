@@ -125,7 +125,8 @@ trait JsObj extends JsExp {
           }
         }
 
-        test(Map(props: _*), jsObj.props)
+        // SCALA3 using `x*` instead of `x: _*`
+        test(Map(props*), jsObj.props)
       }
 
       case x => super.equals(x)
@@ -259,16 +260,19 @@ object JE {
     def toJsCmd = "JSON.stringify(" + in.toJsCmd + ")"
   }
 
+  // SCALA3 using `x*` instead of `x: _*`
   case class JsArray(in: JsExp*) extends JsExp {
     def toJsCmd = new JsExp {
       def toJsCmd = in.map(_.toJsCmd).mkString("[", ", ", "]\n")
     }.toJsCmd
 
-    def this(in: List[JsExp]) = this(in: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    def this(in: List[JsExp]) = this(in*)
   }
 
   object JsArray {
-    def apply(in: List[JsExp]) = new JsArray(in: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    def apply(in: List[JsExp]) = new JsArray(in*)
   }
 
   case class ValById(id: String) extends JsExp {

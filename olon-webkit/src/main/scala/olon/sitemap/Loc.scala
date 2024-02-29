@@ -465,11 +465,12 @@ trait Loc[T] {
 
   def hidden = _hidden
 
+  // SCALA3 using `x*` instead of `x: _*`
   private lazy val groupSet: Set[String] =
     Set(allParams.flatMap {
       case s: Loc.LocGroup => s.group
       case _               => Nil
-    }: _*)
+    }*)
 
   def inGroup_?(group: String): Boolean = groupSet.contains(group)
 

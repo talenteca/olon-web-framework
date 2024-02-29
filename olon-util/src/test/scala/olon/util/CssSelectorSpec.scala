@@ -361,7 +361,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "substitute a String by id" in {
-      ("#foo" replaceWith "hello").apply(<b><span id="foo"/></b>) must ==/(
+      ("#foo".replaceWith("hello")).apply(<b><span id="foo"/></b>) must ==/(
         <b>hello</b>
       )
     }
@@ -696,8 +696,8 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "substitute multiple Strings by id" in {
-      (("#foo" replaceWith "hello") &
-        ("#baz" replaceWith "bye"))(
+      (("#foo".replaceWith("hello")) &
+        ("#baz".replaceWith("bye")))(
         <b><div id="baz">Hello</div><span id="foo"/></b>
       ) must_== (NodeSeq fromSeq <b>{Text("bye")}{Text("hello")}</b>)
     }
@@ -712,8 +712,8 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "substitute multiple Strings with a List by id" in {
-      (("#foo" replaceWith "hello") &
-        ("#baz" replaceWith List("bye", "bye")))(
+      (("#foo".replaceWith ("hello")) &
+        ("#baz".replaceWith(List("bye", "bye"))))(
         <b><div id="baz">Hello</div><span id="foo"/></b>
       ) must_== (NodeSeq fromSeq <b>{Text("bye")}{Text("bye")}{
         Text("hello")
@@ -732,8 +732,8 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "substitute multiple Strings with a List of XML by id" in {
-      val answer = (("#foo" replaceWith "hello") &
-        ("#baz" replaceWith List[NodeSeq](<i/>, <i>Meow</i>)))(
+      val answer = (("#foo".replaceWith("hello")) &
+        ("#baz".replaceWith(List[NodeSeq](<i/>, <i>Meow</i>))))(
         <b><div frog="dog" id="baz">Hello</div><span id="foo"/></b>
       )
 
@@ -914,7 +914,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "list of strings" in {
-      val answer = (("#moose *" replaceWith List("a", "b", "c", "woof")) &
+      val answer = (("#moose *".replaceWith(List("a", "b", "c", "woof"))) &
         ClearClearable).apply(<ul>
           <li id="moose">first</li>
           <li class="clearable">second</li>
@@ -945,12 +945,12 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "list of Nodes" in {
-      val answer = (("#moose *" replaceWith List[NodeSeq](
+      val answer = (("#moose *".replaceWith(List[NodeSeq](
         <i>"a"</i>,
         Text("b"),
         Text("c"),
         <b>woof</b>
-      )) &
+      ))) &
         ClearClearable).apply(<ul>
           <li id="moose">first</li>
           <li class="clearable">second</li>
@@ -966,7 +966,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "set href" in {
-      val answer = (("#moose [href]" replaceWith "Hi") &
+      val answer = (("#moose [href]".replaceWith("Hi")) &
         ClearClearable).apply(
         <ul><a id="moose" href="meow">first</a><li class="clearable">second</li><li class="clearable">Third</li></ul>
       )
@@ -976,7 +976,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "set href and subnodes" in {
-      val answer = (("#moose [href]" replaceWith "Hi") &
+      val answer = (("#moose [href]".replaceWith("Hi")) &
         ClearClearable).apply(
         <ul><a id="moose" href="meow">first<li class="clearable">second</li><li class="clearable">Third</li></a></ul>
       )
@@ -1023,15 +1023,17 @@ object CheckTheImplicitConversionsForToCssBindPromoter {
   bog #> Full((null: Bindable))
   bog #> Some((null: Bindable))
 
-  bog #> nsToNs _
-  bog #> nsToOptNs _
-  bog #> nsToBoxNs _
-  bog #> nsToSeqNs _
+  // SCALA3 Removing `_` for function passing as values
+  bog #> nsToNs
+  bog #> nsToOptNs
+  bog #> nsToBoxNs
+  bog #> nsToSeqNs
 
-  bog #> nsToString _
-  bog #> nsToOptString _
-  bog #> nsToBoxString _
-  bog #> nsToSeqString _
+  // SCALA3 Removing `_` for function passing as values
+  bog #> nsToString
+  bog #> nsToOptString
+  bog #> nsToBoxString
+  bog #> nsToSeqString
 
   val nsf: NodeSeq => NodeSeq = bog #> "Hello" &
     bog #> <span/> &
@@ -1059,15 +1061,17 @@ object CheckTheImplicitConversionsForToCssBindPromoter {
   "foo" #> Full((null: Bindable))
   "foo" #> Some((null: Bindable))
 
-  "foo" #> nsToNs _
-  "foo" #> nsToOptNs _
-  "foo" #> nsToBoxNs _
-  "foo" #> nsToSeqNs _
+  // SCALA3 Removing `_` for function passing as values
+  "foo" #> nsToNs
+  "foo" #> nsToOptNs
+  "foo" #> nsToBoxNs
+  "foo" #> nsToSeqNs
 
-  "foo" #> nsToString _
-  "foo" #> nsToOptString _
-  "foo" #> nsToBoxString _
-  "foo" #> nsToSeqString _
+  // SCALA3 Removing `_` for function passing as values
+  "foo" #> nsToString
+  "foo" #> nsToOptString
+  "foo" #> nsToBoxString
+  "foo" #> nsToSeqString
 
   "#foo" #> Set("a", "b", "c")
 

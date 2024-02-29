@@ -107,11 +107,13 @@ class MockHttpServletRequest(
   /** Sets the body to the given json value. Also sets the contentType to
     * "application/json"
     */
-  def body_=(jval: JValue): Unit = body_=(jval, "application/json")
+  // SCALA3 adding JValue generic parameter type
+  def body_=(jval: JValue[?]): Unit = body_=(jval, "application/json")
 
   /** Sets the body to the given json value and content type.
     */
-  def body_=(jval: JValue, contentType: String): Unit = {
+  // SCALA3 adding JValue generic parameter type
+  def body_=(jval: JValue[?], contentType: String): Unit = {
     import json.JsonAST
 
     body = JsonAST.prettyRender(jval).getBytes(charEncoding)
@@ -477,7 +479,7 @@ class MockHttpServletRequest(
             .map(Helpers.internetDateFormatter.parse(_).getTime)
         }
       )
-      .flatMap(x => x) openOr -1L
+      .flatMap(x => x).openOr(-1L)
   }
 
   def getHeader(h: String): String = headers.get(h) match {
@@ -491,7 +493,7 @@ class MockHttpServletRequest(
     headers.getOrElse(s, Nil).iterator.asJavaEnumeration
 
   def getIntHeader(h: String): Int = {
-    Box.!!(getHeader(h)).map(_.toInt) openOr -1
+    Box.!!(getHeader(h)).map(_.toInt).openOr(-1)
   }
 
   def getMethod(): String = method

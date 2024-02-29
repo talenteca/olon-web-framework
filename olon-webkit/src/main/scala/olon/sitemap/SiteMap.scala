@@ -32,8 +32,9 @@ case class SiteMap(
   /** Create a new SiteMap by passing the current menu items to a function. This
     * function can add to, remove, or otherwise mutate the current menu items.
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def rebuild(f: List[Menu] => List[Menu]) =
-    SiteMap(globalParamFuncs, f(kids.toList): _*)
+    SiteMap(globalParamFuncs, f(kids.toList)*)
 
   kids.foreach(_._parent = Full(this))
   kids.foreach(_.init(this))
@@ -240,10 +241,12 @@ sealed class SiteMapSingleton {
 
   /** A Java-callable method that builds a SiteMap
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def build(kids: Array[ConvertableToMenu]): SiteMap =
-    this.apply(ArraySeq.unsafeWrapArray(kids): _*)
+    this.apply(ArraySeq.unsafeWrapArray(kids)*)
 
-  def apply(kids: ConvertableToMenu*) = new SiteMap(Nil, kids: _*)
+  // SCALA3 using `x*` instead of `x: _*`
+  def apply(kids: ConvertableToMenu*) = new SiteMap(Nil, kids*)
 
   /** Should the top level /index path be rendered as / By default this value is
     * false. You may set it to true, but this may confuse some application

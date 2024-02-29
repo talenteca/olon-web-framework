@@ -29,8 +29,9 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
     }
 
   def addHeaders(headers: List[HTTPParam]): Unit = {
+    // SCALA3 using `x*` instead of `x: _*`
     val appearOnce = Set(
-      LiftRules.overwrittenReponseHeaders.vend.map(_.toLowerCase): _*
+      LiftRules.overwrittenReponseHeaders.vend.map(_.toLowerCase)*
     )
     for (
       h <- headers;

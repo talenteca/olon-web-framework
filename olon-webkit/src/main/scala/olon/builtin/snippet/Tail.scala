@@ -29,13 +29,14 @@ object Head extends DispatchSnippet {
       in flatMap {
         case Group(ns) => validHeadTagsOnly(ns)
         case e: Elem if (null eq e.prefix) && valid.contains(e.label) => {
+          // SCALA3 using `x*` instead of `x: _*`
           new Elem(
             e.prefix,
             e.label,
             e.attributes,
             e.scope,
             e.minimizeEmpty,
-            validHeadTagsOnly(e.child): _*
+            validHeadTagsOnly(e.child)*
           )
         }
         case e: Elem if (null eq e.prefix) => NodeSeq.Empty

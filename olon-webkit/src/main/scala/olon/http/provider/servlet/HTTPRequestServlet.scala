@@ -162,6 +162,7 @@ class HTTPRequestServlet(
               .asInstanceOf[java.util.Iterator[String]]
               .asScala
               .toList
+        // SCALA3 using `x*` instead of `x: _*`
         val map: Map[String, List[String]] = Map(
           names.map(n =>
             n -> headers
@@ -169,7 +170,7 @@ class HTTPRequestServlet(
               .asInstanceOf[java.util.Iterator[String]]
               .asScala
               .toList
-          ): _*
+          )*
         )
         LiftRules.withMimeHeaders(map) {
           LiftRules.handleMimeFile(

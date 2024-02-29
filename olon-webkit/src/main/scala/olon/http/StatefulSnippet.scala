@@ -59,13 +59,14 @@ trait StatefulSnippet extends DispatchSnippet {
     * @param attrs
     *   \- the (optional) attributes for the HTML element
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def link(
       to: String,
       func: () => Any,
       body: NodeSeq,
       attrs: SHtml.ElemAttr*
   ): Elem =
-    SHtml.link(to, () => { registerThisSnippet(); func() }, body, attrs: _*)
+    SHtml.link(to, () => { registerThisSnippet(); func() }, body, attrs*)
 
   /** Redirect to another page, but make sure this StatefulSnippet is registered
     * on that page so the state continues on the new page

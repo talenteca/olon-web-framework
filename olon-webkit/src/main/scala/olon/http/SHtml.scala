@@ -372,10 +372,11 @@ trait SHtml extends Loggable {
       )
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   private def deferCall(data: JsExp, jsFunc: Call): Call =
     Call(
       jsFunc.function,
-      (jsFunc.params ++ List(AnonFunc(makeAjaxCall(data)))): _*
+      (jsFunc.params ++ List(AnonFunc(makeAjaxCall(data))))*
     )
 
   /** Create an Ajax button. When it's pressed, the function is executed
@@ -603,8 +604,9 @@ trait SHtml extends Loggable {
     * @return
     *   a button to put on your page
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxButton(text: String, func: () => JsCmd, attrs: ElemAttr*): Elem =
-    ajaxButton(Text(text), func, attrs: _*)
+    ajaxButton(Text(text), func, attrs*)
 
   /** Create an Ajax button that when pressed, executes the function
     *
@@ -617,13 +619,14 @@ trait SHtml extends Loggable {
     * @return
     *   a button to put on your page
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxButton(
       text: String,
       jsFunc: Call,
       func: () => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    ajaxButton(Text(text), jsFunc, func, attrs: _*)
+    ajaxButton(Text(text), jsFunc, func, attrs*)
 
   /** This method generates an AJAX editable field.
     *
@@ -772,8 +775,9 @@ trait SHtml extends Loggable {
   /** Create an anchor with a body and the function to be executed when the
     * anchor is clicked
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def a(body: NodeSeq, attrs: ElemAttr*)(func: => JsCmd): Elem =
-    a(() => func, body, attrs: _*)
+    a(() => func, body, attrs*)
 
   /** Create an anchor with a body and the function to be executed when the
     * anchor is clicked
@@ -786,8 +790,9 @@ trait SHtml extends Loggable {
     * @param attrs
     *   \- the anchor node attributes
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def a(jsFunc: Call, body: NodeSeq, attrs: ElemAttr*)(func: => JsCmd): Elem =
-    a(jsFunc, () => func, body, attrs: _*)
+    a(jsFunc, () => func, body, attrs*)
 
   /** Create an anchor that will run a JavaScript command when clicked
     */
@@ -863,8 +868,9 @@ trait SHtml extends Loggable {
     * @return
     *   a text field
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def jsonText(value: String, json: JsExp => JsCmd, attrs: ElemAttr*): Elem =
-    jsonText(value, false, json, attrs: _*)
+    jsonText(value, false, json, attrs*)
 
   /** Create a JSON text widget that makes a JSON call on blur or "return".
     *
@@ -878,39 +884,45 @@ trait SHtml extends Loggable {
     * @return
     *   a text field
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def jsonText(
       value: String,
       cmd: String,
       json: JsonCall,
       attrs: ElemAttr*
   ): Elem =
-    jsonText(value, exp => json(cmd, exp), attrs: _*)
+    jsonText(value, exp => json(cmd, exp), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxTextElem(
       settable: Settable { type ValueType = String },
       attrs: ElemAttr*
   ): Elem =
-    ajaxText(settable.get, (b: String) => { settable.set(b); Noop }, attrs: _*)
+    ajaxText(settable.get, (b: String) => { settable.set(b); Noop }, attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxText(value: String, func: String => JsCmd, attrs: ElemAttr*): Elem =
-    ajaxText_*(value, false, Empty, SFuncHolder(func), attrs: _*)
+    ajaxText_*(value, false, Empty, SFuncHolder(func), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxText(
       value: String,
       jsFunc: Call,
       func: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    ajaxText_*(value, false, Full(jsFunc), SFuncHolder(func), attrs: _*)
+    ajaxText_*(value, false, Full(jsFunc), SFuncHolder(func), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxText(
       value: String,
       ignoreBlur: Boolean,
       func: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    ajaxText_*(value, ignoreBlur, Empty, SFuncHolder(func), attrs: _*)
+    ajaxText_*(value, ignoreBlur, Empty, SFuncHolder(func), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxText(
       value: String,
       ignoreBlur: Boolean,
@@ -918,7 +930,7 @@ trait SHtml extends Loggable {
       func: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    ajaxText_*(value, ignoreBlur, Full(jsFunc), SFuncHolder(func), attrs: _*)
+    ajaxText_*(value, ignoreBlur, Full(jsFunc), SFuncHolder(func), attrs*)
 
   private def ajaxText_*(
       valuePreNull: String,
@@ -980,28 +992,31 @@ trait SHtml extends Loggable {
     * @return
     *   a text field
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def jsonTextarea(
       value: String,
       cmd: String,
       json: JsonCall,
       attrs: ElemAttr*
   ): Elem =
-    jsonTextarea(value, exp => json(cmd, exp), attrs: _*)
+    jsonTextarea(value, exp => json(cmd, exp), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxTextarea(
       value: String,
       func: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    ajaxTextarea_*(value, Empty, SFuncHolder(func), attrs: _*)
+    ajaxTextarea_*(value, Empty, SFuncHolder(func), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxTextarea(
       value: String,
       jsFunc: Call,
       func: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    ajaxTextarea_*(value, Full(jsFunc), SFuncHolder(func), attrs: _*)
+    ajaxTextarea_*(value, Full(jsFunc), SFuncHolder(func), attrs*)
 
   private def ajaxTextarea_*(
       value: String,
@@ -1076,6 +1091,7 @@ trait SHtml extends Loggable {
     * @param attrs
     *   \- the balance of the attributes for the tag
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def area(
       shape: AreaShape,
       jsCmd: JsCmd,
@@ -1085,7 +1101,7 @@ trait SHtml extends Loggable {
     area(
       shape,
       alt,
-      (("onclick" -> jsCmd.toJsCmd): ElemAttr) :: attrs.toList: _*
+      (("onclick" -> jsCmd.toJsCmd): ElemAttr) :: attrs.toList*
     )
 
   /** Generate an Area tag
@@ -1107,15 +1123,17 @@ trait SHtml extends Loggable {
       attrs: ElemAttr*
   ): Elem = {
     fmapFunc((func)) { funcName =>
+      // SCALA3 using `x*` instead of `x: _*`
       area(
         shape,
         alt,
         (("onclick" -> (makeAjaxCall(Str(funcName + "=true")).toJsCmd +
-          "; return false;")): ElemAttr) :: attrs.toList: _*
+          "; return false;")): ElemAttr) :: attrs.toList*
       )
     }
   }
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxCheckboxElem(
       settable: Settable { type ValueType = Boolean },
       attrs: ElemAttr*
@@ -1123,9 +1141,10 @@ trait SHtml extends Loggable {
     ajaxCheckbox(
       settable.get,
       (b: Boolean) => { settable.set(b); Noop },
-      attrs: _*
+      attrs*
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxCheckbox(
       value: Boolean,
       func: Boolean => JsCmd,
@@ -1135,9 +1154,10 @@ trait SHtml extends Loggable {
       value,
       Empty,
       LFuncHolder(in => func(in.exists(toBoolean(_)))),
-      attrs: _*
+      attrs*
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxCheckboxElem(
       settable: Settable { type ValueType = Boolean },
       jsFunc: Call,
@@ -1150,9 +1170,10 @@ trait SHtml extends Loggable {
         settable.set(in.exists(toBoolean(_)));
         Noop
       }),
-      attrs: _*
+      attrs*
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxCheckbox(
       value: Boolean,
       jsFunc: Call,
@@ -1163,7 +1184,7 @@ trait SHtml extends Loggable {
       value,
       Full(jsFunc),
       LFuncHolder(in => func(in.exists(toBoolean(_)))),
-      attrs: _*
+      attrs*
     )
 
   private def ajaxCheckbox_*(
@@ -1228,6 +1249,7 @@ trait SHtml extends Loggable {
     * @param onSubmit
     *   -- the function to execute on form submission
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxSelectElem[T](options: Seq[T], default: Box[T], attrs: ElemAttr*)(
       onSubmit: T => JsCmd
   )(implicit f: PairStringPromoter[T]): Elem = {
@@ -1235,7 +1257,7 @@ trait SHtml extends Loggable {
       options.map(v => (v -> f(v))),
       default,
       onSubmit,
-      attrs: _*
+      attrs*
     )
   }
 
@@ -1257,11 +1279,12 @@ trait SHtml extends Loggable {
   ): Elem = {
 
     val secure = options.map { selectableOption =>
+      // SCALA3 using `x*` instead of `x: _*`
       SelectableOptionWithNonce(
         selectableOption.value,
         randomString(20),
         selectableOption.label,
-        selectableOption.attrs: _*
+        selectableOption.attrs*
       )
     }
 
@@ -1270,10 +1293,11 @@ trait SHtml extends Loggable {
     }
 
     val nonces = secure.map { selectableOptionWithNonce =>
+      // SCALA3 using `x*` instead of `x: _*`
       SelectableOption(
         selectableOptionWithNonce.nonce,
         selectableOptionWithNonce.label,
-        selectableOptionWithNonce.attrs: _*
+        selectableOptionWithNonce.attrs*
       )
     }
 
@@ -1281,7 +1305,8 @@ trait SHtml extends Loggable {
       secure.find(_.nonce == nonce).map(x => onSubmit(x.value)) getOrElse Noop
     //  (nonces, defaultNonce, SFuncHolder(process))
 
-    ajaxSelect_*(nonces, defaultNonce, Empty, SFuncHolder(process _), attrs: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    ajaxSelect_*(nonces, defaultNonce, Empty, SFuncHolder(process _), attrs*)
   }
 
   /** Create a select box based on the list with a default value and the
@@ -1323,11 +1348,12 @@ trait SHtml extends Loggable {
   ): Elem = {
 
     val secure = options.map { selectableOption =>
+      // SCALA3 using `x*` instead of `x: _*`
       SelectableOptionWithNonce(
         selectableOption.value,
         randomString(20),
         selectableOption.label,
-        selectableOption.attrs: _*
+        selectableOption.attrs*
       )
     }
 
@@ -1336,10 +1362,11 @@ trait SHtml extends Loggable {
     }
 
     val nonces = secure.map { selectableOptionWithNonce =>
+      // SCALA3 using `x*` instead of `x: _*`
       SelectableOption(
         selectableOptionWithNonce.nonce,
         selectableOptionWithNonce.label,
-        selectableOptionWithNonce.attrs: _*
+        selectableOptionWithNonce.attrs*
       )
     }
 
@@ -1347,12 +1374,13 @@ trait SHtml extends Loggable {
       secure.find(_.nonce == nonce).map(x => onSubmit(x.value)) getOrElse Noop
     //  (nonces, defaultNonce, SFuncHolder(process))
 
+    // SCALA3 using `x*` instead of `x: _*`
     ajaxSelect_*(
       nonces,
       defaultNonce,
       Full(jsFunc),
       SFuncHolder(process _),
-      attrs: _*
+      attrs*
     )
   }
 
@@ -1385,27 +1413,31 @@ trait SHtml extends Loggable {
     val options = opts :+ SelectableOption(textOpt, "New Element")
     var _options = options
 
+    // SCALA3 using `x*` instead of `x: _*`
     lazy val func: (String) => JsCmd = (select: String) => {
       def text(in: String): JsCmd = {
         _options = SelectableOption(in, in) +: _options
-        Replace(id, ajaxSelect(_options, Some(in), func, attributes: _*))
+        Replace(id, ajaxSelect(_options, Some(in), func, attributes*))
       }
       if (select == textOpt)
-        Replace(id, ajaxText("", text(_), attributes: _*)) & Focus(id)
+        Replace(id, ajaxText("", text(_), attributes*)) & Focus(id)
       else f(select)
     }
 
-    ajaxSelect(options, deflt, func, attributes: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    ajaxSelect(options, deflt, func, attributes*)
   }
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxSelect(
       opts: Seq[SelectableOption[String]],
       deflt: Box[String],
       func: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    ajaxSelect_*(opts, deflt, Empty, SFuncHolder(func), attrs: _*)
+    ajaxSelect_*(opts, deflt, Empty, SFuncHolder(func), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxSelect(
       opts: Seq[SelectableOption[String]],
       deflt: Box[String],
@@ -1413,7 +1445,7 @@ trait SHtml extends Loggable {
       func: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    ajaxSelect_*(opts, deflt, Full(jsFunc), SFuncHolder(func), attrs: _*)
+    ajaxSelect_*(opts, deflt, Full(jsFunc), SFuncHolder(func), attrs*)
 
   private def ajaxSelect_*(
       opts: Seq[SelectableOption[String]],
@@ -1532,16 +1564,18 @@ trait SHtml extends Loggable {
       attrs.foldLeft(<input type={name} name={funcName}/>)(_ % _)
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   def text_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
-    text_*(value, func, Empty, attrs: _*)
+    text_*(value, func, Empty, attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def text_*(
       value: String,
       func: AFuncHolder,
       ajaxTest: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    text_*(value, func, Full(ajaxTest), attrs: _*)
+    text_*(value, func, Full(ajaxTest), attrs*)
 
   private def buildOnBlur(bf: Box[String => JsCmd]): MetaData = bf match {
     case Full(func) =>
@@ -1554,6 +1588,7 @@ trait SHtml extends Loggable {
     case _ => Null
   }
 
+  // SCALA3 using `x*` instead of `x: _*`
   def text_*(
       value: String,
       ignoreBlur: Boolean,
@@ -1561,7 +1596,7 @@ trait SHtml extends Loggable {
       ajaxTest: Box[String => JsCmd],
       attrs: ElemAttr*
   ): Elem =
-    makeFormElement("text", func, attrs: _*) % new UnprefixedAttribute(
+    makeFormElement("text", func, attrs*) % new UnprefixedAttribute(
       "value",
       Text(value match {
         case null => ""
@@ -1570,22 +1605,26 @@ trait SHtml extends Loggable {
       Null
     ) % (if (ignoreBlur) Null else buildOnBlur(ajaxTest))
 
+  // SCALA3 using `x*` instead of `x: _*`
   def text_*(
       value: String,
       func: AFuncHolder,
       ajaxTest: Box[String => JsCmd],
       attrs: ElemAttr*
   ): Elem =
-    text_*(value, false, func, ajaxTest, attrs: _*)
+    text_*(value, false, func, ajaxTest, attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def password_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
-    makeFormElement("password", func, attrs: _*) % ("value" -> value)
+    makeFormElement("password", func, attrs*) % ("value" -> value)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def hidden_*(func: AFuncHolder, attrs: ElemAttr*): Elem =
-    makeFormElement("hidden", func, attrs: _*) % ("value" -> "true")
+    makeFormElement("hidden", func, attrs*) % ("value" -> "true")
 
+  // SCALA3 using `x*` instead of `x: _*`
   def submit_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem = {
-    def doit = makeFormElement("submit", func, attrs: _*) % ("value" -> value)
+    def doit = makeFormElement("submit", func, attrs*) % ("value" -> value)
 
     _formGroup.is match {
       case Empty => formGroup(1)(doit)
@@ -1627,11 +1666,12 @@ trait SHtml extends Loggable {
           case Group(g) => runNodes(g)
           // button
           case e: Elem => {
+            // SCALA3 using `x*` instead of `x: _*`
             val oldAttr: Map[String, String] =
               Map(
                 allEvent.flatMap(a =>
                   e.attribute(a).map(v => a -> (v.text))
-                ): _*
+                )*
               )
 
             val newAttr = e.attributes.filter {
@@ -1697,11 +1737,12 @@ trait SHtml extends Loggable {
           case Group(g) => runNodes(g)
           // button
           case e: Elem => {
+            // SCALA3 using `x*` instead of `x: _*`
             val oldAttr: Map[String, String] =
               Map(
                 allEvent.flatMap(a =>
                   e.attribute(a).map(v => a -> (v.text + "; "))
-                ): _*
+                )*
               )
 
             val newAttr = e.attributes.filter {
@@ -1855,62 +1896,71 @@ trait SHtml extends Loggable {
       }
   }
 
+  // SCALA3 using `x*` instead of `x: _*`
   def text(value: String, func: String => Any, attrs: ElemAttr*): Elem =
-    text_*(value, SFuncHolder(func), attrs: _*)
+    text_*(value, SFuncHolder(func), attrs*)
 
   /** Generate an input element for the Settable
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def textElem(
       settable: Settable { type ValueType = String },
       attrs: ElemAttr*
   ): Elem =
-    text_*(settable.get, SFuncHolder(s => settable.set(s)), attrs: _*)
+    text_*(settable.get, SFuncHolder(s => settable.set(s)), attrs*)
 
   /** Generate an input field with type email. At some point, there will be
     * graceful fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def email(value: String, func: String => Any, attrs: ElemAttr*): Elem =
-    email_*(value, SFuncHolder(func), attrs: _*)
+    email_*(value, SFuncHolder(func), attrs*)
 
   /** Generate an email input element for the Settable. At some point there will
     * be graceful fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def email(
       settable: Settable { type ValueType = String },
       attrs: ElemAttr*
   ): Elem =
-    email_*(settable.get, SFuncHolder(s => settable.set(s)), attrs: _*)
+    email_*(settable.get, SFuncHolder(s => settable.set(s)), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   private def email_*(
       value: String,
       func: AFuncHolder,
       attrs: ElemAttr*
   ): Elem =
-    makeFormElement("email", func, attrs: _*) %
+    makeFormElement("email", func, attrs*) %
       new UnprefixedAttribute("value", Text(value), Null)
 
   /** Generate an input field with type url. At some point, there will be
     * graceful fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def url(value: String, func: String => Any, attrs: ElemAttr*): Elem =
-    url_*(value, SFuncHolder(func), attrs: _*)
+    url_*(value, SFuncHolder(func), attrs*)
 
   /** Generate a url input element for the Settable. At some point there will be
     * graceful fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def url(
       settable: Settable { type ValueType = String },
       attrs: ElemAttr*
   ): Elem =
-    url_*(settable.get, SFuncHolder(s => settable.set(s)), attrs: _*)
+    url_*(settable.get, SFuncHolder(s => settable.set(s)), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   private def url_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
-    makeFormElement("url", func, attrs: _*) %
+    makeFormElement("url", func, attrs*) %
       new UnprefixedAttribute("value", Text(value), Null)
 
   /** Generate an input field with type number. At some point, there will be
     * graceful fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def number(
       value: Int,
       func: Int => Any,
@@ -1923,12 +1973,13 @@ trait SHtml extends Loggable {
       min,
       max,
       SFuncHolder(s => Helpers.asInt(s).map(func)),
-      attrs: _*
+      attrs*
     )
 
   /** Generate a number input element for the Settable. At some point there will
     * be graceful fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def number(
       settable: Settable { type ValueType = Int },
       min: Int,
@@ -1940,7 +1991,7 @@ trait SHtml extends Loggable {
       min,
       max,
       SFuncHolder(s => Helpers.asInt(s).map(s => settable.set(s))),
-      attrs: _*
+      attrs*
     )
 
   private def number_*(
@@ -1952,7 +2003,8 @@ trait SHtml extends Loggable {
   ): Elem = {
     import Helpers._
 
-    makeFormElement("number", func, attrs: _*) %
+    // SCALA3 using `x*` instead of `x: _*`
+    makeFormElement("number", func, attrs*) %
       ("value" -> value.toString) %
       ("min" -> min.toString) %
       ("max" -> max.toString)
@@ -1962,6 +2014,7 @@ trait SHtml extends Loggable {
     * step is for example: 0.1 At some point, there will be graceful fallback
     * for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def number(
       value: Double,
       func: Double => Any,
@@ -1976,13 +2029,14 @@ trait SHtml extends Loggable {
       max,
       step,
       SFuncHolder(s => Helpers.asDouble(s).map(func)),
-      attrs: _*
+      attrs*
     )
 
   /** Generate a number input element for the Settable. It allows for Double if
     * your step is for example: 0.1 At some point there will be graceful
     * fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def number(
       settable: Settable { type ValueType = Double },
       min: Double,
@@ -1996,9 +2050,10 @@ trait SHtml extends Loggable {
       max,
       step: Double,
       SFuncHolder(s => Helpers.asDouble(s).map(s => settable.set(s))),
-      attrs: _*
+      attrs*
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   private def number_double_*(
       value: Double,
       min: Double,
@@ -2009,7 +2064,7 @@ trait SHtml extends Loggable {
   ): Elem = {
     import Helpers._
     logger.trace("Number double with max " + max)
-    makeFormElement("number", func, attrs: _*) %
+    makeFormElement("number", func, attrs*) %
       ("value" -> value.toString) %
       ("min" -> min.toString) %
       ("min" -> min.toString) %
@@ -2019,6 +2074,7 @@ trait SHtml extends Loggable {
   /** Generate an input field with type range. At some point, there will be
     * graceful fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def range(
       value: Int,
       func: Int => Any,
@@ -2031,12 +2087,13 @@ trait SHtml extends Loggable {
       min,
       max,
       SFuncHolder(s => Helpers.asInt(s).map(func)),
-      attrs: _*
+      attrs*
     )
 
   /** Generate a range input element for the Settable. At some point there will
     * be graceful fallback for non-HTML5 browsers. FIXME
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def range(
       settable: Settable { type ValueType = Int },
       min: Int,
@@ -2048,9 +2105,10 @@ trait SHtml extends Loggable {
       min,
       max,
       SFuncHolder(s => Helpers.asInt(s).map(s => settable.set(s))),
-      attrs: _*
+      attrs*
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   private def range_*(
       value: Int,
       min: Int,
@@ -2060,35 +2118,39 @@ trait SHtml extends Loggable {
   ): Elem = {
     import Helpers._
 
-    makeFormElement("range", func, attrs: _*) %
+    makeFormElement("range", func, attrs*) %
       ("value" -> value.toString) %
       ("min" -> min.toString) %
       ("max" -> max.toString)
   }
 
+  // SCALA3 using `x*` instead of `x: _*`
   def textAjaxTest(
       value: String,
       func: String => Any,
       ajaxTest: String => JsCmd,
       attrs: ElemAttr*
   ): Elem =
-    text_*(value, SFuncHolder(func), ajaxTest, attrs: _*)
+    text_*(value, SFuncHolder(func), ajaxTest, attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def textAjaxTest(
       value: String,
       func: String => Any,
       ajaxTest: Box[String => JsCmd],
       attrs: ElemAttr*
   ): Elem =
-    text_*(value, SFuncHolder(func), ajaxTest, attrs: _*)
+    text_*(value, SFuncHolder(func), ajaxTest, attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def password(value: String, func: String => Any, attrs: ElemAttr*): Elem =
     makeFormElement(
       "password",
       SFuncHolder(func),
-      attrs: _*
+      attrs*
     ) % new UnprefixedAttribute("value", Text(value), Null)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def passwordElem(
       settable: Settable { type ValueType = String },
       attrs: ElemAttr*
@@ -2096,16 +2158,18 @@ trait SHtml extends Loggable {
     makeFormElement(
       "password",
       SFuncHolder(s => settable.set(s)),
-      attrs: _*
+      attrs*
     ) % new UnprefixedAttribute("value", Text(settable.get), Null)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def hidden(func: () => Any, attrs: ElemAttr*): Elem =
     makeFormElement(
       "hidden",
       NFuncHolder(func),
-      attrs: _*
+      attrs*
     ) % ("value" -> "true")
 
+  // SCALA3 using `x*` instead of `x: _*`
   def hidden(
       func: (String) => Any,
       defaultlValue: String,
@@ -2114,7 +2178,7 @@ trait SHtml extends Loggable {
     makeFormElement(
       "hidden",
       SFuncHolder(func),
-      attrs: _*
+      attrs*
     ) % ("value" -> defaultlValue)
 
   /** Create an HTML button with strOrNodeSeq as the body. The button will be
@@ -2162,8 +2226,9 @@ trait SHtml extends Loggable {
     */
   def submit(value: String, func: () => Any, attrs: ElemAttr*): Elem = {
 
+    // SCALA3 using `x*` instead of `x: _*`
     def doit = {
-      makeFormElement("submit", NFuncHolder(func), attrs: _*) %
+      makeFormElement("submit", NFuncHolder(func), attrs*) %
         new UnprefixedAttribute("value", Text(value), Null)
     }
 
@@ -2243,8 +2308,9 @@ trait SHtml extends Loggable {
     * @param attrs
     *   Optional XHTML element attributes that will be applied to the button
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def submitButton(func: () => Any, attrs: ElemAttr*): Elem =
-    makeFormElement("submit", NFuncHolder(func), attrs: _*)
+    makeFormElement("submit", NFuncHolder(func), attrs*)
 
   /** Takes a form and wraps it so that it will be submitted via AJAX.
     *
@@ -2346,6 +2412,7 @@ trait SHtml extends Loggable {
       AjaxContext.js(Full(postSubmit.toJsCmd))
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   private def secureOptions[T](
       options: Seq[SelectableOption[T]],
       default: Box[T],
@@ -2356,7 +2423,7 @@ trait SHtml extends Loggable {
         selectableOption.value,
         randomString(20),
         selectableOption.label,
-        selectableOption.attrs: _*
+        selectableOption.attrs*
       )
     }
 
@@ -2364,11 +2431,12 @@ trait SHtml extends Loggable {
       secure.find(_.value == default).map(_.nonce)
     }
 
+    // SCALA3 using `x*` instead of `x: _*`
     val nonces = secure.map { selectableOptionWithNonce =>
       SelectableOption(
         selectableOptionWithNonce.nonce,
         selectableOptionWithNonce.label,
-        selectableOptionWithNonce.attrs: _*
+        selectableOptionWithNonce.attrs*
       )
     }
 
@@ -2414,13 +2482,14 @@ trait SHtml extends Loggable {
     * @param func
     *   -- the function to execute on form submission
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def select(
       opts: Seq[SelectableOption[String]],
       deflt: Box[String],
       func: String => Any,
       attrs: ElemAttr*
   ): Elem =
-    select_*(opts, deflt, SFuncHolder(func), attrs: _*)
+    select_*(opts, deflt, SFuncHolder(func), attrs*)
 
   /** Create a select box based on the list with a default value and the
     * function to be executed on form submission
@@ -2437,6 +2506,7 @@ trait SHtml extends Loggable {
     * @param f
     *   -- the function that converts a T to a Display String.
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def selectElem[T](options: Seq[T], default: Box[T], attrs: ElemAttr*)(
       onSubmit: T => Any
   )(implicit f: PairStringPromoter[T]): Elem = {
@@ -2444,7 +2514,7 @@ trait SHtml extends Loggable {
       options.map(v => SelectableOption(v, f(v))),
       default,
       onSubmit,
-      attrs: _*
+      attrs*
     )
   }
 
@@ -2463,6 +2533,7 @@ trait SHtml extends Loggable {
     * @param f
     *   -- the function that converts a T to a Display String.
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def selectElem[T](options: Seq[T], settable: LiftValue[T], attrs: ElemAttr*)(
       implicit f: PairStringPromoter[T]
   ): Elem = {
@@ -2470,7 +2541,7 @@ trait SHtml extends Loggable {
       options.map(v => SelectableOption(v, f(v))),
       Full(settable.get),
       s => settable.set(s),
-      attrs: _*
+      attrs*
     )
   }
 
@@ -2493,7 +2564,8 @@ trait SHtml extends Loggable {
     val (nonces, defaultNonce, secureOnSubmit) =
       secureOptions(options, default, onSubmit)
 
-    select_*(nonces, defaultNonce, secureOnSubmit, attrs: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    select_*(nonces, defaultNonce, secureOnSubmit, attrs*)
   }
 
   /** Create a select box based on the list with a default value and the
@@ -2543,13 +2615,14 @@ trait SHtml extends Loggable {
     * @param func
     *   -- the function to execute on form submission
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def untrustedSelect(
       opts: Seq[SelectableOption[String]],
       deflt: Box[String],
       func: String => Any,
       attrs: ElemAttr*
   ): Elem =
-    untrustedSelect_*(opts, deflt, SFuncHolder(func), attrs: _*)
+    untrustedSelect_*(opts, deflt, SFuncHolder(func), attrs*)
 
   /** Create a select box based on the list with a default value and the
     * function to be executed on form submission. No check is made to see if the
@@ -2589,13 +2662,14 @@ trait SHtml extends Loggable {
     * @param func
     *   -- the function to execute on form submission
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def untrustedMultiSelect(
       opts: Seq[SelectableOption[String]],
       deflt: Seq[String],
       func: List[String] => Any,
       attrs: ElemAttr*
   ): NodeSeq =
-    untrustedMultiSelect_*(opts, deflt, LFuncHolder(func), attrs: _*)
+    untrustedMultiSelect_*(opts, deflt, LFuncHolder(func), attrs*)
 
   /** Create a multiple select box based on the list with a default value and
     * the function to be executed on form submission. No check is made to see if
@@ -2644,13 +2718,14 @@ trait SHtml extends Loggable {
     * @param attrs
     *   -- select box attributes
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxUntrustedSelect(
       opts: Seq[SelectableOption[String]],
       deflt: Box[String],
       func: String => JsCmd,
       attrs: (String, String)*
   ): Elem =
-    ajaxUntrustedSelect_*(opts, deflt, Empty, SFuncHolder(func), attrs: _*)
+    ajaxUntrustedSelect_*(opts, deflt, Empty, SFuncHolder(func), attrs*)
 
   /** Create a select box based on the list with a default value and the
     * function to be executed on form submission. No check is made to see if the
@@ -2668,6 +2743,7 @@ trait SHtml extends Loggable {
     * @param attrs
     *   -- select box attributes
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def ajaxUntrustedSelect(
       opts: Seq[SelectableOption[String]],
       deflt: Box[String],
@@ -2680,7 +2756,7 @@ trait SHtml extends Loggable {
       deflt,
       Full(jsFunc),
       SFuncHolder(func),
-      attrs: _*
+      attrs*
     )
 
   /** Create a select box based on the list with a default value and the
@@ -2739,13 +2815,14 @@ trait SHtml extends Loggable {
   private def selected(in: Boolean) =
     if (in) new UnprefixedAttribute("selected", "selected", Null) else Null
 
+  // SCALA3 using `x*` instead of `x: _*`
   def multiSelect(
       opts: Seq[SelectableOption[String]],
       deflt: Seq[String],
       func: List[String] => Any,
       attrs: ElemAttr*
   ): Elem =
-    multiSelect_*(opts, deflt, LFuncHolder(func), attrs: _*)
+    multiSelect_*(opts, deflt, LFuncHolder(func), attrs*)
 
   /** Create a select box based on the list with a default value and the
     * function to be executed on form submission
@@ -2760,11 +2837,12 @@ trait SHtml extends Loggable {
   def multiSelectElem[T](options: Seq[T], default: Seq[T], attrs: ElemAttr*)(
       onSubmit: List[T] => Any
   )(implicit f: PairStringPromoter[T]): Elem = {
+    // SCALA3 using `x*` instead of `x: _*`
     multiSelectObj[T](
       options.map(v => SelectableOption(v, f(v))),
       default,
       onSubmit,
-      attrs: _*
+      attrs*
     )
   }
 
@@ -2787,7 +2865,8 @@ trait SHtml extends Loggable {
     val (nonces, defaultNonce, secureOnSubmit) =
       secureMultiOptions(options, default, onSubmit)
 
-    multiSelect_*(nonces, defaultNonce, secureOnSubmit, attrs: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    multiSelect_*(nonces, defaultNonce, secureOnSubmit, attrs*)
   }
 
   private[http] def secureMultiOptions[T](
@@ -2799,15 +2878,17 @@ trait SHtml extends Loggable {
 
     val secure: List[SelectableOptionWithNonce[T]] = o2.map {
       selectableOption =>
+        // SCALA3 using `x*` instead of `x: _*`
         SelectableOptionWithNonce(
           selectableOption.value,
           randomString(20),
           selectableOption.label,
-          selectableOption.attrs: _*
+          selectableOption.attrs*
         )
     }
 
-    val sm: Map[String, T] = Map(secure.map(v => (v.nonce, v.value)): _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    val sm: Map[String, T] = Map(secure.map(v => (v.nonce, v.value))*)
 
     val defaultNonce: Seq[String] = default.flatMap { defaultOption =>
       secure.find(_.value == defaultOption).map(_.nonce)
@@ -2815,10 +2896,11 @@ trait SHtml extends Loggable {
 
     val nonces: List[SelectableOption[String]] = secure.map {
       selectableOptionWithNonce =>
+        // SCALA3 using `x*` instead of `x: _*`
         SelectableOption(
           selectableOptionWithNonce.nonce,
           selectableOptionWithNonce.label,
-          selectableOptionWithNonce.attrs: _*
+          selectableOptionWithNonce.attrs*
         )
     }.toList
 
@@ -2839,14 +2921,16 @@ trait SHtml extends Loggable {
       }</select>)(_ % _)
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   def textarea(value: String, func: String => Any, attrs: ElemAttr*): Elem =
-    textarea_*(value, SFuncHolder(func), attrs: _*)
+    textarea_*(value, SFuncHolder(func), attrs*)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def textareaElem(
       settable: Settable { type ValueType = String },
       attrs: ElemAttr*
   ): Elem =
-    textarea_*(settable.get, SFuncHolder(s => settable.set(s)), attrs: _*)
+    textarea_*(settable.get, SFuncHolder(s => settable.set(s)), attrs*)
 
   def textarea_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
     fmapFunc(func)(funcName =>
@@ -2858,13 +2942,14 @@ trait SHtml extends Loggable {
       }</textarea>)(_ % _)
     )
 
+  // SCALA3 using `x*` instead of `x: _*`
   def radio(
       opts: Seq[String],
       deflt: Box[String],
       func: String => Any,
       attrs: ElemAttr*
   ): ChoiceHolder[String] =
-    radio_*(opts, deflt, SFuncHolder(func), attrs: _*)
+    radio_*(opts, deflt, SFuncHolder(func), attrs*)
 
   /** Generate a collection or radio box items from a sequence of things
     */
@@ -3106,22 +3191,24 @@ trait SHtml extends Loggable {
 
   /** Defines a new checkbox for the Settable
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def checkboxElem(
       settable: Settable { type ValueType = Boolean },
       attrs: ElemAttr*
   ): NodeSeq = {
-    checkbox_id(settable.get, s => settable.set(s), Empty, attrs: _*)
+    checkbox_id(settable.get, s => settable.set(s), Empty, attrs*)
   }
 
   /** Defines a new checkbox set to {{@code value}} and running {{@code func}}
     * when the checkbox is submitted.
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def checkbox(
       value: Boolean,
       func: Boolean => Any,
       attrs: ElemAttr*
   ): NodeSeq = {
-    checkbox_id(value, func, Empty, attrs: _*)
+    checkbox_id(value, func, Empty, attrs*)
   }
 
   /** Defines a new checkbox for the Settable
@@ -3136,11 +3223,12 @@ trait SHtml extends Loggable {
         f(in.exists(toBoolean(_)))
         true
       }
+    // SCALA3 using `x*` instead of `x: _*`
     checkbox_*(
       settable.get,
       LFuncHolder(from(s => settable.set(s))),
       id,
-      attrs: _*
+      attrs*
     )
   }
 
@@ -3158,7 +3246,8 @@ trait SHtml extends Loggable {
         f(in.exists(toBoolean(_)))
         true
       }
-    checkbox_*(value, LFuncHolder(from(func)), id, attrs: _*)
+    // SCALA3 using `x*` instead of `x: _*`
+    checkbox_*(value, LFuncHolder(from(func)), id, attrs*)
   }
 
   def checkbox_*(

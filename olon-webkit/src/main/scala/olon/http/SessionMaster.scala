@@ -248,9 +248,10 @@ object SessionMaster extends LiftActor with Loggable {
         killedSessions.asScala.filter(_._2 < now).map(_._1)
       removeKeys.foreach(s => killedSessions.remove(s))
 
+      // SCALA3 using `x*` instead of `x: _*`
       val ses = Map(lockRead {
         nsessions
-      }.asScala.toList: _*)
+      }.asScala.toList*)
 
       for {
         f <- sessionCheckFuncs

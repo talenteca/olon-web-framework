@@ -174,7 +174,8 @@ class TestRunner(
       TestResults(log.toList)
     }
 
-    (() => run, applyAssert _)
+    // SCALA3 removing `_` for passing function as a value
+    (() => run, applyAssert)
   }
 }
 

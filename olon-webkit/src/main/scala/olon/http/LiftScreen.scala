@@ -939,12 +939,13 @@ trait AbstractScreen extends Factory with Loggable {
   ): Field { type ValueType = String } = {
     val eAttr = grabParams(stuff)
 
+    // SCALA3 using `x*` instead of `x: _*`
     makeField[String, Nothing](
       name,
       defaultValue,
-      field => SHtml.password(field.get, field.set(_), eAttr: _*),
+      field => SHtml.password(field.get, field.set(_), eAttr*),
       NothingOtherValueInitializer,
-      stuff: _*
+      stuff*
     )
   }
 
@@ -967,12 +968,13 @@ trait AbstractScreen extends Factory with Loggable {
   ): Field { type ValueType = String } = {
     val eAttr = grabParams(stuff)
 
+    // SCALA3 using `x*` instead of `x: _*`
     makeField[String, Nothing](
       name,
       defaultValue,
-      field => SHtml.text(field.get, field.set(_), eAttr: _*),
+      field => SHtml.text(field.get, field.set(_), eAttr*),
       NothingOtherValueInitializer,
-      stuff: _*
+      stuff*
     )
   }
 
@@ -989,12 +991,13 @@ trait AbstractScreen extends Factory with Loggable {
     * @return
     *   a newly minted Field{type ValueType = String}
     */
+  // SCALA3 using `x*` instead of `x: _*`
   protected def textarea(
       name: => String,
       defaultValue: => String,
       stuff: FilterOrValidate[String]*
   ): Field { type ValueType = String } =
-    textarea(name, defaultValue, 5, 80, stuff: _*)
+    textarea(name, defaultValue, 5, 80, stuff*)
 
   /** Create a textarea field
     *
@@ -1025,12 +1028,13 @@ trait AbstractScreen extends Factory with Loggable {
       (("rows" -> rows.toString): SHtml.ElemAttr) ::
         (("cols" -> cols.toString): SHtml.ElemAttr) :: grabParams(stuff)
 
+    // SCALA3 using `x*` instead of `x: _*`
     makeField[String, Nothing](
       name,
       defaultValue,
-      field => SHtml.textarea(field.is, field.set(_), eAttr: _*),
+      field => SHtml.textarea(field.is, field.set(_), eAttr*),
       NothingOtherValueInitializer,
-      stuff: _*
+      stuff*
     )
   }
 
@@ -1062,15 +1066,16 @@ trait AbstractScreen extends Factory with Loggable {
   ): Field { type ValueType = T; type OtherValueType = Seq[T] } = {
     val eAttr = grabParams(stuff)
 
+    // SCALA3 using `x*` instead of `x: _*`
     makeField[T, Seq[T]](
       name,
       default,
       field =>
-        SHtml.selectElem(field.otherValue, Full(field.is), eAttr: _*)(
+        SHtml.selectElem(field.otherValue, Full(field.is), eAttr*)(
           field.set(_)
         ),
       OtherValueInitializerImpl[Seq[T]](() => choices),
-      stuff: _*
+      stuff*
     )
   }
 
@@ -1102,15 +1107,16 @@ trait AbstractScreen extends Factory with Loggable {
   ): Field { type ValueType = Seq[T]; type OtherValueType = Seq[T] } = {
     val eAttr = grabParams(stuff)
 
+    // SCALA3 using `x*` instead of `x: _*`
     makeField[Seq[T], Seq[T]](
       name,
       default,
       field =>
-        SHtml.multiSelectElem(field.otherValue, field.is, eAttr: _*)(
+        SHtml.multiSelectElem(field.otherValue, field.is, eAttr*)(
           field.set(_)
         ),
       OtherValueInitializerImpl[Seq[T]](() => choices),
-      stuff: _*
+      stuff*
     )
   }
 
@@ -1151,17 +1157,19 @@ trait AbstractScreen extends Factory with Loggable {
   ): Field { type ValueType = String; type OtherValueType = Seq[String] } = {
     val eAttr = grabParams(stuff)
 
+    // SCALA3 using `x*` instead of `x: _*`
+    // SCALA3 removing `_` for passing function as value
     makeField[String, Seq[String]](
       name,
       default,
       field =>
         Full(
           SHtml
-            .radio(field.otherValue, Full(field.is), field.set _, eAttr: _*)
+            .radio(field.otherValue, Full(field.is), field.set, eAttr*)
             .toForm
         ),
       OtherValueInitializerImpl[Seq[String]](() => choices),
-      stuff: _*
+      stuff*
     )
   }
 

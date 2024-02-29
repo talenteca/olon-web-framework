@@ -144,6 +144,7 @@ trait PaginatorSnippet[T] extends Paginator[T] {
 
   /** The status displayed when using &lt;nav:records/&gt; in the template.
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def currentXml: NodeSeq =
     if (count == 0)
       Text(S.?("paginator.norecords"))
@@ -153,7 +154,7 @@ trait PaginatorSnippet[T] extends Paginator[T] {
           "paginator.displayingrecords",
           ArraySeq.unsafeWrapArray(
             Array(recordsFrom, recordsTo, count).map(_.asInstanceOf[AnyRef])
-          ): _*
+          )*
         )
       )
 

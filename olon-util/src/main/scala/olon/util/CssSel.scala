@@ -577,7 +577,7 @@ private class SelectorMap(binds: List[CssBind])
                 )
               case _ if this.id.isEmpty =>
                 calced.map(kids =>
-                  // Using `x*` instead of `x: _*`
+                  // SCALA3 using `x*` instead of `x: _*`
                   new Elem(
                     realE.prefix,
                     realE.label,

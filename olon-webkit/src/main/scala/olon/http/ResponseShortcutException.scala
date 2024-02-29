@@ -38,9 +38,10 @@ object ResponseShortcutException {
   def shortcutResponse(responseIt: => LiftResponse) =
     new ResponseShortcutException(responseIt, true)
 
+  // SCALA3 using `x*` instead of `x: _*`
   def redirect(to: String): ResponseShortcutException =
     new ResponseShortcutException(
-      () => RedirectResponse(to, S.responseCookies: _*),
+      () => RedirectResponse(to, S.responseCookies*),
       Full(to),
       true
     )
@@ -52,9 +53,10 @@ object ResponseShortcutException {
       case _ => redirect(to)
     }
 
+  // SCALA3 using `x*` instead of `x: _*`
   def seeOther(to: String): ResponseShortcutException =
     new ResponseShortcutException(
-      () => SeeOtherResponse(to, S.responseCookies: _*),
+      () => SeeOtherResponse(to, S.responseCookies*),
       Full(to),
       true
     )

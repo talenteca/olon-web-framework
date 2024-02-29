@@ -1102,7 +1102,8 @@ class LiftServlet extends Loggable {
         headers: List[(String, String)],
         toInsure: List[(String, String)]
     ): List[(String, String)] = {
-      val org = Map(headers: _*)
+      // SCALA3 using `x*` instead of `x: _*`
+      val org = Map(headers*)
 
       toInsure
         .foldLeft(org) { case (map, (key, value)) =>

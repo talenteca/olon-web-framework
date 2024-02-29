@@ -53,7 +53,8 @@ object Form extends DispatchSnippet {
               }
             )
           )
-        new Elem(null, "form", meta, e.scope, e.minimizeEmpty, e.child: _*)
+        // SCALA3 using `x*` instead of `x: _*`
+        new Elem(null, "form", meta, e.scope, e.minimizeEmpty, e.child*)
       } else {
         <form method="post" action={S.uri}>{kids}</form>
       }
@@ -75,9 +76,11 @@ object Form extends DispatchSnippet {
       (kids(0).prefix eq null) &&
       kids(0).label == "form"
     ) {
-      new Elem(null, "form", addAjaxForm, TopScope, true, kids(0).child: _*)
+      // SCALA3 using `x*` instead of `x: _*`
+      new Elem(null, "form", addAjaxForm, TopScope, true, kids(0).child*)
     } else {
-      Elem(null, "form", addAjaxForm, TopScope, true, kids: _*)
+      // SCALA3 using `x*` instead of `x: _*`
+      Elem(null, "form", addAjaxForm, TopScope, true, kids*)
     }
   }
 

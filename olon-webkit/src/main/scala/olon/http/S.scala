@@ -1001,6 +1001,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     val cometVersions = requestCometVersions.is
     requestCometVersions.set(Set())
 
+    // SCALA3 using `x*` instead of `x: _*`
     if (cometVersions.nonEmpty) {
       List(
         js.JE
@@ -1009,7 +1010,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
             js.JE.JsObj(
               cometVersions.toList.map { case CometVersionPair(guid, version) =>
                 (guid, js.JE.Num(version))
-              }: _*
+              }*
             ),
             // Don't kick off a new comet request client-side if we're responding
             // to a comet request right now.
@@ -1292,6 +1293,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see
     *   # resourceBundles
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def ?(str: String, params: Any*): String =
     if (params.length == 0)
       ?(str)
@@ -1302,7 +1304,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
         params.flatMap {
           case s: AnyRef => List(s)
           case _         => Nil
-        }.toArray: _*
+        }.toArray*
       )
 
   private def ?!(str: String, resBundle: List[ResourceBundle]): String =
@@ -2279,11 +2281,12 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see
     *   TempalateFinder # apply
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def runTemplate(
       path: List[String],
       snips: (String, NodeSeq => NodeSeq)*
   ): Box[NodeSeq] =
-    mapSnippetsWith(snips: _*) {
+    mapSnippetsWith(snips*) {
       for {
         t <- Templates(path) ?~ ("Couldn't find template " + path)
         sess <- session ?~ "No current session"
@@ -2301,11 +2304,12 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   a Full Box containing the processed template, or a Failure if the
     *   template could not be found.
     */
+  // SCALA3 using `x*` instead of `x: _*`
   def eval(
       template: NodeSeq,
       snips: (String, NodeSeq => NodeSeq)*
   ): Box[NodeSeq] =
-    mapSnippetsWith(snips: _*) {
+    mapSnippetsWith(snips*) {
       for {
         sess <- session ?~ "No current session"
       } yield sess.processSurroundAndInclude("HTML Constant", template)

@@ -278,18 +278,20 @@ object Menu extends DispatchSnippet with Loggable {
           "uri" -> uri.toString,
           "children" -> buildItems(kids),
           "current" -> current,
-          "cssClass" -> Str(in.cssClass openOr ""),
+          "cssClass" -> Str(in.cssClass.openOr("")),
           "placeholder" -> in.placeholder_?,
           "path" -> path
         )
     }
 
-    def buildItems(in: Seq[MenuItem]): JsExp =
-      JsArray(in.map(buildItem): _*)
+    def buildItems(in: Seq[MenuItem]): JsExp = {
+      // SCALA3 using `x*` instead of `x: _*`
+      JsArray(in.map(buildItem)*)
+    }
 
     Script(
       JsCrVar(
-        S.attr("var") openOr "lift_menu",
+        S.attr("var").openOr("lift_menu"),
         JsObj("menu" -> buildItems(toRender))
       )
     )

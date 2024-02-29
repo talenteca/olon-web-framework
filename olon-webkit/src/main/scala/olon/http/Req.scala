@@ -460,10 +460,11 @@ object Req {
     // val (uri, path, localSingleParams) = processRewrite(tmpUri, tmpPath, TreeMap.empty)
     val rewritten = processRewrite(tmpPath, Map.empty)
 
+    // SCALA3 using `x*` instead of `x: _*`
     val localParams: Map[String, List[String]] = Map(
       rewritten.params.toList.map { case (name, value) =>
         name -> List(value)
-      }: _*
+      }*
     )
 
     // val session = request.getSession
@@ -700,6 +701,7 @@ object Req {
       } else attrs.copy(fixAttrs(toFix, attrs.next, fixURL))
     }
 
+    // SCALA3 using `x*` instead of `x: _*`
     def _fixHtml(contextPath: String, in: NodeSeq): NodeSeq = {
       in.map { v =>
         v match {
@@ -711,7 +713,7 @@ object Req {
               fixAttrs("action", v.attributes, true),
               v.scope,
               e.minimizeEmpty,
-              _fixHtml(contextPath, v.child): _*
+              _fixHtml(contextPath, v.child)*
             )
           case e: Elem if e.label == "script" =>
             Elem(
@@ -720,7 +722,7 @@ object Req {
               fixAttrs("src", v.attributes, false),
               v.scope,
               e.minimizeEmpty,
-              _fixHtml(contextPath, v.child): _*
+              _fixHtml(contextPath, v.child)*
             )
           case e: Elem if e.label == "a" =>
             Elem(
@@ -729,7 +731,7 @@ object Req {
               fixAttrs("href", v.attributes, true),
               v.scope,
               e.minimizeEmpty,
-              _fixHtml(contextPath, v.child): _*
+              _fixHtml(contextPath, v.child)*
             )
           case e: Elem if e.label == "link" =>
             Elem(
@@ -738,7 +740,7 @@ object Req {
               fixAttrs("href", v.attributes, false),
               v.scope,
               e.minimizeEmpty,
-              _fixHtml(contextPath, v.child): _*
+              _fixHtml(contextPath, v.child)*
             )
           case e: Elem =>
             Elem(
@@ -747,7 +749,7 @@ object Req {
               fixAttrs("src", v.attributes, true),
               v.scope,
               e.minimizeEmpty,
-              _fixHtml(contextPath, v.child): _*
+              _fixHtml(contextPath, v.child)*
             )
           case _ => v
         }

@@ -81,6 +81,7 @@ private[http] trait LiftMerge {
 
     waitUntilSnippetsDone()
 
+    // SCALA3 using `x*` instead of `x: _*`
     val processedSnippets: Map[String, NodeSeq] = Map(
       snippetHashs.toList.flatMap {
         case (name, Full(value)) => List((name, value))
@@ -89,7 +90,7 @@ private[http] trait LiftMerge {
         case (name, Empty) =>
           List((name, LiftRules.deferredSnippetTimeout.vend))
         case _ => Nil
-      }: _*
+      }*
     )
 
     val hasHtmlHeadAndBody: Boolean = xhtml.find {
@@ -286,7 +287,8 @@ private[http] trait LiftMerge {
       }
 
       // Appends ajax script to body
-      if (LiftRules.autoIncludeAjaxCalc.vend().apply(this)) {
+      // SCALA3 calling `vend.apply` explicitly to avoid compiler ambiguity
+      if (LiftRules.autoIncludeAjaxCalc.vend.apply().apply(this)) {
         bodyChildren +=
           <script src={
             S.encodeURL(
@@ -337,13 +339,14 @@ private[http] trait LiftMerge {
       )(_ % _)
       htmlKids += nl
 
+      // SCALA3 using `x*` instead of `x: _*`
       val tmpRet = Elem(
         htmlElement.prefix,
         htmlElement.label,
         htmlElement.attributes,
         htmlElement.scope,
         htmlElement.minimizeEmpty,
-        htmlKids.toList: _*
+        htmlKids.toList*
       )
 
       val ret: Node = if (Props.devMode) {
