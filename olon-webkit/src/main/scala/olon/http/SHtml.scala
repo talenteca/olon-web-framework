@@ -193,7 +193,8 @@ trait SHtml extends Loggable {
     * @return
     *   the function ID and JavaScript that makes the call
     */
-  def jsonCall(jsCalcValue: JsExp, func: JsonAST.JValue => JsCmd): GUIDJsExp =
+  // SCALA3 Adding JValue generic parameter type
+  def jsonCall(jsCalcValue: JsExp, func: JsonAST.JValue[?] => JsCmd): GUIDJsExp =
     jsonCall_*(
       jsCalcValue,
       SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop)
@@ -215,10 +216,11 @@ trait SHtml extends Loggable {
     * @return
     *   the function ID and JavaScript that makes the call
     */
+  // SCALA3 Adding JValue generic parameter type
   def jsonCall(
       jsCalcValue: JsExp,
       jsContext: JsContext,
-      func: JsonAST.JValue => JsCmd
+      func: JsonAST.JValue[?] => JsCmd
   ): GUIDJsExp =
     jsonCall_*(
       jsCalcValue,
@@ -244,10 +246,11 @@ trait SHtml extends Loggable {
     * @return
     *   the function ID and JavaScript that makes the call
     */
+  // SCALA3 Adding JValue generic parameter type
   def jsonCall(
       jsCalcValue: JsExp,
       jsonContext: JsonContext,
-      func: JsonAST.JValue => JsonAST.JValue
+      func: JsonAST.JValue[?] => JsonAST.JValue[?]
   ): GUIDJsExp =
     jsonCall_*(
       jsCalcValue,

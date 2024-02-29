@@ -15,6 +15,7 @@ import Helpers._
 import js._
 import provider._
 import http.rest.RestContinuation
+import scala.reflect.ClassTag
 
 class SJBridge {
   def s = S
@@ -948,12 +949,13 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * AJAX callback. You can also separately register a comet to receive updates
     * like this using {S.addComet}.
     */
+  // SCALA3 Using ClassTag instead of Manifest
   def findOrCreateComet[T <: LiftCometActor](
       cometName: Box[String],
       cometHtml: NodeSeq,
       cometAttributes: Map[String, String],
       receiveUpdatesOnPage: Boolean
-  )(implicit cometManifest: Manifest[T]): Box[T] = {
+  )(implicit cometManifest: ClassTag[T]): Box[T] = {
     for {
       session <- session ?~ "Comet lookup and creation requires a session."
       cometActor <- session
@@ -2979,7 +2981,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @return
     *   ( JsonCall, JsCmd )
     */
-  def createJsonFunc(f: PFPromoter[JValue, JsCmd]): (JsonCall, JsCmd) =
+  // SCALA3 Adding JValue generic parameter type
+  def createJsonFunc(f: PFPromoter[JValue[?], JsCmd]): (JsonCall, JsCmd) =
     createJsonFunc(Empty, Empty, f)
 
   /** Build a handler for incoming JSON commands based on the new Json Parser
@@ -3013,10 +3016,11 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @return
     *   ( JsonCall, JsCmd )
     */
+  // SCALA3 Adding JValue generic parameter type
   def createJsonFunc(
       name: Box[String],
       onError: Box[JsCmd],
-      pfp: PFPromoter[JValue, JsCmd]
+      pfp: PFPromoter[JValue[?], JsCmd]
   ): (JsonCall, JsCmd) = {
     functionLifespan(true) {
       val key = formFuncName

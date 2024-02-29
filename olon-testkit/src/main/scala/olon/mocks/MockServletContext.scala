@@ -99,9 +99,10 @@ class MockServletContext(var target: String) extends ServletContext {
   def log(msg: String) = println("MockServletContext.log: " + msg)
   def getContextPath(): String = null
 
+  // SCALA3 Using `?` instead of `_`
   def addFilter(
       filterName: String,
-      filterClass: Class[_ <: Filter]
+      filterClass: Class[? <: Filter]
   ): FilterRegistration.Dynamic = null
 
   def addFilter(
@@ -114,15 +115,17 @@ class MockServletContext(var target: String) extends ServletContext {
       className: String
   ): FilterRegistration.Dynamic = null
 
-  def addListener(listenerClass: Class[_ <: java.util.EventListener]): Unit = ()
+  // SCALA3 Using `?` instead of `_`
+  def addListener(listenerClass: Class[? <: java.util.EventListener]): Unit = ()
 
   def addListener[T <: java.util.EventListener](listener: T): Unit = ()
 
   def addListener(listenerClass: String): Unit = ()
 
+  // SCALA3 Using `?` instead of `_`
   def addServlet(
       servletName: String,
-      servletClass: Class[_ <: Servlet]
+      servletClass: Class[? <: Servlet]
   ): ServletRegistration.Dynamic = null
 
   def addServlet(
@@ -161,7 +164,8 @@ class MockServletContext(var target: String) extends ServletContext {
   def getFilterRegistration(filterName: String): FilterRegistration =
     null
 
-  def getFilterRegistrations(): java.util.Map[String, _ <: FilterRegistration] =
+  // SCALA3 Using `?` instead of `_`
+  def getFilterRegistrations(): java.util.Map[String, ? <: FilterRegistration] =
     null
 
   def getJspConfigDescriptor(): descriptor.JspConfigDescriptor =
@@ -170,8 +174,9 @@ class MockServletContext(var target: String) extends ServletContext {
   def getServletRegistration(servletName: String): ServletRegistration =
     null
 
+  // SCALA3 Using `?` instead of `_`
   def getServletRegistrations()
-      : java.util.Map[String, _ <: ServletRegistration] = null
+      : java.util.Map[String, ? <: ServletRegistration] = null
 
   def getSessionCookieConfig(): SessionCookieConfig = null
 
