@@ -19,7 +19,8 @@ trait AbstractScreen extends Factory with Loggable {
 
   protected type Errors = List[FieldError]
 
-  @volatile private[this] var _fieldList: List[() => FieldContainer] = Nil
+  // SCALA3 Using `private` instead of `private[this]`
+  @volatile private var _fieldList: List[() => FieldContainer] = Nil
 
   /** Any additional parameters that need to be put on the form (e.g., mime
     * type)
@@ -171,11 +172,14 @@ trait AbstractScreen extends Factory with Loggable {
 
     def toForm: Box[NodeSeq] = {
       val func: Box[(ValueType, ValueType => Any) => NodeSeq] =
-        AbstractScreen.this.vendForm(manifest) or otherFuncVendors(manifest) or
-          LiftRules.vendForm(manifest)
+        AbstractScreen.this
+          .vendForm(manifest)
+          .or(otherFuncVendors(manifest))
+          .or(LiftRules.vendForm(manifest))
 
+      // SCALA3 Removing `_` for passing function as a value
       func
-        .map(f => f(is, set _))
+        .map(f => f(is, set))
         .filter(_ => editable_?)
         .map(ns => SHtml.ElemAttr.applyToAllElems(ns, formElemAttrs))
     }

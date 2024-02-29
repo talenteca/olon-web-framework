@@ -72,13 +72,15 @@ private[http] case class NodeAndEventJs(node: Node, js: JsCmd) {
   *     that element.
   *   - Provides for caller-specific additional processing for each node.
   */
-private[http] final object HtmlNormalizer {
+// SCALA3 Removing innecesary `final` from an object declaration
+private[http] object HtmlNormalizer {
   // Fix URLs using Req.normalizeHref and extract JS event attributes for
   // putting into page JS. Returns a triple of:
   //  - The optional id that was found in this set of attributes.
   //  - The normalized metadata.
   //  - A list of extracted `EventAttribute`s.
-  private[this] def normalizeUrlAndExtractEvents(
+  // SCALA3 Using `private` instead of `private[this]`
+  private def normalizeUrlAndExtractEvents(
       attributeToNormalize: String,
       attributes: MetaData,
       contextPath: String,
@@ -180,7 +182,8 @@ private[http] final object HtmlNormalizer {
 
   // Given an element id and the `EventAttribute`s to apply to elements with
   // that id, return a JsCmd that binds all those event handlers to that id.
-  private[this] def jsForEventAttributes(
+  // SCALA3 Using `private` instead of `private[this]`
+  private def jsForEventAttributes(
       elementId: String,
       eventAttributes: List[EventAttribute]
   ): JsCmd = {

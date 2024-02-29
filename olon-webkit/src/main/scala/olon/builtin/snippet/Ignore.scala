@@ -10,7 +10,8 @@ import scala.xml._
 object Ignore extends DispatchSnippet with Loggable {
 
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 Removing `_` for passing function as a value
+    render
   }
 
   def render(kids: NodeSeq): NodeSeq = {

@@ -9,7 +9,8 @@ import scala.xml._
 object Children extends DispatchSnippet {
 
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 removing `_` for passing function as a value
+    render
   }
 
   /** Returns the child nodes:

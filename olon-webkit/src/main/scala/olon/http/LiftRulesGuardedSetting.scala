@@ -69,26 +69,31 @@ import LiftRulesGuardedSetting._
 class LiftRulesGuardedSetting[T](val name: String, val default: T)
     extends LiftValue[T]
     with HasCalcDefaultValue[T] {
-  private[this] var v: T = default
-  private[this] var lastSet: Option[StackTrace] = None
-  private[this] var lastRead: Option[StackTrace] = None
+  // SCALA3 Using `private` instead of `private[this]`
+  private var v: T = default
+  private var lastSet: Option[StackTrace] = None
+  private var lastRead: Option[StackTrace] = None
 
-  private[this] def writeAfterReadMessage =
+  // SCALA3 Using `private` instead of `private[this]`
+  private def writeAfterReadMessage =
     s"LiftRules.$name was set after already being read! " +
       s"Review the stacktrace below to see where the value was last read. "
 
-  private[this] def writeAfterBootMessage =
+  // SCALA3 Using `private` instead of `private[this]`
+  private def writeAfterBootMessage =
     s"LiftRules.$name set after Lift finished booting. " +
       s"Review the stacktrace below to see where settings are being changed after boot time. "
 
-  private[this] def trimmedStackTrace(t: Throwable): StackTrace = {
+  // SCALA3 Using `private` instead of `private[this]`
+  private def trimmedStackTrace(t: Throwable): StackTrace = {
     val toIgnore = Set("LiftRulesGuardedSetting", "LiftValue")
     t.getStackTrace.dropWhile(e =>
-      toIgnore.find(e.getClassName contains _).isDefined
+      toIgnore.find(e.getClassName.contains(_)).isDefined
     )
   }
 
-  private[this] def currentStackTrace: StackTrace = trimmedStackTrace(
+  // SCALA3 Using `private` instead of `private[this]`
+  private def currentStackTrace: StackTrace = trimmedStackTrace(
     new Exception
   )
 

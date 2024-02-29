@@ -15,7 +15,8 @@ import Helpers._
 
 /** Used to track state for LiftMerge's HTML normalization/merging process.
   */
-private[this] case class HtmlState(
+// SCALA3 Using `private` instead of `private[this]`
+private case class HtmlState(
     htmlDescendant: Boolean = false, // any descendant of HTML
     headChild: Boolean = false, // direct child of a HEAD in its proper place
     bodyDescendant: Boolean = false, // any descendant of BODY
@@ -35,7 +36,8 @@ private[http] trait LiftMerge {
   }
 
   // Gather all page-specific JS into one JsCmd.
-  private[this] def assemblePageSpecificJavaScript(eventJs: JsCmd): JsCmd = {
+  // SCALA3 Using `private` instead of `private[this]`
+  private def assemblePageSpecificJavaScript(eventJs: JsCmd): JsCmd = {
     val allJs =
       LiftRules.javaScriptSettings
         .vend()
@@ -207,43 +209,42 @@ private[http] trait LiftMerge {
               case other =>
                 other
             }
-            .map {
-              normalizedResults: NodeAndEventJs =>
-                node match {
-                  case e: Elem
-                      if e.label == "node" &&
-                        e.prefix == "lift_deferred" =>
-                    val deferredNodes: Seq[NodesAndEventJs] = {
-                      for {
-                        idAttribute <- e.attributes("id").take(1)
-                        id = idAttribute.text
-                        nodes <- processedSnippets.get(id)
-                      } yield {
-                        normalizeMergeAndExtractEvents(nodes, startingState)
-                      }
-                    }.toSeq
-
-                    deferredNodes.foldLeft(soFar.append(normalizedResults))(
-                      _ append _
-                    )
-
-                  case _ =>
-                    if (headChild) {
-                      headChildren ++= normalizedResults.node
-                    } else if (headInBodyChild) {
-                      addlHead ++= normalizedResults.node
-                    } else if (tailInBodyChild) {
-                      addlTail ++= normalizedResults.node
-                    } else if (_bodyChild && !bodyHead && !bodyTail) {
-                      bodyChildren ++= normalizedResults.node
+            .map { (normalizedResults: NodeAndEventJs) =>
+              node match {
+                case e: Elem
+                    if e.label == "node" &&
+                      e.prefix == "lift_deferred" =>
+                  val deferredNodes: Seq[NodesAndEventJs] = {
+                    for {
+                      idAttribute <- e.attributes("id").take(1)
+                      id = idAttribute.text
+                      nodes <- processedSnippets.get(id)
+                    } yield {
+                      normalizeMergeAndExtractEvents(nodes, startingState)
                     }
+                  }.toSeq
 
-                    if (bodyHead || bodyTail) {
-                      soFar.append(normalizedResults.js)
-                    } else {
-                      soFar.append(normalizedResults)
-                    }
-                }
+                  deferredNodes.foldLeft(soFar.append(normalizedResults))(
+                    _.append(_)
+                  )
+
+                case _ =>
+                  if (headChild) {
+                    headChildren ++= normalizedResults.node
+                  } else if (headInBodyChild) {
+                    addlHead ++= normalizedResults.node
+                  } else if (tailInBodyChild) {
+                    addlTail ++= normalizedResults.node
+                  } else if (_bodyChild && !bodyHead && !bodyTail) {
+                    bodyChildren ++= normalizedResults.node
+                  }
+
+                  if (bodyHead || bodyTail) {
+                    soFar.append(normalizedResults.js)
+                  } else {
+                    soFar.append(normalizedResults)
+                  }
+              }
             } getOrElse {
             soFar
           }
@@ -316,9 +317,11 @@ private[http] trait LiftMerge {
           ("data-lift-gc" -> RenderVersion.get) ::
             (
               if (autoIncludeComet) {
-                ("data-lift-session-id" -> (S.session.map(
-                  _.uniqueId
-                ) openOr "xx")) ::
+                ("data-lift-session-id" -> (S.session
+                  .map(
+                    _.uniqueId
+                  )
+                  .openOr("xx"))) ::
                   S.requestCometVersions.is.toList.map {
                     case CometVersionPair(guid, version) =>
                       (s"data-lift-comet-$guid" -> version.toString)

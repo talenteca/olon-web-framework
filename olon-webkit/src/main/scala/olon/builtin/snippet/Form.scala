@@ -18,10 +18,11 @@ import Helpers._
   */
 object Form extends DispatchSnippet {
 
+  // SCALA3 Removing `_` for passing function as a value
   def dispatch: DispatchIt = {
-    case "render" => render _
-    case "ajax"   => render _
-    case "post"   => post _
+    case "render" => render
+    case "ajax"   => render
+    case "post"   => post
   }
 
   /** Add the post method and postback (current URL) as action. If the multipart

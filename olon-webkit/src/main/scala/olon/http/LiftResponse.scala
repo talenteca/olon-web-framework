@@ -333,14 +333,17 @@ object JsonResponse {
   def apply(json: JsExp): LiftResponse =
     new JsonResponse(json, headers, cookies, 200)
 
-  def apply(json: JsonAST.JValue): LiftResponse =
+  // SCALA3 Adding JValue parameter type
+  def apply(json: JsonAST.JValue[?]): LiftResponse =
     apply(json, headers, cookies, 200)
 
-  def apply(json: JsonAST.JValue, code: Int): LiftResponse =
+  // SCALA3 Adding JValue parameter type
+  def apply(json: JsonAST.JValue[?], code: Int): LiftResponse =
     apply(json, headers, cookies, code)
 
+  // SCALA3 Adding JValue parameter type
   def apply(
-      _json: JsonAST.JValue,
+      _json: JsonAST.JValue[?],
       _headers: List[(String, String)],
       _cookies: List[HTTPCookie],
       code: Int
@@ -355,7 +358,8 @@ object JsonResponse {
     )
   }
 
-  lazy val jsonPrinter: JsonAST.JValue => String =
+  // SCALA3 Adding JValue parameter type
+  lazy val jsonPrinter: JsonAST.JValue[?] => String =
     LiftRules.jsonOutputConverter.vend
 }
 
@@ -564,7 +568,7 @@ object DoRedirectResponse {
 }
 
 object RedirectWithState {
-  
+
   // SCALA3 using `x*` instead of `x: _*`
   def apply(
       uri: String,
@@ -722,7 +726,7 @@ trait NodeResponse extends LiftResponse {
   def flipDocTypeForIE6 = false
 
   protected def writeDocType(writer: Writer): Unit = {
-    val doc: String = docType.map(_ + "\n") openOr ""
+    val doc: String = docType.map(_ + "\n").openOr("")
     val encoding: String = if (!includeXmlVersion) "" else _encoding
 
     if (flipDocTypeForIE6 && isIE6) {
@@ -772,7 +776,7 @@ trait XmlNodeResponse extends LiftResponse {
   def encoding: String = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 
   protected def writeDocType(writer: Writer): Unit = {
-    val doc: String = docType.map(_ + "\n") openOr ""
+    val doc: String = docType.map(_ + "\n").openOr("")
 
     writer.append(encoding)
     writer.append(doc)
@@ -833,10 +837,10 @@ case class XhtmlResponse(
   }
 
   override protected lazy val _encoding: String =
-    htmlProperties.encoding openOr ""
+    htmlProperties.encoding.openOr("")
 
   val headers: List[(String, String)] =
-    _headers.find(_._1 equalsIgnoreCase "content-type") match {
+    _headers.find(_._1.equalsIgnoreCase("content-type")) match {
       case Some(_) => _headers
       case _ =>
         htmlProperties.contentType match {
@@ -925,10 +929,10 @@ object XmlResponse {
 
   /** Additional headers for the XmlResponse
     */
-  def addlHeaders: List[(String, String)] = _addlHeaders.box openOr Nil
+  def addlHeaders: List[(String, String)] = _addlHeaders.box.openOr(Nil)
 
   def withHeaders[T](headers: (String, String)*)(f: => T): T = {
-    val cur = _addlHeaders.box openOr Nil
+    val cur = _addlHeaders.box.openOr(Nil)
     _addlHeaders.doWith(headers.toList ::: cur)(f)
   }
 

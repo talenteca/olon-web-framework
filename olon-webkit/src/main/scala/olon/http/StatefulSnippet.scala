@@ -32,7 +32,8 @@ import util._
   * } </pre>
   */
 trait StatefulSnippet extends DispatchSnippet {
-  private[this] var _names: Set[String] = Set()
+  // SCALA3 Using `private` instead of `private[this]`
+  private var _names: Set[String] = Set()
   def addName(name: String): Unit = {
     synchronized {
       _names = _names + name

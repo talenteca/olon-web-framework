@@ -107,7 +107,8 @@ final case class DataAttributeProcessorAnswerFuture(
 object LiftRules extends LiftRulesMocker {
   lazy val prodInstance: LiftRules = new LiftRules()
 
-  private[this] val devOrTest = Props.devMode || Props.testMode
+  // SCALA3 Using `private` instead of `private[this]`
+  private val devOrTest = Props.devMode || Props.testMode
 
   /** Get the real instance of LiftRules
     */
@@ -161,13 +162,6 @@ object LiftRules extends LiftRulesMocker {
     * should be handled by lift rather than the default handler
     */
   type LiftRequestPF = PartialFunction[Req, Boolean]
-
-  /*
-  private[this] var _doneBoot = false
-  private[http] def doneBoot = _doneBoot
-
-  private[http] def doneBoot_=(in: Boolean) {_doneBoot = in}
-   */
 
   /** Holds the failure information when a snippet can not be executed.
     */
@@ -232,9 +226,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     import json.{prettyRender, compactRender}
 
     if (Props.devMode) {
-      prettyRender _
+      // SCALA3 Removing `_` for passing function as a value
+      prettyRender
     } else {
-      compactRender _
+      // SCALA3 Removing `_` for passing function as a value
+      compactRender
     }
   }) {}
 
@@ -274,7 +270,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     (BasicResponse, HTTPResponse, List[(String, String)], Box[Req]) => Any
   ]
 
-  private[this] lazy val defaultSecurityRules = SecurityRules()
+  // SCALA3 Using `private` instead of `private[this]`
+  private lazy val defaultSecurityRules = SecurityRules()
 
   /** The security rules used by Lift to secure this application. These mostly
     * relate to HTTPS handling and HTTP `Content-Security-Policy`. See the

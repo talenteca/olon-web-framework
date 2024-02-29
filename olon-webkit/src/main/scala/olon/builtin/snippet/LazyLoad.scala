@@ -17,7 +17,8 @@ import comet.AsyncRenderComet
   */
 object LazyLoad extends DispatchSnippet {
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 Removing `_` for passing function as a value
+    render
   }
 
   /** If you need to provide a custom `renderer` function, perhaps because you

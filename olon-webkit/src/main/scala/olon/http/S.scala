@@ -246,7 +246,8 @@ object S extends S {
     def duplicate(newOwner: String): AFuncHolder =
       new ProxyFuncHolder(this, Full(newOwner))
 
-    @volatile private[this] var _lastSeen: Long = millis
+    // SCALA3 Using `private` instead of `private[this]`
+    @volatile private var _lastSeen: Long = millis
 
     private[http] def lastSeen = _lastSeen
 
@@ -254,7 +255,8 @@ object S extends S {
 
     def sessionLife: Boolean = _sessionLife
 
-    private[this] val _sessionLife: Boolean = functionLifespan_?
+    // SCALA3 Using `private` instead of `private[this]`
+    private val _sessionLife: Boolean = functionLifespan_?
   }
 
   /** We create one of these dudes and put it

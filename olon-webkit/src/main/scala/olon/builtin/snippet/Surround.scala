@@ -10,7 +10,8 @@ import scala.xml._
 object Surround extends DispatchSnippet {
 
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 Removing `_` for passing function as a value
+    render
   }
 
   def render(kids: NodeSeq): NodeSeq =
@@ -26,7 +27,7 @@ object Surround extends DispatchSnippet {
 
       WithParamVar.doWith(Map()) {
         lazy val mainParam = (
-          S.attr("at") openOr "main",
+          S.attr("at").openOr("main"),
           eatDiv(ctx.processSurroundAndInclude(PageName.get, kids))
         )
         lazy val paramsMap = {

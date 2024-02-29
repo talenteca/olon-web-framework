@@ -248,7 +248,8 @@ final case class OldHtmlProperties(userAgent: Box[String])
     }
   }
 
-  def htmlParser: InputStream => Box[NodeSeq] = PCDataXmlParser.apply _
+  // SCALA3 Removing `_` for passing function as a value
+  def htmlParser: InputStream => Box[NodeSeq] = PCDataXmlParser.apply
 
   def htmlWriter: (Node, Writer) => Unit =
     (n: Node, w: Writer) => {
@@ -282,13 +283,13 @@ final case class OldHtmlProperties(userAgent: Box[String])
     }
 
   val html5FormsSupport: Boolean = {
-    val r = S.request openOr Req.nil
+    val r = S.request.openOr(Req.nil)
     r.isSafari5 || r.isFirefox36 || r.isFirefox40 ||
     r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
-    LiftRules.maxConcurrentRequests.vend(S.request openOr Req.nil)
+    LiftRules.maxConcurrentRequests.vend(S.request.openOr(Req.nil))
 }
 
 /** If you're going to use HTML5, then this is the set of properties to use
@@ -302,7 +303,8 @@ final case class Html5Properties(userAgent: Box[String])
     Full("text/html; charset=utf-8")
   }
 
-  def htmlParser: InputStream => Box[Elem] = Html5.parse _
+  // SCALA3 Removing `_` for passing function as a value
+  def htmlParser: InputStream => Box[Elem] = Html5.parse
 
   def htmlWriter: (Node, Writer) => Unit =
     Html5.write(_, _, false, !LiftRules.convertToEntity.vend)
@@ -310,13 +312,13 @@ final case class Html5Properties(userAgent: Box[String])
   def htmlOutputHeader: Box[String] = docType.map(_.trim + "\n")
 
   val html5FormsSupport: Boolean = {
-    val r = S.request openOr Req.nil
+    val r = S.request.openOr(Req.nil)
     r.isSafari5 || r.isFirefox36 || r.isFirefox40 ||
     r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
-    LiftRules.maxConcurrentRequests.vend(S.request openOr Req.nil)
+    LiftRules.maxConcurrentRequests.vend(S.request.openOr(Req.nil))
 }
 
 /** If you're going to use HTML5 out, but want XHTML in (so you can have mixed
@@ -332,7 +334,8 @@ final case class XHtmlInHtml5OutProperties(userAgent: Box[String])
     Full("text/html; charset=utf-8")
   }
 
-  def htmlParser: InputStream => Box[NodeSeq] = PCDataXmlParser.apply _
+  // SCALA3 Removing `_` for passing function as a value
+  def htmlParser: InputStream => Box[NodeSeq] = PCDataXmlParser.apply
 
   def htmlWriter: (Node, Writer) => Unit =
     Html5.write(_, _, false, !LiftRules.convertToEntity.vend)
@@ -340,11 +343,11 @@ final case class XHtmlInHtml5OutProperties(userAgent: Box[String])
   def htmlOutputHeader: Box[String] = docType.map(_ + "\n")
 
   val html5FormsSupport: Boolean = {
-    val r = S.request openOr Req.nil
+    val r = S.request.openOr(Req.nil)
     r.isSafari5 || r.isFirefox36 || r.isFirefox40 ||
     r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
-    LiftRules.maxConcurrentRequests.vend(S.request openOr Req.nil)
+    LiftRules.maxConcurrentRequests.vend(S.request.openOr(Req.nil))
 }

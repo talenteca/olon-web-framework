@@ -6,8 +6,9 @@ import org.mockito.Mockito._
 
 object OfflineRequestSnapshotSpec extends WebSpec {
 
-  private[this] val X_SSL = "X-SSL"
-  private[this] val xSSLHeader = HTTPParam(X_SSL, List("true")) :: Nil
+  // SCALA3 Using `private` instead of `private[this]`
+  private val X_SSL = "X-SSL"
+  private val xSSLHeader = HTTPParam(X_SSL, List("true")) :: Nil
 
   "OfflineRequestSnapshot" should {
     "have a 'headers' method that returns the list of headers with a given name" in {
@@ -59,7 +60,8 @@ object OfflineRequestSnapshotSpec extends WebSpec {
     }
   }
 
-  private[this] def getRequestSnapshot(
+  // SCALA3 Using `private` instead of `private[this]`
+  private def getRequestSnapshot(
       originalPort: Int,
       headers: List[HTTPParam] = Nil,
       params: List[HTTPParam] = Nil

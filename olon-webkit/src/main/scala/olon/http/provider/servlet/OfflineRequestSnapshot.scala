@@ -16,16 +16,20 @@ private[servlet] class OfflineRequestSnapshot(
 ) extends HTTPRequest {
 
   // SCALA3 using `x*` instead of `x: _*`
-  private[this] val _cookies = List(req.cookies*)
+  // SCALA3 Using `private` instead of `private[this]`
+  private val _cookies = List(req.cookies*)
 
   // SCALA3 using `x*` instead of `x: _*`
-  private[this] val _headers = List(req.headers*)
+  // SCALA3 Using `private` instead of `private[this]`
+  private val _headers = List(req.headers*)
 
   // SCALA3 using `x*` instead of `x: _*`
-  private[this] val _params = List(req.params*)
+  // SCALA3 Using `private` instead of `private[this]`
+  private val _params = List(req.params*)
 
   // SCALA3 using `x*` instead of `x: _*`
-  private[this] val _serverPort = req.serverPort
+  // SCALA3 Using `private` instead of `private[this]`
+  private val _serverPort = req.serverPort
 
   def cookies: List[HTTPCookie] = _cookies
 

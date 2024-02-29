@@ -674,8 +674,9 @@ class LiftServlet extends Loggable {
             })
 
             val what2 = what.flatMap {
-              case js: JsCmd       => List(js)
-              case jv: JValue      => List(jv)
+              case js: JsCmd => List(js)
+              // SCALA3 Adding JValue parameter type matching
+              case jv: JValue[_]   => List(jv)
               case n: NodeSeq      => List(n)
               case js: JsCommands  => List(js)
               case r: LiftResponse => List(r)
@@ -684,7 +685,8 @@ class LiftServlet extends Loggable {
 
             val ret: LiftResponse = what2 match {
               case (json: JsObj) :: Nil => JsonResponse(json)
-              case (jv: JValue) :: Nil  => JsonResponse(jv)
+              // SCALA3 Adding JValue parameter type matching
+              case (jv: JValue[_]) :: Nil => JsonResponse(jv)
               case (js: JsCmd) :: xs => {
                 (JsCommands(S.noticesToJsCmd :: Nil) &
                   (js :: (xs.collect { case js: JsCmd =>
@@ -825,7 +827,9 @@ class LiftServlet extends Loggable {
       val ret: Box[LiftResponse] =
         nextAction match {
           case Left(future) =>
-            val result = runAjax(liftSession, requestState) map CachedResponse
+            // SCALA3 Adding explicit apply call
+            val result =
+              runAjax(liftSession, requestState).map(CachedResponse.apply)
 
             if (result.exists(_.failed_?)) {
               // The request failed. The client will retry it, so
@@ -899,7 +903,7 @@ class LiftServlet extends Loggable {
   private object BeginContinuation
 
   private lazy val cometTimeout: Long =
-    (LiftRules.cometRequestTimeout openOr 120) * 1000L
+    (LiftRules.cometRequestTimeout.openOr(120)) * 1000L
 
   private def setupContinuation(
       request: Req,

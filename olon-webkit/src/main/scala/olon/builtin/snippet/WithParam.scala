@@ -17,7 +17,8 @@ object WithParamVar extends RequestVar[Map[String, NodeSeq]](Map.empty)
 object WithParam extends DispatchSnippet {
 
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 Removing `_` for passing function as a value
+    render
   }
 
   /** Evaluates the body and stores it in the WithParam RequestVar map. This map
@@ -29,7 +30,7 @@ object WithParam extends DispatchSnippet {
       ctx <- S.session ?~ ("FIX" + "ME: Invalid session")
       _ <- S.request ?~ ("FIX" + "ME: Invalid request")
     } yield {
-      val name: String = S.attr("name") openOr "main"
+      val name: String = S.attr("name").openOr("main")
       val body = ctx.processSurroundAndInclude(PageName.get, kids)
       WithParamVar.atomicUpdate(_ + (name -> body))
       NodeSeq.Empty

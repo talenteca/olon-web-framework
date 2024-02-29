@@ -712,7 +712,7 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "substitute multiple Strings with a List by id" in {
-      (("#foo".replaceWith ("hello")) &
+      (("#foo".replaceWith("hello")) &
         ("#baz".replaceWith(List("bye", "bye"))))(
         <b><div id="baz">Hello</div><span id="foo"/></b>
       ) must_== (NodeSeq fromSeq <b>{Text("bye")}{Text("bye")}{
@@ -945,12 +945,14 @@ class CssBindHelpersSpec extends Specification with XmlMatchers with Loggable {
     }
 
     "list of Nodes" in {
-      val answer = (("#moose *".replaceWith(List[NodeSeq](
-        <i>"a"</i>,
-        Text("b"),
-        Text("c"),
-        <b>woof</b>
-      ))) &
+      val answer = (("#moose *".replaceWith(
+        List[NodeSeq](
+          <i>"a"</i>,
+          Text("b"),
+          Text("c"),
+          <b>woof</b>
+        )
+      )) &
         ClearClearable).apply(<ul>
           <li id="moose">first</li>
           <li class="clearable">second</li>

@@ -32,7 +32,8 @@ object LAFutureWithSession {
     }
   }
 
-  private[this] def withSession[T](
+  // SCALA3 Using `private` instead of `private[this]`
+  private def withSession[T](
       task: => T,
       scheduler: LAScheduler
   ): LAFuture[T] = {
@@ -40,13 +41,17 @@ object LAFutureWithSession {
 
       def around[S](fn: () => S): () => S = {
         val session =
-          S.session openOrThrowException "LiftSession not available in this thread context"
+          S.session.openOrThrowException(
+            "LiftSession not available in this thread context"
+          )
         session.buildDeferredFunction(fn)
       }
 
       def around[A, S](fn: (A) => S): (A) => S = {
         val session =
-          S.session openOrThrowException "LiftSession not available in this thread context"
+          S.session.openOrThrowException(
+            "LiftSession not available in this thread context"
+          )
         session.buildDeferredFunction(fn)
       }
     }
@@ -54,7 +59,8 @@ object LAFutureWithSession {
     LAFuture.build(task, scheduler, Full(sessionContext))
   }
 
-  private[this] def withFailure[T](
+  // SCALA3 Using `private` instead of `private[this]`
+  private def withFailure[T](
       failure: Failure,
       scheduler: LAScheduler
   ): LAFuture[T] = {

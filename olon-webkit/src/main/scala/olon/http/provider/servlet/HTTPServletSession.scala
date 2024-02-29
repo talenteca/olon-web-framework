@@ -7,7 +7,8 @@ import jakarta.servlet.http._
 import olon.common._
 
 class HTTPServletSession(session: HttpSession) extends HTTPSession {
-  private[this] val servletSessionIdentifier =
+  // SCALA3 Using `private` instead of `private[this]`
+  private val servletSessionIdentifier =
     LiftRules.servletSessionIdentifier
 
   def sessionId: String = session.getId

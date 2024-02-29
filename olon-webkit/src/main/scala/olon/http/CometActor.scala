@@ -14,6 +14,7 @@ import scala.xml.Elem
 import scala.xml.Node
 import scala.xml.NodeSeq
 import scala.xml.Text
+import scala.compiletime.uninitialized
 
 import JsCmds._
 import JE._
@@ -366,7 +367,8 @@ trait LiftCometActor
 
   /** If the predicate cell changes, the Dependent will be notified
     */
-  def predicateChanged(which: Cell[_]): Unit = {
+  // SCALA3 Using `?` instead of `_`
+  def predicateChanged(which: Cell[?]): Unit = {
     poke()
   }
 
@@ -412,7 +414,9 @@ trait BaseCometActor
 
   /** If we're going to cache the last rendering, here's the private cache
     */
-  private[this] var _realLastRendering: RenderOut = _
+  // SCALA3 Using `private` instead of `private[this]`
+  // SCALA3 Using `uninitialized` instead of `_`
+  private var _realLastRendering: RenderOut = uninitialized
 
   /** Get the current render clock for the CometActor
     * @return
@@ -482,11 +486,13 @@ trait BaseCometActor
       d.filter(d => (m - d.timestamp) < 120000L)
     }
 
-  private var _theSession: LiftSession = _
+  // Using `uninitialized` instead of `_`
+  private var _theSession: LiftSession = uninitialized
 
   def theSession = _theSession
 
-  @volatile private var _defaultHtml: NodeSeq = _
+  // Using `uninitialized` instead of `_`
+  @volatile private var _defaultHtml: NodeSeq = uninitialized
 
   /** The template that was passed to this component during comet
     * initializations
@@ -543,7 +549,7 @@ trait BaseCometActor
   def defaultPrefix: Box[String] = Empty
 
   private lazy val _defaultPrefix: String =
-    (defaultPrefix or _name) openOr "comet"
+    (defaultPrefix.or(_name)).openOr("comet")
 
   /** Set to 'true' if we should run "render" on every page load
     */
@@ -589,7 +595,7 @@ trait BaseCometActor
     * mechanism. If you use the jsonSend call, you will get a
     * JObject(JField("command", cmd), JField("param", params))
     */
-  def receiveJson(): PartialFunction[JsonAST.JValue, JsCmd] = Map()
+  def receiveJson(): PartialFunction[JsonAST.JValue[?], JsCmd] = Map()
 
   /** The JavaScript call that you use to send the data to the server. For
     * example: &lt;button onclick={jsonSend("Hello",

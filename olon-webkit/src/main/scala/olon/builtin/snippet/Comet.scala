@@ -12,12 +12,14 @@ import Helpers._
 
 object Comet extends DispatchSnippet with LazyLoggable {
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 removing `_` for passing function as a value
+    render
   }
 
   // Take the comet's internal container and annotate it with the unique
   // `containerId`.
-  private[this] def buildContainer(
+  // SCALA3 Using `private` instead of `private[this]`
+  private def buildContainer(
       cometHtml: NodeSeq,
       cometActor: LiftCometActor,
       containerId: String
@@ -96,9 +98,9 @@ object Comet extends DispatchSnippet with LazyLoggable {
   private def buildComet(cometHtml: NodeSeq): NodeSeq = {
     val theType: Box[String] = S.attr.~("type").map(_.text)
     val cometName: Box[String] =
-      S.currentAttr("name") or
-        S.currentAttr("metaname").flatMap(S.param) or
-        S.currentAttr("randomname").map(_ => Helpers.nextFuncName)
+      S.currentAttr("name")
+        .or(S.currentAttr("metaname").flatMap(S.param))
+        .or(S.currentAttr("randomname").map(_ => Helpers.nextFuncName))
 
     try {
       theType match {

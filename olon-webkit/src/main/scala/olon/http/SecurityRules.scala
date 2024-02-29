@@ -262,13 +262,16 @@ final case class ContentSecurityPolicy(
     }
   }
 
-  private[this] lazy val reportOnlyHeaders = {
+  // SCALA3 Using `private` instead of `private[this]`
+  private lazy val reportOnlyHeaders = {
     List(
       "Content-Security-Policy-Report-Only" -> contentSecurityPolicyString,
       "X-Content-Security-Policy-Report-Only" -> contentSecurityPolicyString
     )
   }
-  private[this] lazy val enforcedHeaders = {
+
+  // SCALA3 Using `private` instead of `private[this]`
+  private lazy val enforcedHeaders = {
     List(
       "Content-Security-Policy" -> contentSecurityPolicyString,
       "X-Content-Security-Policy" -> contentSecurityPolicyString
@@ -324,7 +327,8 @@ case class ContentSecurityPolicyViolation(
     originalPolicy: String
 )
 object ContentSecurityPolicyViolation extends LazyLoggable {
-  private[this] implicit val formats: Formats = DefaultFormats
+  // SCALA3 Using `private` instead of `private[this]`
+  private implicit val formats: Formats = DefaultFormats
 
   def defaultViolationHandler: DispatchPF = {
     case request @ Req(start :: "content-security-policy-report" :: Nil, _, _)

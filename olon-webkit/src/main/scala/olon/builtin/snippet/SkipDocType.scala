@@ -9,7 +9,8 @@ import scala.xml._
 object SkipDocType extends DispatchSnippet {
 
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 Removing `_` for passing function as a value
+    render
   }
 
   /** Useful if you need to omit the DocType from the returned html (calling the

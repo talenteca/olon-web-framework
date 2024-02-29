@@ -44,6 +44,7 @@ import common.Full
 object Msgs extends DispatchSnippet {
   // Dispatch to the render method no matter how we're called
   def dispatch: DispatchIt = { case _ =>
+    // SCALA3 Removing `_` for passing function as a value
     render
   }
 
@@ -55,7 +56,7 @@ object Msgs extends DispatchSnippet {
     */
   def render(styles: NodeSeq): NodeSeq = {
     // Capture the value for later AJAX updates
-    ShowAll(toBoolean(S.attr("showAll") or S.attr("showall")))
+    ShowAll(toBoolean(S.attr("showAll").or(S.attr("showall"))))
 
     // Extract user-specified titles and CSS classes for later use
     List(
@@ -101,9 +102,11 @@ object Msgs extends DispatchSnippet {
     // Determine which formatting function to use based on tag usage
     val f =
       if (ShowAll.is) {
-        S.messages _
+        // SCALA3 Removing `_` for passing function as a value
+        S.messages
       } else {
-        S.noIdMessages _
+        // SCALA3 Removing `_` for passing function as a value
+        S.noIdMessages
       }
 
     // Compute the formatted set of messages for a given input
@@ -116,7 +119,7 @@ object Msgs extends DispatchSnippet {
     ): NodeSeq = args match {
       case (messages, noticeType, ajaxStorage) =>
         // get current settings
-        val title = ajaxStorage.get.map(_.title) openOr Text("")
+        val title = ajaxStorage.get.map(_.title).openOr(Text(""))
         val styles = ajaxStorage.get.flatMap(_.cssClasses)
 
         // Compute the resulting div
@@ -159,11 +162,11 @@ object Msgs extends DispatchSnippet {
       default: T,
       wrap: JsCmd => T
   ): T =
-    LiftRules.noticesAutoFadeOut()(noticeType) map {
+    (LiftRules.noticesAutoFadeOut()(noticeType) map {
       case (duration, fadeTime) => {
         wrap(LiftRules.jsArtifacts.fadeOut(noticeType.id, duration, fadeTime))
       }
-    } openOr default
+    }).openOr(default)
 
   /** This method produces and appends a script element to lift's page script to
     * fade out the given notice type.

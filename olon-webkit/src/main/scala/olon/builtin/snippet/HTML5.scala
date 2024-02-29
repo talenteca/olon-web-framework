@@ -12,7 +12,8 @@ import scala.xml._
 object HTML5 extends DispatchSnippet {
 
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 Removing `_` for passing function as a value
+    render
   }
 
   def render(xhtml: NodeSeq): NodeSeq = {

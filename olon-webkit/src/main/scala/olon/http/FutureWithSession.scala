@@ -26,7 +26,8 @@ import scala.util.Try
   *   original `Future` instance that will be enriched with session and request
   *   access
   */
-private[http] class FutureWithSession[T](private[this] val delegate: Future[T])
+// SCALA3 Using `private` instead of `private[this]`
+private[http] class FutureWithSession[T](private val delegate: Future[T])
     extends Future[T] {
 
   import FutureWithSession.withCurrentSession
@@ -166,13 +167,17 @@ object FutureWithSession {
 
   private def withCurrentSession[T](task: () => T): () => T = {
     val session =
-      S.session openOrThrowException "LiftSession not available in this thread context"
+      S.session.openOrThrowException(
+        "LiftSession not available in this thread context"
+      )
     session.buildDeferredFunction(task)
   }
 
   private def withCurrentSession[A, T](task: (A) => T): (A) => T = {
     val session =
-      S.session openOrThrowException "LiftSession not available in this thread context"
+      S.session.openOrThrowException(
+        "LiftSession not available in this thread context"
+      )
     session.buildDeferredFunction(task)
   }
 }

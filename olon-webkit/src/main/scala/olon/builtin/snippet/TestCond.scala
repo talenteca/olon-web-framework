@@ -11,8 +11,10 @@ import scala.xml._
   */
 object TestCond extends DispatchSnippet {
   def dispatch: DispatchIt = {
-    case "loggedin" | "logged_in" | "LoggedIn" | "loggedIn"     => loggedIn _
-    case "loggedout" | "logged_out" | "LoggedOut" | "loggedOut" => loggedOut _
+    // SCALA3 Removing `_` for passing function as a value
+    case "loggedin" | "logged_in" | "LoggedIn" | "loggedIn" => loggedIn
+    // SCALA3 Removing `_` for passing function as a value
+    case "loggedout" | "logged_out" | "LoggedOut" | "loggedOut" => loggedOut
   }
 
   def loggedIn(xhtml: NodeSeq): NodeSeq =

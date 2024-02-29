@@ -479,7 +479,8 @@ class MockHttpServletRequest(
             .map(Helpers.internetDateFormatter.parse(_).getTime)
         }
       )
-      .flatMap(x => x).openOr(-1L)
+      .flatMap(x => x)
+      .openOr(-1L)
   }
 
   def getHeader(h: String): String = headers.get(h) match {

@@ -194,7 +194,10 @@ trait SHtml extends Loggable {
     *   the function ID and JavaScript that makes the call
     */
   // SCALA3 Adding JValue generic parameter type
-  def jsonCall(jsCalcValue: JsExp, func: JsonAST.JValue[?] => JsCmd): GUIDJsExp =
+  def jsonCall(
+      jsCalcValue: JsExp,
+      func: JsonAST.JValue[?] => JsCmd
+  ): GUIDJsExp =
     jsonCall_*(
       jsCalcValue,
       SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop)
@@ -1672,9 +1675,7 @@ trait SHtml extends Loggable {
             // SCALA3 using `x*` instead of `x: _*`
             val oldAttr: Map[String, String] =
               Map(
-                allEvent.flatMap(a =>
-                  e.attribute(a).map(v => a -> (v.text))
-                )*
+                allEvent.flatMap(a => e.attribute(a).map(v => a -> (v.text)))*
               )
 
             val newAttr = e.attributes.filter {

@@ -9,7 +9,8 @@ import util._
 
 object Tail extends DispatchSnippet {
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 Removing `_` for passing function as a value
+    render
   }
 
   def render(xhtml: NodeSeq): NodeSeq = <tail>{xhtml}</tail>
@@ -21,7 +22,8 @@ object Head extends DispatchSnippet {
   lazy val valid = Set("title", "base", "link", "meta", "style", "script")
 
   def dispatch: DispatchIt = { case _ =>
-    render _
+    // SCALA3 Removing `_` for passing function as a value
+    render
   }
 
   def render(_xhtml: NodeSeq): NodeSeq = {
@@ -47,8 +49,13 @@ object Head extends DispatchSnippet {
 
     <head>{
       if (
-        (S.attr("withResourceId") or S
-          .attr("withresourceid")).filter(Helpers.toBoolean).isDefined
+        (S.attr("withResourceId")
+          .or(
+            S
+              .attr("withresourceid")
+          )
+          .filter(Helpers.toBoolean)
+          .isDefined)
       ) {
         WithResourceId.render(xhtml)
       } else {
