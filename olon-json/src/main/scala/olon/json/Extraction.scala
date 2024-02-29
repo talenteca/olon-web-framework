@@ -13,7 +13,7 @@ import java.lang.{Short => JavaShort}
 import java.sql.Timestamp
 import java.util.Date
 import scala.collection.immutable.ArraySeq
-import scala.reflect.Manifest
+import scala.reflect.ClassTag
 
 /** Function to extract values from JSON AST using case classes.
   *

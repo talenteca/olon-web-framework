@@ -4,7 +4,7 @@ package common
 import java.util.{ArrayList => JavaArrayList}
 import java.util.{Iterator => JavaIterator}
 import scala.language.existentials
-import scala.reflect.Manifest
+import scala.reflect.ClassTag
 
 /** A bridge to make using Lift `[[Box]]` from Java easier.
   *
@@ -273,7 +273,7 @@ sealed trait BoxTrait extends OptionImplicits {
     */
   // SCALA3 using `AnyRef` instead of an existencial type just for
   // making the compiler happy
-  def asA[B](in: AnyRef)(implicit m: Manifest[B]): Box[B] = {
+  def asA[B](in: AnyRef)(implicit m: ClassTag[B]): Box[B] = {
     (Box !! in).asA[B]
   }
 
@@ -552,7 +552,7 @@ sealed abstract class Box[+A] extends Product with Serializable {
     * res1: olon.common.Box[Int] = Full(5)
     * }}}
     */
-  def asA[B](implicit m: Manifest[B]): Box[B]
+  def asA[B](implicit m: ClassTag[B]): Box[B]
 
   /** Returns an `[[scala.collection.Iterator Iterator]]` over the value
     * contained in this `Box`, if any.
@@ -883,7 +883,7 @@ final case class Full[+A](value: A) extends Box[A] {
     case _ => Empty
   }
 
-  override def asA[B](implicit m: Manifest[B]): Box[B] =
+  override def asA[B](implicit m: ClassTag[B]): Box[B] =
     this.isA(m.runtimeClass).asInstanceOf[Box[B]]
 
   override def ===[B >: A](to: B): Boolean = value == to
@@ -923,7 +923,7 @@ sealed abstract class EmptyBox extends Box[Nothing] with Serializable {
   override def ~>[T](errorCode: => T): ParamFailure[T] =
     ParamFailure("", Empty, Empty, errorCode)
 
-  def asA[B](implicit m: scala.reflect.Manifest[B]): olon.common.Box[B] = this
+  def asA[B](implicit m: ClassTag[B]): olon.common.Box[B] = this
 
   def dmap[B](dflt: => B)(f: Nothing => B): B = dflt
 
@@ -988,7 +988,7 @@ sealed case class Failure(
 
   override def isA[B](cls: Class[B]): Box[B] = this
 
-  override def asA[B](implicit m: Manifest[B]): Box[B] = this
+  override def asA[B](implicit m: ClassTag[B]): Box[B] = this
 
   private def chainList: List[Failure] = chain match {
     case Full(f) => f :: f.chainList

@@ -49,7 +49,8 @@ trait JValueGen {
     name <- identifier; value <- genJValue; id <- choose(0, 1000000)
   ) yield JField(name + id, value)
 
-  def genJValueClass: Gen[Class[_ <: JValue]] = oneOf(
+  // SCALA3 Using `?` instead of `_`
+  def genJValueClass: Gen[Class[? <: JValue]] = oneOf(
     JNull.getClass.asInstanceOf[Class[JValue]],
     JNothing.getClass.asInstanceOf[Class[JValue]],
     classOf[JInt],

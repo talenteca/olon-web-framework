@@ -609,8 +609,9 @@ trait BaseCometActor
     */
   def jsonToIncludeInCode: JsCmd = _jsonToIncludeCode
 
+  // SCALA3 Removing `_` for an explicit function call
   private lazy val (_sendJson, _jsonToIncludeCode) =
-    S.createJsonFunc(Full(_defaultPrefix), onJsonError, receiveJson _)
+    S.createJsonFunc(Full(_defaultPrefix), onJsonError, () => receiveJson())
 
   /** Set this method to true to have the Json call code included in the Comet
     * output
@@ -775,15 +776,16 @@ trait BaseCometActor
         case Full(who) => forwardMessageTo(l, who) // who forward l
         case _ =>
           if (when < lastRenderTime && !partialUpdateStream_?) {
+            // SCALA3 Removing `_` for passing function as a value
             toDo(
               AnswerRender(
                 new XmlOrJsCmd(
                   spanId,
                   lastRendering,
-                  buildSpan _,
+                  buildSpan,
                   notices.toList
                 ),
-                whosAsking openOr this,
+                whosAsking.openOr(this),
                 lastRenderTime,
                 wasLastFullRender
               )
@@ -807,7 +809,7 @@ trait BaseCometActor
                       false,
                       notices.toList
                     ),
-                    whosAsking openOr this,
+                    whosAsking.openOr(this),
                     hd.when,
                     false
                   )
@@ -861,15 +863,16 @@ trait BaseCometActor
               Empty
             }
 
+          // SCALA3 Removing `_` for passing function as a value
           reply(
             AnswerRender(
               new XmlOrJsCmd(
                 spanId,
                 out.openOr(lastRendering),
-                buildSpan _,
+                buildSpan,
                 notices.toList
               ),
-              whosAsking openOr this,
+              whosAsking.openOr(this),
               lastRenderTime,
               true
             )
@@ -972,7 +975,7 @@ trait BaseCometActor
               false,
               notices.toList
             ),
-            whosAsking openOr this,
+            whosAsking.openOr(this),
             time,
             false
           )
@@ -1079,9 +1082,10 @@ trait BaseCometActor
 
     val out = lastRendering
 
+    // SCALA3 Removing `_` for passing function as a value
     val rendered: AnswerRender =
       AnswerRender(
-        new XmlOrJsCmd(spanId, out, buildSpan _, notices.toList),
+        new XmlOrJsCmd(spanId, out, buildSpan, notices.toList),
         this,
         lastRenderTime,
         sendAll
@@ -1579,7 +1583,7 @@ case class RenderOut(
     RenderOut(
       xhtml,
       fixedXhtml,
-      script.map(_ & cmd) or Full(cmd),
+      script.map(_ & cmd).or(Full(cmd)),
       destroyScript,
       ignoreHtmlOnJs
     )

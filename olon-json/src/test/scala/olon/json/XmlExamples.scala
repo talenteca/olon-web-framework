@@ -154,14 +154,17 @@ object XmlExamples extends Specification {
   }
 
   "Example with multiple attributes, multiple nested elements " in {
-    val a1 = attrToObject("stats", "count", s => JInt(s.s.toInt)) _
-    val a2 = attrToObject("messages", "href", identity) _
+    // SCALA3 Removing `_` for passing function as a value
+    val a1 = attrToObject("stats", "count", s => JInt(s.s.toInt))
+    // SCALA3 Removing `_` for passing function as a value
+    val a2 = attrToObject("messages", "href", identity)
     val json = a1(a2(toJson(messageXml1)))
-    (json diff parse(expected1)) mustEqual Diff(JNothing, JNothing, JNothing)
+    (json.diff(parse(expected1))) mustEqual Diff(JNothing, JNothing, JNothing)
   }
 
   "Example with one attribute, one nested element " in {
-    val a = attrToObject("stats", "count", s => JInt(s.s.toInt)) _
+    // SCALA3 Removing `_` for passing function as a value
+    val a = attrToObject("stats", "count", s => JInt(s.s.toInt))
     compactRender(a(toJson(messageXml2))) mustEqual expected2
     compactRender(a(toJson(messageXml3))) mustEqual expected2
   }

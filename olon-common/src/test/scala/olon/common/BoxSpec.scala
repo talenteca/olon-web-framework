@@ -124,7 +124,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     }
     "define a 'flatMap' method transforming its value in another Box. If the value is transformed in a Full box, the total result is a Full box" in {
       Full(1) flatMap {
-        x: Int =>
+        (x: Int) =>
           if (x > 0) Full("full") else Empty
       } must_== Full("full")
     }
@@ -194,10 +194,11 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     "define a 'pass' method passing the can to a function and returning itself (alias: $)" in {
       var empty = false
       def emptyString(s: Box[String]) = s foreach {
-        c: String =>
+        (c: String) =>
           empty = c.isEmpty
       }
-      Full("") $ emptyString _
+      // SCALA3 Removing `_` for passing function as a value
+      Full("").$(emptyString)
       empty must beTrue
     }
     "define a 'run' method either returning a default value or applying a user-defined function on it" in {
@@ -328,7 +329,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       Empty map { _.toString } must beEmpty
     }
     "define a 'flatMap' method returning Empty" in {
-      Empty flatMap { _: Int => Full("full") } must beEmpty
+      Empty flatMap { (_: Int) => Full("full") } must beEmpty
     }
     "define a 'flatten' method returning Empty" in {
       Empty.flatten must beEmpty
@@ -423,7 +424,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
         Empty
       )
       Failure("error", Empty, Empty) flatMap {
-        x: String =>
+        (x: String) =>
           Full(x.toString)
       } must_== Failure("error", Empty, Empty)
       Failure("error", Empty, Empty).flatten must_== Failure(
@@ -593,14 +594,16 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       }
     }
 
+    // SCALA3 using `?` instead of `_`
     "return Empty in case of NPE and ignore list with NPE" in {
-      val ignore: List[Class[_]] = List(classOf[NullPointerException])
+      val ignore: List[Class[?]] = List(classOf[NullPointerException])
 
       Box.tryo(ignore)(throw new NullPointerException) must_== Empty
     }
 
+    // SCALA3 using `?` instead of `_`
     "return Failure(_, Full(NPE), _) in case of non empty ignore list without NPE" in {
-      val ignore: List[Class[_]] = List(classOf[IllegalArgumentException])
+      val ignore: List[Class[?]] = List(classOf[IllegalArgumentException])
 
       Box.tryo(ignore)(throw new NullPointerException) must beLike {
         case Failure(_, Full(ex), _) =>
@@ -608,8 +611,9 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       }
     }
 
+    // SCALA3 using `?` instead of `_`
     "not throw NPE in case of nullable ignore list" in {
-      val ignore: List[Class[_]] = null
+      val ignore: List[Class[?]] = null
 
       Box.tryo(ignore)(throw new IllegalArgumentException) must beLike {
         case Failure(_, Full(ex), _) =>

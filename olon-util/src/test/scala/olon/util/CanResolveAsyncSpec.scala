@@ -17,7 +17,8 @@ object CanResolveAsyncSpec extends Spec {
       val resolver = implicitly[CanResolveAsync[Future[String], String]]
 
       val receivedResolution = new LAFuture[String]
-      resolver.resolveAsync(myPromise.future, receivedResolution.satisfy _)
+      // SCALA3 Removing `_` for passing function as a value
+      resolver.resolveAsync(myPromise.future, receivedResolution.satisfy)
 
       myPromise.success("All done!")
 
@@ -30,7 +31,8 @@ object CanResolveAsyncSpec extends Spec {
       val resolver = implicitly[CanResolveAsync[LAFuture[String], String]]
 
       val receivedResolution = new LAFuture[String]
-      resolver.resolveAsync(myFuture, receivedResolution.satisfy _)
+      // SCALA3 Removing `_` for passing function as a value
+      resolver.resolveAsync(myFuture, receivedResolution.satisfy)
 
       myFuture.satisfy("Got it!")
 

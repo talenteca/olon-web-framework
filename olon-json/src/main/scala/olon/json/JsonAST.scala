@@ -716,7 +716,7 @@ object JsonAST {
       */
     def extract[A](implicit
         formats: Formats,
-        mf: scala.reflect.Manifest[A]
+        mf: Manifest[A]
     ): A =
       Extraction.extract(this)(formats, mf)
 
@@ -749,7 +749,7 @@ object JsonAST {
       */
     def extractOpt[A](implicit
         formats: Formats,
-        mf: scala.reflect.Manifest[A]
+        mf: Manifest[A]
     ): Option[A] =
       Extraction.extractOpt(this)(formats, mf)
 
@@ -773,7 +773,7 @@ object JsonAST {
       */
     def extractOrElse[A](
         default: => A
-    )(implicit formats: Formats, mf: scala.reflect.Manifest[A]): A =
+    )(implicit formats: Formats, mf: Manifest[A]): A =
       Extraction.extractOpt(this)(formats, mf).getOrElse(default)
 
     def toOpt: Option[JValue[?]] = this match {

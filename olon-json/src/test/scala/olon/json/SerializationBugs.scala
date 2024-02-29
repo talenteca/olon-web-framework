@@ -84,8 +84,10 @@ object SerializationBugs extends Specification {
   }
 
   "TypeInfo is not correctly constructed for customer serializer -- 970" in {
-    class SeqFormat extends Serializer[Seq[_]] {
-      val SeqClass = classOf[Seq[_]]
+    // SCALA3 Using `?` instead of `_`
+    class SeqFormat extends Serializer[Seq[?]] {
+      // SCALA3 Using `?` instead of `_`
+      val SeqClass = classOf[Seq[?]]
 
       def serialize(implicit format: Formats) = { case seq: Seq[_] =>
         JArray(seq.toList.map(Extraction.decompose))
@@ -93,11 +95,12 @@ object SerializationBugs extends Specification {
 
       def deserialize(implicit format: Formats) = {
         case (TypeInfo(SeqClass, parameterizedType), JArray(xs)) =>
+          // SCALA3 Using `?` instead of `_`
           val typeInfo = TypeInfo(
             parameterizedType
               .map(_.getActualTypeArguments()(0))
               .getOrElse(failure("No type parameter info for type Seq"))
-              .asInstanceOf[Class[_]],
+              .asInstanceOf[Class[?]],
             None
           )
           xs.map(x => Extraction.extract(x, typeInfo))
@@ -125,8 +128,9 @@ object SerializationBugs extends Specification {
   }
 
   "Either can't be deserialized with type hints" in {
+    // SCALA3 Using `?` instead of `_`
     implicit val formats =
-      DefaultFormats + FullTypeHints(classOf[Either[_, _]] :: Nil)
+      DefaultFormats + FullTypeHints(classOf[Either[?, ?]] :: Nil)
     val x = Eith(Left("hello"))
     val s = Serialization.write(x)
     read[Eith](s) mustEqual x

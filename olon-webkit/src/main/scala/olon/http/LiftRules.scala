@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{ConcurrentHashMap => CHash}
 import scala.reflect.Manifest
 import scala.xml._
+import scala.compiletime.uninitialized
 
 import common._
 import util._
@@ -678,7 +679,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * localization stuff. By default, Text(s) is returned, but you can change
     * this to attempt to parse the XML in the String and return the NodeSeq.
     */
-  @volatile var localizeStringToXml: String => NodeSeq = _stringToXml _
+  // SCALA3 Removing `_` for passing function as a value
+  @volatile var localizeStringToXml: String => NodeSeq = _stringToXml
 
   /** The base name of the resource bundle
     */
@@ -900,8 +902,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
   /** A function that takes the current HTTP request and returns the current
     */
+  // SCALA3 Removing `_` for passing function as a value
   @volatile var timeZoneCalculator: Box[HTTPRequest] => TimeZone =
-    defaultTimeZoneCalculator _
+    defaultTimeZoneCalculator
 
   def defaultTimeZoneCalculator(request: Box[HTTPRequest]): TimeZone = {
     logger.trace("Default time zone calculator for uri " + request.map(_.uri))
@@ -1221,7 +1224,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val deferredSnippetFailure: FactoryMaker[Failure => NodeSeq] =
     new FactoryMaker(() => {
-      failure: Failure =>
+      (failure: Failure) =>
         {
           if (Props.devMode)
             <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{
@@ -1348,7 +1351,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   @volatile var calculateContextPath: () => Box[String] = () => Empty
 
-  @volatile private var _context: HTTPContext = _
+  // SCALA3 Using `uninitialized` instead of `_`
+  @volatile private var _context: HTTPContext = uninitialized
 
   /** Should an exception be thrown on out of scope Session and RequestVar
     * access. By default, no.
@@ -1396,20 +1400,22 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     otherPackages = what.getName :: otherPackages
   }
 
-  private val defaultFinder = getClass.getResource _
+  // SCALA3 Removing `_` for explicit function call
+  private val defaultFinder = (path: String) => getClass.getResource(path)
 
   private def resourceFinder(name: String): java.net.URL =
     if (null eq _context) null else _context.resource(name)
 
   /** Obtain the resource URL by name
     */
-  @volatile var getResource: String => Box[java.net.URL] = defaultGetResource _
+  // SCALA3 Removing `_` for passing function as a value
+  @volatile var getResource: String => Box[java.net.URL] = defaultGetResource
 
   /** Obtain the resource URL by name
     */
   def defaultGetResource(name: String): Box[java.net.URL] =
     for {
-      rf <- (Box !! resourceFinder(name)) or (Box !! defaultFinder(name))
+      rf <- (Box !! resourceFinder(name)).or((Box !! defaultFinder(name)))
     } yield rf
 
   /** Open a resource by name and process its contents using the supplied
@@ -1513,7 +1519,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val earlyInStateless = RulesSeq[Box[Req] => Unit]
 
-  private var _configureLogging: () => Unit = _
+  // SCALA3 Using `uninitialized` instead of `_`
+  private var _configureLogging: () => Unit = uninitialized
 
   /** Holds the function that configures logging. Must be set before any loggers
     * are created
@@ -1631,8 +1638,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   /** Set a snippet failure handler here. The class and method for the snippet
     * are passed in
     */
+  // SCALA3 Removing `_` for passing function as a value
   val snippetFailedFunc =
-    RulesSeq[SnippetFailure => Unit].prepend(logSnippetFailure _)
+    RulesSeq[SnippetFailure => Unit].prepend(logSnippetFailure)
 
   private def logSnippetFailure(sf: SnippetFailure) =
     logger.info("Snippet Failure: " + sf)
@@ -1773,7 +1781,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
           css.map(str =>
             CssHelpers.fixCSS(
               new BufferedReader(new StringReader(str)),
-              prefix openOr (S.contextPath)
+              prefix.openOr(S.contextPath)
             ) match {
               case (Full(c), _) => CSSResponse(c)
               case (x, input) => {
@@ -1873,7 +1881,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   }
 
   @volatile var calcIE6ForResponse: () => Boolean = () =>
-    S.request.map(_.isIE6) openOr false
+    S.request.map(_.isIE6).openOr(false)
 
   @volatile var flipDocTypeForIE6 = true
 

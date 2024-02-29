@@ -65,8 +65,10 @@ class MockHttpServletRequest(
     */
   var charEncoding: String = "UTF-8" // HTTP's default encoding
 
+  // SCALA3 creating an internal alias for `body` for external usage of `body =`
   /** The raw body of the request. */
-  var body: Array[Byte] = Array()
+  private var _body: Array[Byte] = Array()
+  def body : Array[Byte] = _body
 
   /** Sets the body to the given string. The content type is set to
     * "text/plain".
@@ -82,7 +84,7 @@ class MockHttpServletRequest(
     * setting of charEncoding.
     */
   def body_=(s: String, contentType: String): Unit = {
-    body = s.getBytes(charEncoding)
+    _body = s.getBytes(charEncoding)
     this.contentType = contentType
   }
 
@@ -100,7 +102,7 @@ class MockHttpServletRequest(
     * setting of charEncoding.
     */
   def body_=(nodes: NodeSeq, contentType: String): Unit = {
-    body = nodes.toString.getBytes(charEncoding)
+    _body = nodes.toString.getBytes(charEncoding)
     this.contentType = contentType
   }
 
@@ -116,7 +118,7 @@ class MockHttpServletRequest(
   def body_=(jval: JValue[?], contentType: String): Unit = {
     import json.JsonAST
 
-    body = JsonAST.prettyRender(jval).getBytes(charEncoding)
+    _body = JsonAST.prettyRender(jval).getBytes(charEncoding)
     this.contentType = contentType
   }
 
@@ -377,12 +379,12 @@ class MockHttpServletRequest(
 
   def getCharacterEncoding(): String = charEncoding
 
-  def getContentLength(): Int = body.length
+  def getContentLength(): Int = _body.length
 
   def getContentType(): String = contentType
 
   def getInputStream(): ServletInputStream = {
-    new MockServletInputStream(new ByteArrayInputStream(body))
+    new MockServletInputStream(new ByteArrayInputStream(_body))
   }
 
   def getLocalAddr(): String = localAddr
@@ -425,7 +427,7 @@ class MockHttpServletRequest(
 
   def getReader(): BufferedReader =
     new BufferedReader(
-      new InputStreamReader(new ByteArrayInputStream(body), charEncoding)
+      new InputStreamReader(new ByteArrayInputStream(_body), charEncoding)
     )
 
   def getRealPath(s: String): String = s
@@ -582,7 +584,7 @@ class MockHttpServletRequest(
   ): AsyncContext = null
   def startAsync(): AsyncContext = null
   def changeSessionId(): String = null
-  def getContentLengthLong(): Long = body.length
+  def getContentLengthLong(): Long = _body.length
 
   def upgrade[T <: jakarta.servlet.http.HttpUpgradeHandler](x$1: Class[T]): T =
     ???

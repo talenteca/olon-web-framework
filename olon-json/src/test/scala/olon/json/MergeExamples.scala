@@ -7,7 +7,7 @@ object MergeExamples extends Specification {
   "Merge Examples".title
 
   "Merge example" in {
-    (scala1 merge scala2) mustEqual expectedMergeResult
+    (scala1.merge(scala2)) mustEqual expectedMergeResult
   }
 
   val scala1 = parse("""

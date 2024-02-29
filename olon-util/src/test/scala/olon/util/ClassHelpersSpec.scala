@@ -37,8 +37,9 @@ class ClassHelpersSpec extends Specification {
       findClass("ClassHelpers", List("olon.util", "java.util")) must_== Full(
         classOf[ClassHelpers]
       )
+      // SCALA3 Using `?` instead of `_`
       findClass("ArrayList", List("olon.util", "java.util")) must_== Full(
-        classOf[java.util.ArrayList[_]]
+        classOf[java.util.ArrayList[?]]
       )
     }
     "return a Full can with the found class when given the name, a list of packages and a target type to conform to" in {

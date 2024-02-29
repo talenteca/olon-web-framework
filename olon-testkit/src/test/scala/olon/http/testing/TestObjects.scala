@@ -16,7 +16,7 @@ object MyCode extends TestKit with Loggable {
 
   val l2: TestResponse = post("/foo")
   l2.foreach {
-    x: HttpResponse =>
+    (x: HttpResponse) =>
       val l3: TestResponse = x.get("ddd")
       logger.trace("HTTP response for ddd is " + l3)
       println("Hello")
@@ -33,7 +33,7 @@ object MyBoxCode extends RequestKit with Loggable {
 
   val l2: Box[TheResponse] = post("/foo")
   l2.foreach {
-    x: TheResponse =>
+    (x: TheResponse) =>
       val l3: Box[TheResponse] = x.get("ddd")
       logger.trace("The box response for ddd is " + l3)
       println("Hello")

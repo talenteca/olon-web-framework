@@ -9,8 +9,9 @@ object JsonQueryExamples extends Specification {
   "JSON Query Examples".title
 
   "List of IPs" in {
+    // SCALA3 Adding `case` for correct syntax desugaring
     val ips = for {
-      JField("ip", JString(ip)) <- (json \\ "ip").obj
+      case JField("ip", JString(ip)) <- (json \\ "ip").obj
     } yield {
       ip
     }
@@ -27,10 +28,11 @@ object JsonQueryExamples extends Specification {
   "List of IPs converted to XML" in {
     val ipsList = (json \\ "ip").obj
 
+    // SCALA3 Adding `case` for correct syntax desugaring
     val ips = <ips>{
       for {
         field <- ipsList
-        JString(ip) <- field.value
+        case JString(ip) <- field.value
       } yield <ip>{ip}</ip>
     }</ips>
 
@@ -38,10 +40,11 @@ object JsonQueryExamples extends Specification {
   }
 
   "List of IPs in cluster2" in {
+    // SCALA3 Adding `case` for correct syntax desugaring
     val ips = for {
-      JObject(x) <- json \ "data_center"
+      case JObject(x) <- json \ "data_center"
       if (x contains JField("name", JString("cluster2")))
-      JField("ip", JString(ip)) <- (JObject(x) \\ "ip").obj
+      case JField("ip", JString(ip)) <- (JObject(x) \\ "ip").obj
     } yield {
       ip
     }
@@ -50,8 +53,9 @@ object JsonQueryExamples extends Specification {
   }
 
   "Total cpus in data center" in {
+    // SCALA3 Adding `case` for correct syntax desugaring
     val computerCpuCount = for {
-      JField("cpus", JInt(x)) <- (json \\ "cpus").obj
+      case JField("cpus", JInt(x)) <- (json \\ "cpus").obj
     } yield {
       x
     }
@@ -62,11 +66,12 @@ object JsonQueryExamples extends Specification {
   "Servers sorted by uptime" in {
     case class Server(ip: String, uptime: Long)
 
+    // SCALA3 Adding `case` for correct syntax desugaring
     val servers = for {
-      JField("servers", JArray(servers)) <- (json \\ "servers").obj
-      JObject(server) <- servers
-      JField("ip", JString(ip)) <- server
-      JField("uptime", JInt(uptime)) <- server
+      case JField("servers", JArray(servers)) <- (json \\ "servers").obj
+      case JObject(server) <- servers
+      case JField("ip", JString(ip)) <- server
+      case JField("uptime", JInt(uptime)) <- server
     } yield {
       Server(ip, uptime.longValue)
     }
@@ -81,14 +86,15 @@ object JsonQueryExamples extends Specification {
   }
 
   "Clusters administered by liza" in {
+    // SCALA3 Adding `case` for correct syntax desugaring
     val clusters = for {
-      JObject(cluster) <- json
-      JField("admins", JArray(admins)) <- cluster
+      case JObject(cluster) <- json
+      case JField("admins", JArray(admins)) <- cluster
       if admins contains JString("liza")
-      JField("name", JString(name)) <- cluster
+      case JField("name", JString(name)) <- cluster
     } yield name
 
-    clusters mustEqual List("cluster2")
+    clusters.mustEqual(List("cluster2"))
   }
 
   val json = parse("""
