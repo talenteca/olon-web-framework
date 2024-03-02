@@ -57,13 +57,13 @@ object Msg extends DispatchSnippet with Loggable {
     attr("id") match {
       case Full(id) => {
         // Extract the currently set CSS
-        (attr("errorClass") or attr("errorclass")).map(cls =>
+        (attr("errorClass").or(attr("errorclass"))).map(cls =>
           MsgErrorMeta += (id -> cls)
         )
-        (attr("warningClass") or attr("warningclass")).map(cls =>
+        (attr("warningClass").or(attr("warningclass"))).map(cls =>
           MsgWarningMeta += (id -> cls)
         )
-        (attr("noticeClass") or attr("noticeclass")).map(cls =>
+        (attr("noticeClass").or(attr("noticeclass"))).map(cls =>
           MsgNoticeMeta += (id -> cls)
         )
 

@@ -223,7 +223,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * By default, use prettyRender for dev mode and compactRender for other
     * modes.
     */
-  val jsonOutputConverter = new FactoryMaker[JsonAST.JValue => String]({
+  val jsonOutputConverter = new FactoryMaker[JsonAST.JValue[?] => String]({
     import json.{prettyRender, compactRender}
 
     if (Props.devMode) {
@@ -350,7 +350,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * &lt;lift:with-resource-id&gt; snippet
     */
   @volatile var attachResourceId: (String) => String = (name) => {
-    name + (if (name contains ("?")) "&" else "?") + instanceResourceId + "=_"
+    name + (if (name.contains("?")) "&" else "?") + instanceResourceId + "=_"
   }
 
   /** Returns a LiftSession instance.
@@ -445,9 +445,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
   /** A factory that will vend comet creators
     */
+  // SCALA3 Removing `_` for passing function as a value
   val cometCreationFactory
       : FactoryMaker[CometCreationInfo => Box[LiftCometActor]] =
-    new FactoryMaker(() => noComet _) {}
+    new FactoryMaker(() => noComet) {}
 
   /** Should codes that represent entities be converted to XML entities when
     * rendered?
@@ -461,7 +462,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val statelessReqTest = RulesSeq[StatelessReqTestPF]
 
-  val statelessSession: FactoryMaker[Req => LiftSession with StatelessSession] =
+  // SCALA3 Using `&` instead of the `with` type operator
+  val statelessSession: FactoryMaker[Req => LiftSession & StatelessSession] =
     new FactoryMaker((req: Req) =>
       new LiftSession(req.contextPath, Helpers.nextFuncName, Empty)
         with StatelessSession
@@ -927,7 +929,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     () =>
       (for (r <- S.request)
         yield r.isIE6 || r.isIE7 ||
-          r.isIE8) openOr true
+          r.isIE8).openOr(true)
 
   /** The JavaScript to execute to log a message on the client side when
     * lift.logError is called.
@@ -983,8 +985,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
   /** A function that takes the current HTTP request and returns the current
     */
+  // SCALA3 Removing `_` for passing funcion as a value
   @volatile var localeCalculator: Box[HTTPRequest] => Locale =
-    defaultLocaleCalculator _
+    defaultLocaleCalculator
 
   def defaultLocaleCalculator(request: Box[HTTPRequest]) =
     request.flatMap(_.locale).openOr(Locale.getDefault())
@@ -1081,10 +1084,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val externalTemplateResolver: FactoryMaker[
     () => PartialFunction[(Locale, List[String]), Box[NodeSeq]]
-  ] =
+  ] = {
     new FactoryMaker(() =>
       (() => Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])
     ) {}
+  }
 
   /** There may be times when you want to entirely control the templating
     * process. You can insert a function that creates a white list of snippets.
@@ -1223,26 +1227,25 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   /** If a deferred snippet has a failure during render, what should we display?
     */
   val deferredSnippetFailure: FactoryMaker[Failure => NodeSeq] =
-    new FactoryMaker(() => {
-      (failure: Failure) =>
-        {
-          if (Props.devMode)
-            <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{
-              failure.msg
-            }{
-              failure.exception match {
-                case Full(e) =>
-                  <pre>{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
-                case _ => NodeSeq.Empty
-              }
-            }<i>note: this error is displayed in the browser because
+    new FactoryMaker(() => { (failure: Failure) =>
+      {
+        if (Props.devMode)
+          <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{
+            failure.msg
+          }{
+            failure.exception match {
+              case Full(e) =>
+                <pre>{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
+              case _ => NodeSeq.Empty
+            }
+          }<i>note: this error is displayed in the browser because
         your application is running in "development" mode.If you
         set the system property run.mode=production, this error will not
         be displayed, but there will be errors in the output logs.
         </i>
         </div>
-          else NodeSeq.Empty
-        }
+        else NodeSeq.Empty
+      }
     }) {}
 
   /** If a deferred snippet has a failure during render, what should we display?
@@ -1265,12 +1268,13 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
   /** Should comments be stripped from the served XHTML
     */
-  val stripComments: FactoryMaker[Boolean] =
+  val stripComments: FactoryMaker[Boolean] = {
     new FactoryMaker(() => {
       if (Props.devMode)
         false
       else true
     }) {}
+  }
 
   private[http] val reqCnt = new AtomicInteger(0)
 
@@ -2389,7 +2393,8 @@ trait FormVendor {
     */
   def vendForm[T](implicit man: Manifest[T]): Box[(T, T => Any) => NodeSeq] = {
     val name = man.toString
-    val first: Option[List[FormBuilderLocator[_]]] =
+    // SCALA3 Using `?` instead of `_`
+    val first: Option[List[FormBuilderLocator[?]]] =
       requestForms.is.get(name) orElse sessionForms.is.get(name)
 
     first match {
@@ -2404,7 +2409,8 @@ trait FormVendor {
     }
   }
 
-  private val globalForms: CHash[String, List[FormBuilderLocator[_]]] =
+  // SCALA3 Using `?` instead of `_`
+  private val globalForms: CHash[String, List[FormBuilderLocator[?]]] =
     new CHash
 
   def prependGlobalFormBuilder[T](builder: FormBuilderLocator[T]): Unit = {
@@ -2448,24 +2454,30 @@ trait FormVendor {
   def doWith[F, T](builder: FormBuilderLocator[T])(f: => F): F =
     requestForms.doWith(prependBuilder(builder, requestForms))(f)
 
+  // SCALA3 Using `?` instead of `_`
   private def prependBuilder(
-      builder: FormBuilderLocator[_],
-      to: Map[String, List[FormBuilderLocator[_]]]
-  ): Map[String, List[FormBuilderLocator[_]]] = {
+      builder: FormBuilderLocator[?],
+      to: Map[String, List[FormBuilderLocator[?]]]
+  ): Map[String, List[FormBuilderLocator[?]]] = {
     val name = builder.manifest.toString
     to + (name -> (builder :: to.getOrElse(name, Nil)))
   }
 
+  // SCALA3 Using `?` instead of `_`
   private def appendBuilder(
-      builder: FormBuilderLocator[_],
-      to: Map[String, List[FormBuilderLocator[_]]]
-  ): Map[String, List[FormBuilderLocator[_]]] = {
+      builder: FormBuilderLocator[?],
+      to: Map[String, List[FormBuilderLocator[?]]]
+  ): Map[String, List[FormBuilderLocator[?]]] = {
     val name = builder.manifest.toString
     to + (name -> (builder :: to.getOrElse(name, Nil)))
   }
 
+  // SCALA3 Using `?` instead of `_`
   private object sessionForms
-      extends SessionVar[Map[String, List[FormBuilderLocator[_]]]](Map())
+      extends SessionVar[Map[String, List[FormBuilderLocator[?]]]](Map())
+
+  // SCALA3 Using `?` instead of `_`
   private object requestForms
-      extends SessionVar[Map[String, List[FormBuilderLocator[_]]]](Map())
+      extends SessionVar[Map[String, List[FormBuilderLocator[?]]]](Map())
+
 }

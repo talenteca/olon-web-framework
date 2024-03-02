@@ -55,11 +55,11 @@ case class CreatedResponse(
   */
 object CreatedResponse {
 
-  lazy val jsonPrinter: JsonAST.JValue => String =
+  lazy val jsonPrinter: JsonAST.JValue[?] => String =
     LiftRules.jsonOutputConverter.vend
 
   def apply(
-      json: JsonAST.JValue,
+      json: JsonAST.JValue[?],
       addlHeaders: List[(String, String)]
   ): LiftResponse = {
     val headers: List[(String, String)] =

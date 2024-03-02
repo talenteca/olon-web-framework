@@ -123,9 +123,8 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       Full(1) map { _.toString } must_== Full("1")
     }
     "define a 'flatMap' method transforming its value in another Box. If the value is transformed in a Full box, the total result is a Full box" in {
-      Full(1) flatMap {
-        (x: Int) =>
-          if (x > 0) Full("full") else Empty
+      Full(1) flatMap { (x: Int) =>
+        if (x > 0) Full("full") else Empty
       } must_== Full("full")
     }
     "define a 'flatMap' method transforming its value in another Box. If the value is transformed in an Empty box, the total result is an Empty box" in {
@@ -193,9 +192,8 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     }
     "define a 'pass' method passing the can to a function and returning itself (alias: $)" in {
       var empty = false
-      def emptyString(s: Box[String]) = s foreach {
-        (c: String) =>
-          empty = c.isEmpty
+      def emptyString(s: Box[String]) = s foreach { (c: String) =>
+        empty = c.isEmpty
       }
       // SCALA3 Removing `_` for passing function as a value
       Full("").$(emptyString)
@@ -423,9 +421,8 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
         Empty,
         Empty
       )
-      Failure("error", Empty, Empty) flatMap {
-        (x: String) =>
-          Full(x.toString)
+      Failure("error", Empty, Empty) flatMap { (x: String) =>
+        Full(x.toString)
       } must_== Failure("error", Empty, Empty)
       Failure("error", Empty, Empty).flatten must_== Failure(
         "error",

@@ -68,7 +68,7 @@ class MockHttpServletRequest(
   // SCALA3 creating an internal alias for `body` for external usage of `body =`
   /** The raw body of the request. */
   private var _body: Array[Byte] = Array()
-  def body : Array[Byte] = _body
+  def body: Array[Byte] = _body
 
   /** Sets the body to the given string. The content type is set to
     * "text/plain".

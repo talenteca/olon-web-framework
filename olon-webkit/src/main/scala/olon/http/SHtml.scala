@@ -677,7 +677,7 @@ trait SHtml extends Loggable {
       (SHtml
         .ajaxCall(
           Str("ignore"),
-          { _: String => SetHtml(show, showContents) }
+          { (_: String) => SetHtml(show, showContents) }
         )
         ._2
         .cmd & swapJsCmd(show, hide))

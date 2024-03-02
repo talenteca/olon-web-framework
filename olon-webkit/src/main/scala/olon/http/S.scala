@@ -3000,7 +3000,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def createJsonFunc(
       onError: JsCmd,
-      f: PFPromoter[JValue, JsCmd]
+      f: PFPromoter[JValue[?], JsCmd]
   ): (JsonCall, JsCmd) =
     createJsonFunc(Empty, Full(onError), f)
 

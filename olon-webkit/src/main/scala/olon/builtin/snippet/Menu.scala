@@ -345,6 +345,7 @@ object Menu extends DispatchSnippet with Loggable {
     }
   }
 
+  // SCALA3 Using `?` instead of `_`
   private object TitleText {
     def unapply(in: NodeSeq): Option[(MetaData, String)] =
       if (in.length == 1 && in(0).isInstanceOf[Elem]) {
@@ -352,7 +353,7 @@ object Menu extends DispatchSnippet with Loggable {
         if (e.prefix == null && e.label == "title") {
           if (e.child.length == 0) {
             Some(e.attributes -> "")
-          } else if (e.child.length == 1 && e.child(0).isInstanceOf[Atom[_]]) {
+          } else if (e.child.length == 1 && e.child(0).isInstanceOf[Atom[?]]) {
             Some(e.attributes -> e.child.text)
           } else None
         } else None
@@ -476,7 +477,8 @@ object Menu extends DispatchSnippet with Loggable {
     for {
       name <- S.attr("name").toList
     } yield {
-      type T = Q forSome { type Q }
+      /// SCALA3 Moved from an existential type here to an abstract type bellow
+      // type T = Q forSome { type Q }
 
       // Builds a link for the given loc
       def buildLink[T](loc: Loc[T]) = {
@@ -497,6 +499,8 @@ object Menu extends DispatchSnippet with Loggable {
       ) match {
         // SCALA3 Using `&` instead of the `with` type operator
         case (_, Full(param), Full(loc: (Loc[_] & ConvertableLoc[_]))) => {
+          // SCALA3 Moved from an existential type above to an abstract type here
+          type T
           val typedLoc = loc.asInstanceOf[Loc[T] & ConvertableLoc[T]]
 
           (for {
