@@ -46,7 +46,7 @@ object MergeExamples extends Specification {
     }""")
 
   "Lotto example" in {
-    (lotto1 merge lotto2) mustEqual mergedLottoResult
+    (lotto1.merge(lotto2)) mustEqual mergedLottoResult
   }
 
   val lotto1 = parse("""

@@ -845,9 +845,13 @@ class LiftServlet extends Loggable {
             result
 
           case Right(future) =>
-            val ret = future.get(ajaxPostTimeout).openOr(olon.common.Failure(
-              "AJAX retry timeout."
-            ))
+            val ret = future
+              .get(ajaxPostTimeout)
+              .openOr(
+                olon.common.Failure(
+                  "AJAX retry timeout."
+                )
+              )
 
             ret
         }

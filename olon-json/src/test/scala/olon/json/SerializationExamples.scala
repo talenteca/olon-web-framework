@@ -200,9 +200,10 @@ object ShortTypeHintExamples extends TypeHintExamples {
 object FullTypeHintExamples extends TypeHintExamples {
   import Serialization.{read, write => swrite}
 
+  // SCALA3 Using `?` instead of `_`
   implicit val formats: Formats = Serialization.formats(
     FullTypeHints(
-      List[Class[_]](
+      List[Class[?]](
         classOf[Animal],
         classOf[True],
         classOf[False],
@@ -289,7 +290,8 @@ trait Animal
 case class Dog(name: String) extends Animal
 case class Fish(weight: Double) extends Animal
 
-case class Objs(objects: List[Obj[_]])
+// SCALA3 Using `?` instead of `_`
+case class Objs(objects: List[Obj[?]])
 case class Obj[A](a: A)
 
 object CustomSerializerExamples extends Specification {
@@ -345,20 +347,23 @@ object CustomSerializerExamples extends Specification {
         )
       )
 
-  class IndexedSeqSerializer extends Serializer[IndexedSeq[_]] {
+  // SCALA3 Using `?` instead of `_`
+  class IndexedSeqSerializer extends Serializer[IndexedSeq[?]] {
     def deserialize(implicit formats: Formats) = {
+      // SCALA3 Using `?` instead of `_`
       case (TypeInfo(clazz, ptype), json)
-          if classOf[IndexedSeq[_]].isAssignableFrom(clazz) =>
+          if classOf[IndexedSeq[?]].isAssignableFrom(clazz) =>
         json match {
           case JArray(xs) =>
             val t = ptype.getOrElse(
               throw new MappingException("parameterized type not known")
             )
             xs.map(x =>
+              // SCALA3 Using `?` instead of `_`
               Extraction.extract(
                 x,
                 TypeInfo(
-                  t.getActualTypeArguments()(0).asInstanceOf[Class[_]],
+                  t.getActualTypeArguments()(0).asInstanceOf[Class[?]],
                   None
                 )
               )

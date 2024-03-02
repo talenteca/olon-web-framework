@@ -55,7 +55,7 @@ object SerializationBugs extends Specification {
   }
 
   "StackOverflowError with large Lists" in {
-    val xs = LongList(List.fill(5000)(0).map(Num))
+    val xs = LongList(List.fill(5000)(0).map(Num.apply))
     val ser = swrite(xs)
     read[LongList](ser).xs.length mustEqual 5000
   }
