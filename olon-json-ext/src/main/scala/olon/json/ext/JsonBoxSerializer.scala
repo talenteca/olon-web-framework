@@ -10,12 +10,13 @@ import java.lang.reflect.ParameterizedType
 import common._
 import Extraction.{decompose, extract}
 
-class JsonBoxSerializer extends Serializer[Box[_]] {
-  private val BoxClass = classOf[Box[_]]
+// SCALA3 Using `?` instead of `_`
+class JsonBoxSerializer extends Serializer[Box[?]] {
+  private val BoxClass = classOf[Box[?]]
 
   def deserialize(implicit
       format: Formats
-  ): PartialFunction[(TypeInfo, JValue), Box[_]] = {
+  ): PartialFunction[(TypeInfo, JValue), Box[?]] = {
     case (TypeInfo(BoxClass, ptype), json) =>
       json match {
         case JNull | JNothing => Empty
@@ -52,11 +53,12 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
           val t = ptype.getOrElse(
             throw new MappingException("parameterized type not known for Box")
           )
+          // SCALA3 Using `?` instead of `_`
           Full(
             extract(
               x,
               TypeInfo(
-                t.getActualTypeArguments()(0).asInstanceOf[Class[_]],
+                t.getActualTypeArguments()(0).asInstanceOf[Class[?]],
                 None
               )
             )
