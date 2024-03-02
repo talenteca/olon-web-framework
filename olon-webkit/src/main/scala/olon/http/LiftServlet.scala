@@ -845,9 +845,9 @@ class LiftServlet extends Loggable {
             result
 
           case Right(future) =>
-            val ret = future.get(ajaxPostTimeout) openOr olon.common.Failure(
+            val ret = future.get(ajaxPostTimeout).openOr(olon.common.Failure(
               "AJAX retry timeout."
-            )
+            ))
 
             ret
         }
@@ -1041,7 +1041,7 @@ class LiftServlet extends Loggable {
 
       LAPinger.schedule(cont, BreakOut(), TimeSpan(cometTimeout))
 
-      val ret2 = f.get(cometTimeout) openOr Nil
+      val ret2 = f.get(cometTimeout).openOr(Nil)
 
       Full(S.init(Box !! originalRequest, session) {
         convertAnswersToCometResponse(session, ret2, actors)
@@ -1091,7 +1091,7 @@ class LiftServlet extends Loggable {
                    else "") + uri
                 ).filter(_ => uri.startsWith("/"));
                 rwf <- URLRewriter.rewriteFunc
-              ) yield rwf(updated)) openOr uri
+              ) yield rwf(updated)).openOr(uri)
             )
           )
         case _ => v

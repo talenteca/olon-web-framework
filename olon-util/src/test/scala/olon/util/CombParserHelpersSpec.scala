@@ -37,7 +37,8 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
     }
     "provide a whitespace parser: white. Alias: wsc" in {
       import WhiteStringGen._
-      val whiteParse = (s: String) => wsc(s).isInstanceOf[Success[_]]
+      // SCALA3 Using `?` instead of `_`
+      val whiteParse = (s: String) => wsc(s).isInstanceOf[Success[?]]
       forAll(whiteParse)
     }
     "provide a whiteSpace parser always succeeding and discarding its result" in {
@@ -114,7 +115,9 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
     "provide a permuteAll parser succeeding if any permutation of the list given parsers, or a sublist of the given parsers succeeds" in {
       def permuteAllParsers(s: String) =
         shouldSucceed(permuteAll(parserA, parserB, parserC, parserD)(s))
-      implicit def pick3Letters = AbcdStringGen.pickN(3, List("a", "b", "c"))
+      // SCALA3 Adding declaration type for using implicit correctly
+      implicit def pick3Letters: Arbitrary[String] =
+        AbcdStringGen.pickN(3, List("a", "b", "c"))
 
       forAll { (s: String) =>
         ((new scala.collection.immutable.StringOps(
@@ -124,7 +127,9 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
     }
     "provide a repNN parser succeeding if an input can be parsed n times with a parser" in {
       def repNNParser(s: String) = shouldSucceed(repNN(3, parserA)(s))
-      implicit def pick3Letters = AbcdStringGen.pickN(3, List("a", "a", "a"))
+      // SCALA3 Adding declaration type for using implicit correctly
+      implicit def pick3Letters: Arbitrary[String] =
+        AbcdStringGen.pickN(3, List("a", "a", "a"))
 
       forAll { (s: String) =>
         ((new scala.collection.immutable.StringOps(
