@@ -59,8 +59,11 @@ lazy val libs = new {
 
   lazy val slf4j_api = Seq("org.slf4j" % "slf4j-api" % versions.slf4jVersion)
 
+  // SCALA3 Upgrading scala-parallel-collections to version 1.0.4 which includes
+  // support for Scala 3
   lazy val scala_parallel_collections =
-    Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0")
+    Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4")
+
 
   // SCALA3 Previous versions for scala-parser-combinators were not
   // released for Scala 3
@@ -315,14 +318,10 @@ lazy val olon_webkit = Project("olon-webkit", file("olon-webkit"))
         libs.jwebunit ++
         libs.jquery ++
         libs.jasmineCore ++
-        libs.jasmineAjax ++ {
-          CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((2, scalaMajor)) if scalaMajor >= 13 =>
-              libs.scala_parallel_collections
-            case _ =>
-              Seq.empty
-          }
-        },
+        libs.jasmineAjax ++
+        // SCALA3 using scala-parallel-collections for Scala 2 and Scala 3
+        // dynamically
+        libs.scala_parallel_collections,
     Test / initialize := {
       System.setProperty(
         "olon.webapptest.src.test.webapp",
