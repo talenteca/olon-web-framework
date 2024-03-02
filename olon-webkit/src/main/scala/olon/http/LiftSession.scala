@@ -8,6 +8,7 @@ import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 import scala.xml.Group
 import scala.xml._
+import scala.compiletime.uninitialized
 
 import collection.mutable.{HashMap, ListBuffer}
 import js.JE.{AnonFunc, JsObj, JsRaw}
@@ -21,6 +22,7 @@ import js._
 import provider._
 import json._
 import json.JsonAST.{JString, JValue}
+import scala.reflect.ClassTag
 
 object LiftSession {
 
@@ -81,8 +83,9 @@ object LiftSession {
     */
   var onEndServicing: List[(LiftSession, Req, Box[LiftResponse]) => Unit] = Nil
 
+  // SCALA3 Using `?` instead of `_`
   @volatile private var constructorCache
-      : Map[(Class[_], Box[Class[_]]), Box[ConstructorType]] = Map()
+      : Map[(Class[?], Box[Class[?]]), Box[ConstructorType]] = Map()
 
   private[http] def constructFrom[T](
       session: LiftSession,
@@ -264,7 +267,7 @@ private[http] object RenderVersion {
         tret
       }
 
-    ret openOr ver.doWith(v)(f)
+    ret.openOr(ver.doWith(v)(f))
   }
 }
 
@@ -275,13 +278,13 @@ trait HowStateful {
 
   /** Test the statefulness of this session.
     */
-  def stateful_? = howStateful.box openOr true
+  def stateful_? = howStateful.box.openOr(true)
 
   /** There may be cases when you are allowed container state (e.g., migratory
     * session, but you're not allowed to write Lift non-migratory state, return
     * true here.
     */
-  def allowContainerState_? = howStateful.box openOr true
+  def allowContainerState_? = howStateful.box.openOr(true)
 
   /** Within the scope of the call, this session is forced into statelessness.
     * This allows for certain URLs in on the site to be stateless and not
@@ -359,7 +362,7 @@ private[http] final case class AjaxRequestInfo(
 )
 
 private[http] class BooleanThreadGlobal extends ThreadGlobal[Boolean] {
-  def ? = this.box openOr false
+  def ? = this.box.openOr(false)
 }
 
 /** The LiftSession class containing the session state information
@@ -377,11 +380,12 @@ class LiftSession(
   private[http] def this() = this("", "", Empty)
 
   def sessionHtmlProperties =
-    LiftRules.htmlProperties.session.is.make openOr LiftRules.htmlProperties.default.is.vend
+    LiftRules.htmlProperties.session.is.make
+      .openOr(LiftRules.htmlProperties.default.is.vend)
 
   val requestHtmlProperties: TransientRequestVar[HtmlProperties] =
     new TransientRequestVar[HtmlProperties](
-      sessionHtmlProperties(S.request openOr Req.nil)
+      sessionHtmlProperties(S.request.openOr(Req.nil))
     ) {}
 
   /** The unique id of this session. Can be used to securely and uniquely
@@ -462,7 +466,7 @@ class LiftSession(
 
   @volatile
   private[http] var inactivityLength: Long =
-    LiftRules.sessionInactivityTimeout.vend openOr ((30.minutes): Long)
+    LiftRules.sessionInactivityTimeout.vend.openOr((30.minutes): Long)
 
   private[http] var highLevelSessionDispatcher =
     new HashMap[String, LiftRules.DispatchPF]()
@@ -959,7 +963,7 @@ class LiftSession(
   private[http] def hasFuncsForOwner(owner: String): Boolean = {
     import scala.jdk.CollectionConverters._
 
-    !nmessageCallback.asScala.find(_._2.owner == owner).isEmpty
+    !nmessageCallback.asScala.find(_._2.owner.toOption == Some(owner)).isEmpty
   }
 
   private def shutDown() = {
@@ -997,7 +1001,7 @@ class LiftSession(
   /** Define the context path for this session. This allows different sessions
     * to have different context paths.
     */
-  def contextPath = LiftRules.calculateContextPath() openOr _contextPath
+  def contextPath = LiftRules.calculateContextPath().openOr(_contextPath)
 
   /** Convert a template into a Lift Response.
     *
@@ -1021,7 +1025,7 @@ class LiftSession(
       code: Int
   ): Box[LiftResponse] = {
     overrideResponseCode.doWith(Empty) {
-      (template or findVisibleTemplate(path, request)).map { xhtml =>
+      (template.or(findVisibleTemplate(path, request))).map { xhtml =>
         fullPageLoad.doWith(true) {
           // allow parallel snippets
           // Phase 1: snippets & templates processing
@@ -1053,7 +1057,7 @@ class LiftSession(
           notices = Nil
           // Phase 3: Response conversion including fixHtml
           LiftRules.convertResponse(
-            (xml, overrideResponseCode.is openOr code),
+            (xml, overrideResponseCode.is.openOr(code)),
             S.getResponseHeaders(LiftRules.defaultHeaders((xml, request))),
             S.responseCookies,
             request
@@ -1131,37 +1135,43 @@ class LiftSession(
 
             // Process but make sure we're okay, sitemap wise
             val response: Box[LiftResponse] =
-              early or (request.testLocation match {
+              early.or(request.testLocation match {
                 case Left(true) =>
                   checkStatelessInSiteMap(request) {
                     cleanUpBeforeRender
 
                     PageName(request.uri + " -> " + request.path)
                     LiftRules.allowParallelSnippets.doWith(() => !Props.inGAE) {
-                      (request.location.flatMap(
-                        _.earlyResponse
-                      ) or LiftRules.earlyResponse.firstFull(request)) or
-                        (processTemplate(
-                          locTemplate,
-                          request,
-                          request.path,
-                          200
-                        ) or
-                          request.createNotFound {
+                      (request.location
+                        .flatMap(
+                          _.earlyResponse
+                        )
+                        .or(LiftRules.earlyResponse.firstFull(request)))
+                        .or(
+                          processTemplate(
+                            locTemplate,
+                            request,
+                            request.path,
+                            200
+                          ).or(request.createNotFound {
                             processTemplate(Empty, request, _, 404)
                           })
+                        )
                     }
                   }
 
                 case Right(Full(resp))                    => Full(resp)
                 case _ if (LiftRules.passNotFoundToChain) => Empty
                 case _ if Props.mode == Props.RunModes.Development =>
-                  request.createNotFound {
-                    processTemplate(Empty, request, _, 404)
-                  } or
-                    Full(
-                      ForbiddenResponse(
-                        "The requested page was not defined in your SiteMap, so access was blocked.  (This message is displayed in development mode only)"
+                  request
+                    .createNotFound {
+                      processTemplate(Empty, request, _, 404)
+                    }
+                    .or(
+                      Full(
+                        ForbiddenResponse(
+                          "The requested page was not defined in your SiteMap, so access was blocked.  (This message is displayed in development mode only)"
+                        )
                       )
                     )
                 case _ =>
@@ -1252,7 +1262,7 @@ class LiftSession(
   }
 
   private[http] def attachRedirectFunc(uri: String, f: Box[() => Unit]) = {
-    f map { fnc =>
+    (f map { fnc =>
       val func: String = {
         val funcName = Helpers.nextFuncName
         nmessageCallback.put(
@@ -1264,7 +1274,7 @@ class LiftSession(
         funcName
       }
       Helpers.appendFuncToURL(uri, func + "=_")
-    } openOr uri
+    }).openOr(uri)
 
   }
 
@@ -1363,26 +1373,34 @@ class LiftSession(
           case sym: Symbol          => xformRule #> sym
           case lng: Long            => xformRule #> lng
           case b: Boolean           => xformRule #> b
-          case b: Box[_]            => runSourceContext(b.toList, retFunc _, _)
-          case b: Option[_]         => runSourceContext(b.toList, retFunc _, _)
+          // SCALA3 Removing `_` for passing function as a value
+          case b: Box[_] => runSourceContext(b.toList, retFunc, _)
+          // SCALA3 Removing `_` for passing function as a value
+          case b: Option[_]     => runSourceContext(b.toList, retFunc, _)
           case fut: LAFuture[_] =>
-            runSourceContext(fut.get(5.seconds).openOr(Empty), retFunc _, _)
+            // SCALA3 Removing `_` for passing function as a value
+            runSourceContext(fut.get(5.seconds).openOr(Empty), retFunc, _)
           case n: java.lang.Iterable[_] =>
-            runSourceContext(n.iterator(), retFunc _, _)
-          case n: java.util.Iterator[_] => runSourceContext(n, retFunc _, _)
+            runSourceContext(n.iterator(), retFunc, _)
+          // SCALA3 Removing `_` for passing function as a value
+          case n: java.util.Iterator[_]     => runSourceContext(n, retFunc, _)
           case en: java.util.Enumeration[_] =>
-            runSourceContext(en, retFunc _, _)
+            // SCALA3 Removing `_` for passing function as a value
+            runSourceContext(en, retFunc, _)
           case se: scala.collection.Iterable[_] =>
-            runSourceContext(se, retFunc _, _)
+            // SCALA3 Removing `_` for passing function as a value
+            runSourceContext(se, retFunc, _)
           case se: scala.collection.Iterator[_] =>
-            runSourceContext(se, retFunc _, _)
+            // SCALA3 Removing `_` for passing function as a value
+            runSourceContext(se, retFunc, _)
           case x => xformRule #> x.toString
         }
 
       func(ns)
     }
 
-    retFunc _
+    // SCALA3 Removing `_` for passing function as a value
+    retFunc
   }
 
   private def fixScriptableObject(in: Any): Any = in match {
@@ -1473,21 +1491,23 @@ class LiftSession(
     S.doSnippet(attrValue) {
       val (cls, method) = splitColonPair(attrValue)
 
-      first(LiftRules.snippetNamesToSearch.vend(cls)) { nameToTry =>
+      (first(LiftRules.snippetNamesToSearch.vend(cls)) { nameToTry =>
         LiftSession.findSnippetClass(nameToTry) flatMap { clz =>
           instantiateOrRedirect(clz) flatMap { inst =>
-            invokeMethod(clz, inst, method) or invokeMethod(
-              clz,
-              inst,
-              method,
-              params.toList.toArray
-            ) match {
+            (invokeMethod(clz, inst, method).or(
+              invokeMethod(
+                clz,
+                inst,
+                method,
+                params.toList.toArray
+              )
+            )) match {
               case Full(md: MetaData) => Full(md.copy(rest))
               case _                  => Empty
             }
           }
         }
-      } openOr rest
+      }).openOr(rest)
     }
   }
 
@@ -1599,19 +1619,24 @@ class LiftSession(
    * class is a StatefulSnippet so that the registration function works on return calls.
    */
   private def findSnippetInstance(cls: String): Box[AnyRef] =
-    S.snippetForClass(cls) or
-      (LiftRules.snippet(cls) or
-        LiftSession
-          .findSnippetClass(cls)
-          .flatMap(c =>
-            instantiateOrRedirect(c) or findSnippetObject(cls)
-          )) match {
-      case Full(inst: StatefulSnippet) =>
-        inst.addName(cls); S.overrideSnippetForClass(cls, inst); Full(inst)
-      case Full(ret)     => Full(ret)
-      case fail: Failure => fail
-      case _             => Empty
-    }
+    S.snippetForClass(cls)
+      .or(
+        LiftRules
+          .snippet(cls)
+          .or(
+            LiftSession
+              .findSnippetClass(cls)
+              .flatMap(c => instantiateOrRedirect(c) or findSnippetObject(cls))
+          ) match {
+          case Full(inst: StatefulSnippet) =>
+            inst.addName(cls)
+            S.overrideSnippetForClass(cls, inst)
+            Full(inst)
+          case Full(ret)     => Full(ret)
+          case fail: Failure => fail
+          case _             => Empty
+        }
+      )
 
   /** Report a snippet error depending on what the run mode is
     */
@@ -1625,7 +1650,9 @@ class LiftSession(
     (S.currentSnippetNodeSeq.filter(_ => S.ignoreFailedSnippets).map {
       nodeSeq =>
         // don't keep nailing the same snippet name if we just failed it
-        (snippetName or S.currentSnippet).foreach(s => _lastFoundSnippet.set(s))
+        (snippetName
+          .or(S.currentSnippet))
+          .foreach(s => _lastFoundSnippet.set(s))
         nodeSeq
     }) openOr {
 
@@ -1639,9 +1666,10 @@ class LiftSession(
         overrideResponseCode.set(LiftRules.devModeFailureResponseCodeOverride)
       }
 
-      Helpers.errorDiv(<div>Error processing snippet:
+      Helpers
+        .errorDiv(<div>Error processing snippet:
         <b>
-          {snippetName openOr "N/A"}
+          {snippetName.openOr("N/A")}
         </b> <br/>
         Reason:
         <b>
@@ -1652,7 +1680,8 @@ class LiftSession(
         <pre style="background: lightgrey; padding: 6px; border: 1px solid">
           {whole.toString}
         </pre>
-      </div>) openOr NodeSeq.Empty
+      </div>)
+        .openOr(NodeSeq.Empty)
     }
   }
 
@@ -1810,13 +1839,17 @@ class LiftSession(
       val pair = (cls, method)
       if (pf.isDefinedAt(pair)) {
         val func = pf(pair)
-        func.map(_.apply(kids)) openOr reportSnippetError(
-          page,
-          snippetName,
-          LiftRules.SnippetFailures.MethodNotFound,
-          NodeSeq.Empty,
-          wholeTag
-        )
+        func
+          .map(_.apply(kids))
+          .openOr(
+            reportSnippetError(
+              page,
+              snippetName,
+              LiftRules.SnippetFailures.MethodNotFound,
+              NodeSeq.Empty,
+              wholeTag
+            )
+          )
       } else f
     }
 
@@ -1829,8 +1862,9 @@ class LiftSession(
 
           snippetTimer.timeSnippet(snippet) {
             S.doSnippet(snippet)(runWhitelist(snippet, cls, method, kids) {
-              (S.locateMappedSnippet(snippet).map(_(kids)) or
-                locSnippet(snippet))
+              (S.locateMappedSnippet(snippet)
+                .map(_(kids))
+                .or(locSnippet(snippet)))
                 .openOr(S.locateSnippet(snippet).map(_(kids)) openOr {
 
                   (locateAndCacheSnippet(cls)) match {
@@ -1897,15 +1931,16 @@ class LiftSession(
                       import java.lang.reflect.{Type, ParameterizedType}
 
                       def isFunc1(tpe: Type): Boolean = tpe match {
-                        case null => false
+                        case null        => false
                         case c: Class[_] =>
-                          classOf[Function1[_, _]] isAssignableFrom c
+                          // SCALA3 Using `?` instead of `_`
+                          classOf[Function1[?, ?]].isAssignableFrom(c)
                         case _ => false
                       }
 
                       def isNodeSeq(tpe: Type): Boolean = tpe match {
                         case null        => false
-                        case c: Class[_] => classOf[NodeSeq] isAssignableFrom c
+                        case c: Class[_] => classOf[NodeSeq].isAssignableFrom(c)
                         case _           => false
                       }
 
@@ -1932,10 +1967,11 @@ class LiftSession(
                         case _ => false
                       }
 
+                      // SCALA3 Using `?` instead of `_`
                       def isFuncNodeSeq(meth: Method): Boolean = {
                         (classOf[
-                          Function1[_, _]
-                        ] isAssignableFrom meth.getReturnType) &&
+                          Function1[?, ?]
+                        ].isAssignableFrom(meth.getReturnType)) &&
                         testGeneric(meth.getGenericReturnType)
                       }
 
@@ -1948,18 +1984,21 @@ class LiftSession(
                           .asInstanceOf[Function1[NodeSeq, NodeSeq]]
                           .apply(kids)
 
-                      (gotIt or nodeSeqFunc) openOr {
+                      (gotIt.or(nodeSeqFunc)) openOr {
 
                         val ar: Array[AnyRef] = List(Group(kids)).toArray
-                        ((Helpers.invokeMethod(
-                          inst.getClass,
-                          inst,
-                          method,
-                          ar,
-                          Array(classOf[NodeSeq])
-                        )) or
-                          Helpers
-                            .invokeMethod(inst.getClass, inst, method)) match {
+                        ((Helpers
+                          .invokeMethod(
+                            inst.getClass,
+                            inst,
+                            method,
+                            ar,
+                            Array(classOf[NodeSeq])
+                          ))
+                          .or(
+                            Helpers
+                              .invokeMethod(inst.getClass, inst, method)
+                          ) match {
                           case CheckNodeSeq(md) => md
                           case _ =>
                             val intersection = if (Props.devMode) {
@@ -1992,7 +2031,7 @@ class LiftSession(
                                 </div>,
                               wholeTag
                             )
-                        }
+                        })
                       }
                     }
                     case Failure(_, Full(exception), _) =>
@@ -2167,7 +2206,7 @@ class LiftSession(
     * session handles lift tags, alter this partial function.
     */
   @volatile
-  var liftTagProcessing: List[LiftRules.LiftTagPF] = _
+  var liftTagProcessing: List[LiftRules.LiftTagPF] = uninitialized
 
   /** The basic partial function that does lift tag processing
     */
@@ -2291,7 +2330,8 @@ class LiftSession(
         SHtml
           .jsonCall(
             JsRaw("x"),
-            (p: JsonAST.JValue) => {
+            // SCALA3 Adding JValue parameter type
+            (p: JsonAST.JValue[?]) => {
               in ! p
               JsCmds.Noop
             }
@@ -2327,9 +2367,10 @@ class LiftSession(
     *   when the function is called, the parameter is JSON serialized and sent
     *   to the server
     */
+  // SCALA3 Adding JValue parameter type
   def clientActorFor(
       in: LiftActor,
-      xlate: JsonAST.JValue => Box[Any]
+      xlate: JsonAST.JValue[?] => Box[Any]
   ): JsExp = {
     testStatefulFeature {
       AnonFunc(
@@ -2337,7 +2378,8 @@ class LiftSession(
         SHtml
           .jsonCall(
             JsRaw("x"),
-            (p: JsonAST.JValue) => {
+            // SCALA3 Adding JValue parameter type
+            (p: JsonAST.JValue[?]) => {
               in.!(xlate(p) match {
                 case Full(v) => v
                 case Empty =>
@@ -2449,7 +2491,8 @@ class LiftSession(
                   partialUpdate(
                     JsCmds.JsSchedule(JsCmds.JsTry(jsExp.cmd, false))
                   )
-                case jv: JsonAST.JValue => {
+                // SCALA3 Adding JValue parameter type pattern maching case
+                case jv: JsonAST.JValue[_] => {
                   val s: String = json.prettyRender(jv)
                   partialUpdate(
                     JsCmds.JsSchedule(
@@ -2524,7 +2567,9 @@ class LiftSession(
               processOrDefer(true)(
                 processSurroundAndInclude(
                   page,
-                  nodeFuture.get(15000).openOr(NodeSeq.Empty)
+                  // SCALA3 Removing innecesary `openOr` call to prevent
+                  // serialized product types
+                  nodeFuture.get(15000)
                 )
               )
           }
@@ -2553,7 +2598,9 @@ class LiftSession(
             case DataAttributeProcessorAnswerFork(nodeFunc) =>
               processOrDefer(true)(nodeFunc())
             case DataAttributeProcessorAnswerFuture(nodeFuture) =>
-              processOrDefer(true)(nodeFuture.get(15000).openOr(NodeSeq.Empty))
+              // SCALA3 Removing innecesary `openOr` call to prevent serialized
+              // product types
+              processOrDefer(true)(nodeFuture.get(15000))
           }
 
         case v: Elem =>
@@ -2651,9 +2698,10 @@ class LiftSession(
     * @param msg
     *   the message to send to the CometActor
     */
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   def sendCometMessage[T](
       msg: Any
-  )(implicit cometManifest: Manifest[T]): Unit = {
+  )(implicit cometManifest: ClassTag[T]): Unit = {
     val castClass = cometManifest.runtimeClass.asInstanceOf[Class[T]]
     val typeName = castClass.getSimpleName
     sendCometMessage(typeName, msg)
@@ -2688,8 +2736,9 @@ class LiftSession(
     * @param msg
     *   the message to send to the CometActor
     */
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   def sendCometMessage[T](name: Box[String], msg: Any)(implicit
-      cometManifest: Manifest[T]
+      cometManifest: ClassTag[T]
   ): Unit = {
     val castClass = cometManifest.runtimeClass.asInstanceOf[Class[T]]
     val typeName = castClass.getSimpleName
@@ -2774,11 +2823,12 @@ class LiftSession(
     * exists, it is returned; otherwise, a new one of that type is created and
     * set up, then returned.
     */
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   private[http] def findOrCreateComet[T <: LiftCometActor](
       cometName: Box[String],
       cometHtml: NodeSeq,
       cometAttributes: Map[String, String]
-  )(implicit cometManifest: Manifest[T]): Box[T] = {
+  )(implicit cometManifest: ClassTag[T]): Box[T] = {
     val castClass = cometManifest.runtimeClass.asInstanceOf[Class[T]]
     val typeName = castClass.getSimpleName
 
@@ -2806,24 +2856,27 @@ class LiftSession(
     val creationInfo =
       CometCreationInfo(cometType, cometName, cometHtml, cometAttributes, this)
 
+    // SCALA3 Removing `_` for passing function as a value
     findOrBuildComet(
       creationInfo,
-      buildAndStoreComet(buildCometByCreationInfo) _
+      buildAndStoreComet(buildCometByCreationInfo)
     )
   }
 
   // Private helper function to do common comet setup handling for
   // `findOrBuildComet` overloads.
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   private def findOrBuildComet[T <: LiftCometActor](
       creationInfo: CometCreationInfo,
       newCometFn: (CometCreationInfo) => Box[T]
-  )(implicit cometManifest: Manifest[T]): Box[T] = {
+  )(implicit cometManifest: ClassTag[T]): Box[T] = {
     val cometInfo = CometId(creationInfo.cometType, creationInfo.cometName)
 
     testStatefulFeature {
       val existingOrNewComet = Box
         .legacyNullTest(nasyncComponents.get(cometInfo))
-        .asA[T] or newCometFn(creationInfo)
+        .asA[T]
+        .or(newCometFn(creationInfo))
 
       existingOrNewComet.map { comet =>
         cometPreMessagesById.atomicUpdate(_.filter {
@@ -2894,8 +2947,10 @@ class LiftSession(
   private def buildCometByCreationInfo(
       creationInfo: CometCreationInfo
   ): Box[LiftCometActor] = {
-    LiftRules.cometCreationFactory.vend.apply(creationInfo) or
-      NamedPF.applyBox(creationInfo, LiftRules.cometCreation.toList) or {
+    LiftRules.cometCreationFactory.vend
+      .apply(creationInfo)
+      .or(NamedPF.applyBox(creationInfo, LiftRules.cometCreation.toList))
+      .or({
         val cometType =
           findType[LiftCometActor](
             creationInfo.cometType,
@@ -2905,7 +2960,7 @@ class LiftSession(
         cometType.flatMap { cometClass =>
           buildCometByClass(cometClass)(creationInfo)
         } ?~ s"Failed to find specified comet class ${creationInfo.cometType}."
-      }
+      })
   }
 
   // Given a comet Class and CometCreationInfo, instantiate the given
@@ -2944,7 +2999,7 @@ class LiftSession(
     // the correct error.
     val attemptedComet = tryo(buildWithNoArgConstructor) match {
       case fail @ Failure(_, Full(_: java.lang.NoSuchMethodException), _) =>
-        fail or tryo(buildWithCreateInfoConstructor)
+        fail.or(tryo(buildWithCreateInfoConstructor))
 
       case other =>
         other
@@ -2975,19 +3030,21 @@ class LiftSession(
         <head/>
       <body>
         {
-      Helpers.errorDiv(<div>Error locating template.
+      Helpers
+        .errorDiv(<div>Error locating template.
             <br/>
           Message:
           <b>
             {in.msg}
           </b> <br/>{
-        in.exception
-          .map(e => <pre>
+          in.exception
+            .map(e => <pre>
           {e.toString}{e.getStackTrace.map(_.toString).mkString("\n")}
         </pre>)
-          .openOr(NodeSeq.Empty)
-      }
-        </div>) openOr NodeSeq.Empty
+            .openOr(NodeSeq.Empty)
+        }
+        </div>)
+        .openOr(NodeSeq.Empty)
     }
       </body>
     </html>
@@ -3098,7 +3155,7 @@ class LiftSession(
       }
 
       nasyncComponents.put(
-        CometId(ca.theType openOr "Roundtrip Comet Actor", ca.name),
+        CometId(ca.theType.openOr("Roundtrip Comet Actor"), ca.name),
         ca
       )
       nasyncById.put(ca.uniqueId, ca)
@@ -3123,23 +3180,29 @@ class LiftSession(
 
       val renderVersion = RenderVersion.get
 
-      val jvmanifest: Manifest[JValue] = implicitly
+      // SCALA3 Using `ClassTag` instead of `Manifest`
+      // SCALA3 Adding JValue parameter type
+      val jvmanifest: ClassTag[JValue[?]] = implicitly
 
       // SCALA3 using `x*` instead of `x: _*`
       val map = Map(info.map(i => i.name -> i)*)
 
-      def fixIt(in: Any): JValue = {
+      // SCALA3 Adding JValue parameter type
+      def fixIt(in: Any): JValue[?] = {
         in match {
-          case jv: JValue => jv
-          case a          => Extraction.decompose(a)
+          // SCALA3 Adding JValue parameter type matching case pattern
+          case jv: JValue[_] => jv
+          case a             => Extraction.decompose(a)
         }
       }
 
-      def localFunc(in: JValue): JsCmd = {
+      // SCALA3 Adding JValue parameter type
+      def localFunc(in: JValue[?]): JsCmd = {
         LAScheduler.execute(() => {
+          // SCALA3 Adding `case` for correct syntax desugaring
           executeInScope(currentReq, renderVersion)(for {
-            JString(guid) <- in \ "guid"
-            JString(name) <- in \ "name"
+            case JString(guid) <- in \ "guid"
+            case JString(name) <- in \ "name"
             func <- map.get(name)
             payload = in \ "payload"
             reified <-
@@ -3231,7 +3294,8 @@ class LiftSession(
 
                       }
 
-                      def send(value: JValue): Unit = {
+                      // SCALA3 Adding JValue parameter type
+                      def send(value: JValue[?]): Unit = {
                         if (!done_?) {
                           ca ! ItemMsg(guid, value)
                         }
@@ -3270,7 +3334,8 @@ class LiftSession(
     }
   }
 
-  private case class ItemMsg(guid: String, item: JValue)
+  // SCALA3 Adding JValue parameter type
+  private case class ItemMsg(guid: String, item: JValue[?])
   private case class DoneMsg(guid: String)
   private case class FailMsg(guid: String, msg: String)
 
@@ -3433,27 +3498,33 @@ private object SnippetNode {
 
 /** Stuff related to round trip messages
   */
+// SCALA3 Using `?` instead of `_`
+// SCALA3 Using `ClassTag` instead of `Manifest`
 sealed trait RoundTripInfo {
   def name: String
-  def manifest: Manifest[_]
+  def manifest: ClassTag[?]
 }
 
 /** The companion objects. Has tasty implicits
   */
 object RoundTripInfo {
+
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   implicit def lazyListBuilder[T](in: (String, T => LazyList[Any]))(implicit
-      m: Manifest[T]
+      m: ClassTag[T]
   ): RoundTripInfo =
     LazyListRoundTrip(in._1, in._2)(m)
 
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   implicit def simpleBuilder[T](in: (String, T => Any))(implicit
-      m: Manifest[T]
+      m: ClassTag[T]
   ): RoundTripInfo =
     SimpleRoundTrip(in._1, in._2)(m)
 
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   implicit def handledBuilder[T](
       in: (String, (T, RoundTripHandlerFunc) => Unit)
-  )(implicit m: Manifest[T]): RoundTripInfo =
+  )(implicit m: ClassTag[T]): RoundTripInfo =
     HandledRoundTrip(in._1, in._2)(m)
 }
 
@@ -3467,7 +3538,8 @@ trait RoundTripHandlerFunc {
     * @param value
     *   the data to send back.
     */
-  def send(value: JValue): Unit
+  // SCALA3 Adding JValue parameter type
+  def send(value: JValue[?]): Unit
 
   /** Send some JavaScript to execute on the client side
     * @param value
@@ -3489,14 +3561,19 @@ trait RoundTripHandlerFunc {
   def failure(msg: String): Unit
 }
 
+// SCALA3 Using `ClassTag` instead of `Manifest`
 final case class LazyListRoundTrip[T](name: String, func: T => LazyList[Any])(
-    implicit val manifest: Manifest[T]
+    implicit val manifest: ClassTag[T]
 ) extends RoundTripInfo
+
+// SCALA3 Using `ClassTag` instead of `Manifest`
 final case class SimpleRoundTrip[T](name: String, func: T => Any)(implicit
-    val manifest: Manifest[T]
+    val manifest: ClassTag[T]
 ) extends RoundTripInfo
+
+// SCALA3 Using `ClassTag` instead of `Manifest`
 final case class HandledRoundTrip[T](
     name: String,
     func: (T, RoundTripHandlerFunc) => Unit
-)(implicit val manifest: Manifest[T])
+)(implicit val manifest: ClassTag[T])
     extends RoundTripInfo

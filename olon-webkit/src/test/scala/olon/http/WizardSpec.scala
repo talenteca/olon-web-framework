@@ -64,7 +64,8 @@ class WizardSpec extends Specification {
     MyWizard.favoritePet.screenName must_== "Screen 3"
   }
 
-  "A field must have a correct Manifest" in {
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  "A field must have a correct ClassTag" in {
     MyWizard.nameAndAge.age.manifest.runtimeClass.getName must_== classOf[
       Int
     ].getName

@@ -14,7 +14,7 @@ import java.util.ResourceBundle
 import java.util.TimeZone
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{ConcurrentHashMap => CHash}
-import scala.reflect.Manifest
+import scala.reflect.ClassTag
 import scala.xml._
 import scala.compiletime.uninitialized
 
@@ -2391,7 +2391,8 @@ trait FormVendor {
 
   /** Given a type manifest, vend a form
     */
-  def vendForm[T](implicit man: Manifest[T]): Box[(T, T => Any) => NodeSeq] = {
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  def vendForm[T](implicit man: ClassTag[T]): Box[(T, T => Any) => NodeSeq] = {
     val name = man.toString
     // SCALA3 Using `?` instead of `_`
     val first: Option[List[FormBuilderLocator[?]]] =

@@ -1,7 +1,7 @@
 package olon
 package json
 
-import scala.reflect.Manifest
+import scala.reflect.ClassTag
 
 /** Functions to serialize and deserialize a case class. Custom serializer can
   * be inserted if a class is not a case class. <p> Example:<pre> val hints =
@@ -44,12 +44,14 @@ object Serialization {
 
   /** Deserialize from a String.
     */
-  def read[A](json: String)(implicit formats: Formats, mf: Manifest[A]): A =
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  def read[A](json: String)(implicit formats: Formats, mf: ClassTag[A]): A =
     parse(json).extract(formats, mf)
 
   /** Deserialize from a Reader.
     */
-  def read[A](in: Reader)(implicit formats: Formats, mf: Manifest[A]): A =
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  def read[A](in: Reader)(implicit formats: Formats, mf: ClassTag[A]): A =
     JsonParser.parse(in).extract(formats, mf)
 
   /** Create Serialization formats with given type hints. <p> Example:<pre> val

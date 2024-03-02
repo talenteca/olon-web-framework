@@ -29,12 +29,17 @@ object Extraction {
     * @throws MappingException
     *   is thrown if extraction fails
     */
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   def extract[A](
       json: JValue
-  )(implicit formats: Formats, mf: Manifest[A]): A = {
+  )(implicit formats: Formats, mf: ClassTag[A]): A = {
     // SCALA3 using `?` instead of `_`
-    def allTypes(mf: Manifest[?]): List[Class[?]] =
-      mf.runtimeClass :: (mf.typeArguments flatMap allTypes)
+    // SCALA3 Using `ClassTag` instead of `Manifest`
+    def allTypes(mf: ClassTag[?]): List[Class[?]] =
+      // SCALA3 FIXME allTypes is not compatible with the change from `Manifest` to `ClassTag`
+      List(mf.runtimeClass)
+      // SCALA3 ORIGINAL
+      // mf.runtimeClass :: (mf.typeArguments flatMap allTypes)
 
     try {
       val types = allTypes(mf)
@@ -49,9 +54,10 @@ object Extraction {
     * @see
     *   olon.json.JsonAST.JValue#extract
     */
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   def extractOpt[A](
       json: JValue
-  )(implicit formats: Formats, mf: Manifest[A]): Option[A] =
+  )(implicit formats: Formats, mf: ClassTag[A]): Option[A] =
     try { Some(extract(json)(formats, mf)) }
     catch { case _: MappingException => None }
 

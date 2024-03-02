@@ -2,6 +2,7 @@ package olon
 package json
 
 import java.lang.StringBuilder
+import scala.reflect.ClassTag
 
 /** This object contains the abstract syntax tree (or AST) for working with JSON
   * objects in lift-json.
@@ -714,9 +715,10 @@ object JsonAST {
       * res0: Person("joe")
       * }}}
       */
+    // SCALA3 Using `ClassTag` instead of `Manifest`
     def extract[A](implicit
         formats: Formats,
-        mf: Manifest[A]
+        mf: ClassTag[A]
     ): A =
       Extraction.extract(this)(formats, mf)
 
@@ -747,9 +749,10 @@ object JsonAST {
       * res1: Option[Person] = Some(Person(joe))
       * }}}
       */
+    // SCALA3 Using `ClassTag` instead of `Manifest`
     def extractOpt[A](implicit
         formats: Formats,
-        mf: Manifest[A]
+        mf: ClassTag[A]
     ): Option[A] =
       Extraction.extractOpt(this)(formats, mf)
 
@@ -771,9 +774,10 @@ object JsonAST {
       * res0: Person("joe")
       * }}}
       */
+    // SCALA3 Using `ClassTag` instead of `Manifest`
     def extractOrElse[A](
         default: => A
-    )(implicit formats: Formats, mf: Manifest[A]): A =
+    )(implicit formats: Formats, mf: ClassTag[A]): A =
       Extraction.extractOpt(this)(formats, mf).getOrElse(default)
 
     def toOpt: Option[JValue[?]] = this match {

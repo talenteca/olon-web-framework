@@ -3,7 +3,7 @@ package http
 
 import olon._
 
-import scala.reflect.Manifest
+import scala.reflect.ClassTag
 import scala.xml._
 
 import http._
@@ -453,8 +453,9 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     }) openOr AjaxOnDone.is
   }
 
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   protected def vendForm[T](implicit
-      man: Manifest[T]
+      man: ClassTag[T]
   ): Box[(T, T => Any) => NodeSeq] = Empty
 
   /** By default, are all the fields on all the screen in this wizard on the
@@ -515,8 +516,9 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
         */
       override def onConfirm_? = Screen.this.onConfirm_?
 
+      // SCALA3 Using `ClassTag` instead of `Manifest`
       override protected def otherFuncVendors(
-          what: Manifest[ValueType]
+          what: ClassTag[ValueType]
       ): Box[(ValueType, ValueType => Any) => NodeSeq] =
         Wizard.this.vendForm(manifest) or WizardRules.vendForm(manifest)
     }

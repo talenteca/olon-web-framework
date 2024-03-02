@@ -3,7 +3,7 @@ package http
 
 import olon.common._
 
-import scala.reflect.Manifest
+import scala.reflect.ClassTag
 
 import util._
 
@@ -19,7 +19,8 @@ trait Factory extends SimpleInjector {
     * specific vendors and use doWith to define the vendor just for the scope of
     * the call.
     */
-  abstract class FactoryMaker[T](_default: Vendor[T])(implicit man: Manifest[T])
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  abstract class FactoryMaker[T](_default: Vendor[T])(implicit man: ClassTag[T])
       extends StackableMaker[T]
       with Vendor[T] {
     registerInjection(this)(man)

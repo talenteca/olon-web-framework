@@ -4,7 +4,7 @@ package http
 import java.util.concurrent.atomic.AtomicReference
 import scala.xml._
 
-import reflect.Manifest
+import reflect.ClassTag
 import common._
 import util._
 import Helpers._
@@ -88,8 +88,9 @@ trait AbstractScreen extends Factory with Loggable {
 
   def screenValidate: List[FieldError] = validations.flatMap(_())
 
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   protected def vendForm[T](implicit
-      man: Manifest[T]
+      man: ClassTag[T]
   ): Box[(T, T => Any) => NodeSeq] = Empty
 
   protected def vendAVar[T](dflt: => T): NonCleanAnyVar[T]
@@ -156,9 +157,11 @@ trait AbstractScreen extends Factory with Loggable {
 
     def otherValueSet_? : Boolean = _otherValue.set_?
 
-    implicit def manifest: Manifest[ValueType]
+    // SCALA3 Using `ClassTag` instead of `Manifest`
+    implicit def manifest: ClassTag[ValueType]
 
-    protected def buildIt[T](implicit man: Manifest[T]): Manifest[T] = man
+    // SCALA3 Using `ClassTag` instead of `Manifest`
+    protected def buildIt[T](implicit man: ClassTag[T]): ClassTag[T] = man
 
     override def helpAsHtml: Box[NodeSeq] = Empty
 
@@ -184,8 +187,9 @@ trait AbstractScreen extends Factory with Loggable {
         .map(ns => SHtml.ElemAttr.applyToAllElems(ns, formElemAttrs))
     }
 
+    // SCALA3 Using `ClassTag` instead of `Manifest`
     protected def otherFuncVendors(
-        what: Manifest[ValueType]
+        what: ClassTag[ValueType]
     ): Box[(ValueType, ValueType => Any) => NodeSeq] = Empty
 
     def validate: List[FieldError] = currentField.doWith(this) {
@@ -210,10 +214,11 @@ trait AbstractScreen extends Factory with Loggable {
 
   protected object currentField extends ThreadGlobal[FieldIdentifier]
 
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   protected class FieldBuilder[T](
       name: => String,
       default: => T,
-      manifest: Manifest[T],
+      manifest: ClassTag[T],
       help: Box[NodeSeq],
       validations: List[T => List[FieldError]],
       filters: List[T => T],
@@ -308,7 +313,8 @@ trait AbstractScreen extends Factory with Loggable {
           */
         override lazy val formElemAttrs: Seq[SHtml.ElemAttr] = grabParams(stuff)
 
-        override implicit def manifest: Manifest[ValueType] =
+        // SCALA3 Using `ClassTag` instead of `Manifest`
+        override implicit def manifest: ClassTag[ValueType] =
           FieldBuilder.this.manifest
 
         override def helpAsHtml = newHelp
@@ -360,11 +366,12 @@ trait AbstractScreen extends Factory with Loggable {
     * @param stuff
     *   \- any filter or validation functions
     */
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   protected def builder[T](
       name: => String,
       default: => T,
       stuff: FilterOrValidate[T]*
-  )(implicit man: Manifest[T]): FieldBuilder[T] = {
+  )(implicit man: ClassTag[T]): FieldBuilder[T] = {
     new FieldBuilder[T](
       name,
       default,
@@ -433,10 +440,11 @@ trait AbstractScreen extends Factory with Loggable {
   protected case class DisplayIf(func: BaseField => Boolean)
       extends FilterOrValidate[Nothing]
 
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   protected def field[T](
       underlying: => BaseField { type ValueType = T },
       stuff: FilterOrValidate[T]*
-  )(implicit man: Manifest[T]): Field { type ValueType = T } = {
+  )(implicit man: ClassTag[T]): Field { type ValueType = T } = {
     val paramFieldId: Box[String] = (stuff.collect { case FormFieldId(id) =>
       id
     }).headOption
@@ -501,7 +509,8 @@ trait AbstractScreen extends Factory with Loggable {
 
       override def default = underlying.get
 
-      override implicit def manifest: Manifest[ValueType] = man
+      // SCALA3 Using `ClassTag` instead of `Manifest`
+      override implicit def manifest: ClassTag[ValueType] = man
 
       override def helpAsHtml = newHelp.or(underlying.helpAsHtml)
 
@@ -538,11 +547,12 @@ trait AbstractScreen extends Factory with Loggable {
     */
   protected implicit object BoxMarkerObj extends BoxMarker
 
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   protected def field[T](
       underlying: => Box[BaseField { type ValueType = T }],
       stuff: FilterOrValidate[T]*
   )(implicit
-      man: Manifest[T],
+      man: ClassTag[T],
       marker: BoxMarker
   ): Field { type ValueType = T } = {
     logger.trace("Field for " + marker)
@@ -612,7 +622,8 @@ trait AbstractScreen extends Factory with Loggable {
 
       override def default = underlying.openOrThrowException("legacy code").get
 
-      override implicit def manifest: Manifest[ValueType] = man
+      // SCALA3 Using `ClassTag` instead of `Manifest`
+      override implicit def manifest: ClassTag[ValueType] = man
 
       override def helpAsHtml = newHelp.or(underlying.flatMap(_.helpAsHtml))
 
@@ -660,11 +671,12 @@ trait AbstractScreen extends Factory with Loggable {
     * @param validate
     *   \- any validation functions
     */
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   protected def field[T](
       name: => String,
       default: => T,
       stuff: FilterOrValidate[T]*
-  )(implicit man: Manifest[T]): Field { type ValueType = T } =
+  )(implicit man: ClassTag[T]): Field { type ValueType = T } =
     new FieldBuilder[T](
       name,
       default,
@@ -787,8 +799,8 @@ trait AbstractScreen extends Factory with Loggable {
       screen: AbstractScreen
   ): Box[NoticeType.Value => MetaData] = {
     logger.trace("Notice type to attribute for " + screen)
-    inject[NoticeType.Value => MetaData] or LiftScreenRules
-      .inject[NoticeType.Value => MetaData]
+    inject[NoticeType.Value => MetaData]
+      .or(LiftScreenRules.inject[NoticeType.Value => MetaData])
   }
 
   /** Create a field that's added to the Screen
@@ -855,7 +867,8 @@ trait AbstractScreen extends Factory with Loggable {
 
           override def name: String = theName
 
-          override implicit def manifest: Manifest[T] = buildIt[T]
+          // SCALA3 Using `ClassTag` instead of `Manifest`
+          override implicit def manifest: ClassTag[T] = buildIt[T]
 
           override def default: T = defaultValue
 
@@ -894,7 +907,8 @@ trait AbstractScreen extends Factory with Loggable {
 
           override def name: String = theName
 
-          override implicit def manifest: Manifest[T] = buildIt[T]
+          // SCALA3 Using `ClassTag` instead of `Manifest`
+          override implicit def manifest: ClassTag[T] = buildIt[T]
 
           override def default: T = defaultValue
 

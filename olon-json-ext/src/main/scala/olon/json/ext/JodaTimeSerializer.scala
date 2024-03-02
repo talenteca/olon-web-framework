@@ -3,6 +3,7 @@ package json
 package ext
 
 import org.joda.time._
+import scala.reflect.ClassTag
 
 object JodaTimeSerializers {
   def all = List(
@@ -121,9 +122,10 @@ private[ext] trait ClassType[A, B] {
   def wrap(a: A)(implicit format: Formats): B
 }
 
-case class ClassSerializer[A: Manifest, B: Manifest](t: ClassType[A, B])
+// SCALA3 Using `ClassTag` instead of `Manifest`
+case class ClassSerializer[A: ClassTag, B: ClassTag](t: ClassType[A, B])
     extends Serializer[A] {
-  private val Class = implicitly[Manifest[A]].runtimeClass
+  private val Class = implicitly[ClassTag[A]].runtimeClass
 
   def deserialize(implicit
       format: Formats

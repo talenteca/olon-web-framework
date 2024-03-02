@@ -1150,8 +1150,8 @@ class LiftServlet extends Loggable {
 
     liftResp match {
       case ResponseWithReason(_, reason) =>
-        response setStatusWithReason (resp.code, reason)
-      case _ => response setStatus resp.code
+        response.setStatusWithReason(resp.code, reason)
+      case _ => response.setStatus(resp.code)
     }
 
     try {

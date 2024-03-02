@@ -3,15 +3,16 @@ package util
 
 import java.lang.ThreadLocal
 import java.util.concurrent.{ConcurrentHashMap => CHash}
-import scala.reflect.Manifest
+import scala.reflect.ClassTag
 import scala.xml.NodeSeq
 
 import common._
 
 /** A trait that does basic dependency injection.
   */
+// SCALA3 Using `ClassTag` instead of `Manifest`
 trait Injector {
-  implicit def inject[T](implicit man: Manifest[T]): Box[T]
+  implicit def inject[T](implicit man: ClassTag[T]): Box[T]
 }
 
 /** An implementation of Injector that has an implementation
@@ -23,14 +24,16 @@ trait SimpleInjector extends Injector {
   /** Perform the injection for the given type. You can call: inject[Date] or
     * inject[List[Map[String, PaymentThing]]]. The appropriate Manifest will be
     */
-  implicit def inject[T](implicit man: Manifest[T]): Box[T] =
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  implicit def inject[T](implicit man: ClassTag[T]): Box[T] =
     (Box !! diHash.get(man.toString))
       .flatMap(f => Helpers.tryo(f.apply()))
       .asInstanceOf[Box[T]]
 
   /** Register a function that will inject for the given Manifest
     */
-  def registerInjection[T](f: () => T)(implicit man: Manifest[T]): Unit = {
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  def registerInjection[T](f: () => T)(implicit man: ClassTag[T]): Unit = {
     diHash.put(man.toString, f)
   }
 
@@ -39,7 +42,8 @@ trait SimpleInjector extends Injector {
     * specific vendors and use doWith to define the vendor just for the scope of
     * the call.
     */
-  abstract class Inject[T](_default: Vendor[T])(implicit man: Manifest[T])
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  abstract class Inject[T](_default: Vendor[T])(implicit man: ClassTag[T])
       extends StackableMaker[T]
       with Vendor[T] {
     registerInjection(this)(man)
@@ -187,6 +191,7 @@ object Vendor {
   implicit def funcToVendor[T](f: () => T): Vendor[T] = apply(f)
 }
 
+// SCALA3 Using `ClassTag` instead of `Manifest`
 case class FormBuilderLocator[T](func: (T, T => Unit) => NodeSeq)(implicit
-    val manifest: Manifest[T]
+    val manifest: ClassTag[T]
 )

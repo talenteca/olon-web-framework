@@ -6,6 +6,7 @@ import java.util.TimeZone
 import java.util.concurrent.ConcurrentHashMap
 import scala.collection.concurrent.{Map => ConcurrentScalaMap}
 import scala.jdk.CollectionConverters._
+import scala.reflect.ClassTag
 
 /** Formats to use when converting JSON. Formats are usually configured by using
   * an implicit parameter: <pre> implicit val formats = olon.json.DefaultFormats
@@ -67,9 +68,10 @@ trait Formats { self: Formats =>
 
   /** Adds a field serializer for a given type to this formats.
     */
+  // SCALA3 Using `ClassTag` instead of `Manifest`
   def +[A](
       newSerializer: FieldSerializer[A]
-  )(implicit mf: Manifest[A]): Formats = new Formats {
+  )(implicit mf: ClassTag[A]): Formats = new Formats {
     val dateFormat = Formats.this.dateFormat
     override val typeHintFieldName = self.typeHintFieldName
     override val parameterNameReader = self.parameterNameReader
@@ -323,11 +325,13 @@ private[json] class ThreadLocal[A](init: => A)
   def apply() = get()
 }
 
-class CustomSerializer[A: Manifest](
+// SCALA3 Using `ClassTag` instead of `Manifest`
+class CustomSerializer[A: ClassTag](
     ser: Formats => (PartialFunction[JValue, A], PartialFunction[Any, JValue])
 ) extends Serializer[A] {
 
-  val Class = implicitly[Manifest[A]].runtimeClass
+  // SCALA3 Using `ClassTag` instead of `Manifest`
+  val Class = implicitly[ClassTag[A]].runtimeClass
 
   def deserialize(implicit format: Formats) = {
     case (TypeInfo(Class, _), json) =>
