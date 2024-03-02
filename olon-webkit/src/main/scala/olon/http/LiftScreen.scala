@@ -333,19 +333,19 @@ trait AbstractScreen extends Factory with Loggable {
   }
 
   implicit def strToListFieldError(msg: String): List[FieldError] =
-    List(FieldError(currentField.box.openOr( new FieldIdentifier {}), Text(msg)))
+    List(FieldError(currentField.box.openOr(new FieldIdentifier {}), Text(msg)))
 
   implicit def xmlToListFieldError(msg: NodeSeq): List[FieldError] =
-    List(FieldError(currentField.box.openOr( new FieldIdentifier {}), msg))
+    List(FieldError(currentField.box.openOr(new FieldIdentifier {}), msg))
 
   implicit def boxStrToListFieldError(msg: Box[String]): List[FieldError] =
     msg.toList.map(msg =>
-      FieldError(currentField.box.openOr( new FieldIdentifier {}), Text(msg))
+      FieldError(currentField.box.openOr(new FieldIdentifier {}), Text(msg))
     )
 
   implicit def boxXmlToListFieldError(msg: Box[NodeSeq]): List[FieldError] =
     msg.toList.map(msg =>
-      FieldError(currentField.box.openOr( new FieldIdentifier {}), msg)
+      FieldError(currentField.box.openOr(new FieldIdentifier {}), msg)
     )
 
   /** Create a FieldBuilder so you can add help screens, validations and
