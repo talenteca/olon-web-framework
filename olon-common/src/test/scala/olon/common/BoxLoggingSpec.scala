@@ -576,7 +576,6 @@ class BoxLoggingSpec extends Specification {
     }
 
     "when logging in a Loggable" in {
-      import olon.common.Logger
       import org.slf4j.{Logger => SLF4JLogger}
 
       val mockLogger = mock[SLF4JLogger]()

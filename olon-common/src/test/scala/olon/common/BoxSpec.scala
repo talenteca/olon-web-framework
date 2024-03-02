@@ -32,13 +32,13 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
 
   "A Box" can {
     "be created from a Option. It is Empty if the option is None" in {
-      Box(None) must beEmpty
+      Box(None).isEmpty must beTrue
     }
     "be created from a Option. It is Full(x) if the option is Some(x)" in {
       Box(Some(1)) must_== Full(1)
     }
     "be created from a List containing one element. It is Empty if the list is empty" in {
-      Box(Nil) must beEmpty
+      Box(Nil).isEmpty must beTrue
     }
     "be created from a List containing one element. It is Full(x) if the list is List(x)" in {
       Box(List(1)) must_== Full(1)
@@ -90,22 +90,22 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       Full(1).or(Full(2)) must_== Full(1)
     }
     "define an 'exists' method returning true if the Box value satisfies the function" in {
-      Full(1) exists { _ > 0 } must beTrue
+      Full(1).exists { _ > 0 } must beTrue
     }
     "define an exists method returning false if the Box value doesn't satisfy the function" in {
-      Full(0) exists { _ > 0 } must beFalse
+      Full(0).exists { _ > 0 } must beFalse
     }
     "define a forall method returning true if the Box value satisfies the function" in {
-      Full(1) forall { _ > 0 } must beTrue
+      Full(1).forall { _ > 0 } must beTrue
     }
     "define a forall method returning false if the Box value doesn't satisfy the function" in {
-      Full(0) forall { _ > 0 } must beFalse
+      Full(0).forall { _ > 0 } must beFalse
     }
     "define a 'filter' method, returning a Full Box if the filter is satisfied" in {
-      Full(1) filter { _ > 0 } must_== Full(1)
+      Full(1).filter { _ > 0 } must_== Full(1)
     }
     "define a 'filter' method, returning Empty if the filter is not satisfied" in {
-      Full(1) filter { _ == 0 } must beEmpty
+      Full(1).filter { _ == 0 }.isEmpty must beTrue
     }
     "define a 'filterMsg' method, returning a Failure if the filter predicate is not satisfied" in {
       Full(1).filterMsg("not equal to 0")(_ == 0) must_== Failure(
@@ -128,11 +128,10 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       } must_== Full("full")
     }
     "define a 'flatMap' method transforming its value in another Box. If the value is transformed in an Empty box, the total result is an Empty box" in {
-      val result = Full(0) flatMap {
-        x: Int =>
-          if (x > 0) Full("full") else Empty
+      val result = Full(0) flatMap { (x: Int) =>
+        if (x > 0) Full("full") else Empty
       }
-      result.must(beEmpty)
+      result.isEmpty.must(beTrue)
     }
     "define a 'flatten' method if it contains another Box." in {
       "If the inner box is a Full box, the final result is identical to that box" in {
@@ -156,7 +155,9 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
         )
       }
       "If the partial-function is not defined for the contents of this box, returns Empty" in {
-        Full("Hermione") collect { case "Albus" => "Dumbledore" } must beEmpty
+        Full("Hermione").collect { case "Albus" =>
+          "Dumbledore"
+        }.isEmpty must beTrue
       }
     }
     "define a 'transform' method that takes a PartialFunction to transform this box into another box" in {
@@ -296,7 +297,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     }
     "return itself if filtered with a predicate" in {
       val empty: Box[Int] = Empty
-      empty.filter { _ > 0 } must beEmpty
+      empty.filter { _ > 0 }.isEmpty must beTrue
     }
     "define an 'exists' method returning false" in {
       val empty: Box[Int] = Empty
@@ -308,7 +309,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     }
     "define a 'filter' method, returning Empty" in {
       val empty: Box[Int] = Empty
-      empty filter { _ > 0 } must beEmpty
+      empty.filter { _ > 0 }.isEmpty must beTrue
     }
     "define a 'filterMsg' method, returning a Failure" in {
       Empty.filterMsg("not equal to 0")(_ == 0) must_== Failure(
@@ -324,16 +325,16 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       total must_== 0
     }
     "define a 'map' method returning Empty" in {
-      Empty map { _.toString } must beEmpty
+      Empty.map { _.toString }.isEmpty must beTrue
     }
     "define a 'flatMap' method returning Empty" in {
-      Empty flatMap { (_: Int) => Full("full") } must beEmpty
+      Empty.flatMap { (_: Int) => Full("full") }.isEmpty must beTrue
     }
     "define a 'flatten' method returning Empty" in {
-      Empty.flatten must beEmpty
+      Empty.flatten.isEmpty must beTrue
     }
     "define a 'collect' method returning Empty" in {
-      Empty collect { case _ => "Some Value" } must beEmpty
+      Empty.collect { case _ => "Some Value" }.isEmpty must beTrue
     }
     "define a 'transform' method that takes a PartialFunction to transform this Empty box into another box" in {
       "If the partial-function is defined for Empty, returns the result of applying the partial function to it" in {
