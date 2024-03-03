@@ -901,7 +901,7 @@ object JsCmds {
   trait HasTime {
     def time: Box[TimeSpan]
 
-    def timeStr = time.map(_.millis.toString) openOr ""
+    def timeStr = time.map(_.millis.toString).openOr("")
   }
 
   case class After(time: TimeSpan, toDo: JsCmd) extends JsCmd {

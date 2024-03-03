@@ -144,12 +144,13 @@ case class HttpDigestAuthentication(realmName: String)(
     UnauthorizedDigestResponse(realm, Qop.AUTH, nonce, randomString(64))
   }
 
+  // SCALA3 Removing `_` for passing function as a value
   def verified_? = {
     case (req) => {
       getInfo(req) match {
         case Full(auth)
-            if (func.isDefinedAt((auth.userName, req, validate(auth) _))) =>
-          func((auth.userName, req, validate(auth) _)) match {
+            if (func.isDefinedAt((auth.userName, req, validate(auth)))) =>
+          func((auth.userName, req, validate(auth))) match {
             case true =>
               val ts = System.currentTimeMillis
               val nonceCreationTime: Long = nonceMap.getOrElse(auth.nonce, -1)

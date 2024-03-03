@@ -1602,7 +1602,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   def performTransform(in: LiftResponse): LiftResponse =
     responseTransformers.toList.foldLeft(in) {
-      case (in, pf: PartialFunction[_, _]) =>
+      // SCALA3 Using `LiftResponse` for explicit partial function types
+      case (in, pf: PartialFunction[LiftResponse, LiftResponse]) =>
         if (pf.isDefinedAt(in)) pf(in) else in
       case (in, f) => f(in)
     }

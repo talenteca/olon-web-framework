@@ -439,7 +439,9 @@ trait RestHelper extends LiftRules.DispatchPF {
   /** The stable identifier for JsonPost. You can use it as an extractor.
     */
   // SCALA3 Adding JValue type parameter
-  protected lazy val JsonPost = new TestPost[JValue[?]] with JsonTest with JsonBody
+  protected lazy val JsonPost = new TestPost[JValue[?]]
+    with JsonTest
+    with JsonBody
 
   /** The stable identifier for XmlPost. You can use it as an extractor.
     */
@@ -468,7 +470,9 @@ trait RestHelper extends LiftRules.DispatchPF {
   /** The stable identifier for JsonPut. You can use it as an extractor.
     */
   // SCALA3 Adding JValue type parameter
-  protected lazy val JsonPut = new TestPut[JValue[?]] with JsonTest with JsonBody
+  protected lazy val JsonPut = new TestPut[JValue[?]]
+    with JsonTest
+    with JsonBody
 
   /** The stable identifier for XmlPut. You can use it as an extractor.
     */
@@ -694,7 +698,10 @@ trait RestHelper extends LiftRules.DispatchPF {
     * JFields with those in toMerge
     */
   // SCALA3 Adding JValue type parameter
-  protected def mergeJson(original: JValue[?], toMerge: JValue[?]): JValue[?] = {
+  protected def mergeJson(
+      original: JValue[?],
+      toMerge: JValue[?]
+  ): JValue[?] = {
     def replace(lst: List[JField], f: JField): List[JField] =
       f :: lst.filterNot(_.name == f.name)
 

@@ -23,7 +23,7 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
     */
   def encodeUrl(url: String): String =
     if (shouldEncodeUrl) {
-      resp encodeURL url
+      resp.encodeURL(url)
     } else {
       url
     }
@@ -45,14 +45,14 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
 
   def setStatus(status: Int) = {
     _status = status
-    resp setStatus status
+    resp.setStatus(status)
   }
 
   def getStatus = _status
 
   def setStatusWithReason(status: Int, reason: String) = {
     _status = status
-    resp sendError (status, reason)
+    resp.sendError(status, reason)
   }
 
   def outputStream: OutputStream = resp.getOutputStream

@@ -130,6 +130,8 @@ private[servlet] class OfflineRequestSnapshot(
   /** The User-Agent of the request
     */
   lazy val userAgent: Box[String] =
-    headers find (_.name equalsIgnoreCase "user-agent") flatMap (_.values.headOption)
+    headers find (_.name.equalsIgnoreCase(
+      "user-agent"
+    )) flatMap (_.values.headOption)
 
 }

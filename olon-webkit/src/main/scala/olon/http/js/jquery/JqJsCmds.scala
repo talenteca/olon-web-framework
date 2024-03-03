@@ -322,7 +322,8 @@ object JqJE {
       *
       * See http://api.jquery.com/html/ .
       */
-    def apply(): JsExp with JsMember = new JsExp with JsMember {
+    // SCALA3 Using `&` instead of the `with` type operator
+    def apply(): JsExp & JsMember = new JsExp with JsMember {
       def toJsCmd = "html()"
     }
 
@@ -332,7 +333,8 @@ object JqJE {
       *
       * See http://api.jquery.com/html/ .
       */
-    def apply(content: NodeSeq): JsExp with JsMember = new JsExp with JsMember {
+    // SCALA3 Using `&` instead of the `with` type operator
+    def apply(content: NodeSeq): JsExp & JsMember = new JsExp with JsMember {
       val toJsCmd = fixHtmlCmdFunc("inline", content) { "html(" + _ + ")" }
     }
   }
@@ -345,7 +347,8 @@ object JqJE {
       *
       * See http://api.jquery.com/text/ .
       */
-    def apply(): JsExp with JsMember = new JsExp with JsMember {
+    // SCALA3 Using `&` instead of the `with` type operator
+    def apply(): JsExp & JsMember = new JsExp with JsMember {
       def toJsCmd = "text()"
     }
 
@@ -355,7 +358,8 @@ object JqJE {
       *
       * See http://api.jquery.com/text/ .
       */
-    def apply(content: String): JsExp with JsMember = new JsExp with JsMember {
+    // SCALA3 Using `&` instead of the `with` type operator
+    def apply(content: String): JsExp & JsMember = new JsExp with JsMember {
       def toJsCmd = "text(" + content.encJs + ")"
     }
   }
@@ -386,22 +390,26 @@ object JqJE {
   }
 
   object JqTabsClick {
-    def apply(tab: JsExp): JsExp with JsMember =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def apply(tab: JsExp): JsExp & JsMember =
       new JsExp with JsMember {
         def toJsCmd = "tabsClick(" + tab.toJsCmd + ")"
       }
 
-    def apply(tab: Int): JsExp with JsMember =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def apply(tab: Int): JsExp & JsMember =
       apply(Num(tab))
   }
 
   object JqTabs {
-    def apply(in: JsExp): JsExp with JsMember =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def apply(in: JsExp): JsExp & JsMember =
       new JsExp with JsMember {
         def toJsCmd = "tabs(" + in.toJsCmd + ")"
       }
 
-    def apply(): JsExp with JsMember =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def apply(): JsExp & JsMember =
       apply(JsRaw(""))
   }
 

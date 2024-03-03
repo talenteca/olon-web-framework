@@ -132,7 +132,7 @@ trait HTTPProvider {
       LiftRules.installServiceRequestTimer(NoOpServiceTimer)
     }
     try {
-      ResourceBundle.getBundle (LiftRules.liftCoreResourceName)
+      ResourceBundle.getBundle(LiftRules.liftCoreResourceName)
     } catch {
       case _: Exception =>
         logger.error(
