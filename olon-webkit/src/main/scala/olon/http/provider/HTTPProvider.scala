@@ -7,7 +7,6 @@ import olon.util._
 
 import java.util.Locale
 import java.util.ResourceBundle
-
 import scala.compiletime.uninitialized
 
 import Helpers._

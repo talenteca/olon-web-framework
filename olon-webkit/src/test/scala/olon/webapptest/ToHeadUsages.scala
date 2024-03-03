@@ -185,8 +185,9 @@ object ToHeadUsages extends Specification {
 
       def excludeBar(in: String): Boolean = in.startsWith("/bar")
 
+      // SCALA3 Removing `_` for passing function as a value
       val second =
-        LiftRules.excludePathFromContextPathRewriting.doWith(excludeBar _) {
+        LiftRules.excludePathFromContextPathRewriting.doWith(excludeBar) {
           Req.normalizeHtml(
             "/wombat",
             <span>

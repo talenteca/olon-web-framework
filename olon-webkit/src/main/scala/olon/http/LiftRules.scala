@@ -14,9 +14,9 @@ import java.util.ResourceBundle
 import java.util.TimeZone
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{ConcurrentHashMap => CHash}
+import scala.compiletime.uninitialized
 import scala.reflect.ClassTag
 import scala.xml._
-import scala.compiletime.uninitialized
 
 import common._
 import util._

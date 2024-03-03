@@ -27,16 +27,16 @@ object ContainerVarTests extends RestHelper {
   // object CaseVar extends ContainerVar(Moose("dog"))
 
   serve {
-    case "cv_int" :: Nil Get _ => <int>{IntVar.is}</int>
-    case "cv_int" :: AsInt(i) :: _ Get _ => {
+    case ("cv_int" :: Nil) `Get` _ => <int>{IntVar.is}</int>
+    case ("cv_int" :: AsInt(i) :: _) `Get` _ => {
       IntVar.set(i)
       <int>{IntVar.is}</int>
     }
   }
 
   serve {
-    case "cv_str" :: Nil Get _ => <str>{StrVar.is}</str>
-    case "cv_str" :: str :: _ Get _ => {
+    case ("cv_str" :: Nil) `Get` _ => <str>{StrVar.is}</str>
+    case ("cv_str" :: str :: _) `Get` _ => {
       StrVar.set(str)
       <str>{StrVar.is}</str>
     }

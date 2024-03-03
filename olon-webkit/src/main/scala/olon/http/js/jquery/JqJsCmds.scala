@@ -4,8 +4,6 @@ package js
 package jquery
 
 import olon.common._
-import olon.http.js.JE
-import olon.http.js.JsExp
 import olon.util.Helpers
 import olon.util.Helpers._
 import olon.util._

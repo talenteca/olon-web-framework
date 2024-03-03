@@ -24,9 +24,8 @@ class LiftMergeSpec extends Specification with XmlMatchers {
     () => (_: LiftSession) => false
   )
   testRules.excludePathFromContextPathRewriting.default
-    .set(() => {
-      in: String =>
-        in.startsWith("exclude-me")
+    .set(() => { (in: String) =>
+      in.startsWith("exclude-me")
     })
 
   val eventExtractingTestRules = new LiftRules()

@@ -5,10 +5,9 @@ import olon.common._
 import olon.http._
 import olon.util._
 
+import scala.compiletime.uninitialized
 import scala.xml.NodeSeq
 import scala.xml.Text
-
-import scala.compiletime.uninitialized
 
 import Helpers._
 import auth._

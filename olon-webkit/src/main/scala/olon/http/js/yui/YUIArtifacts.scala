@@ -3,7 +3,8 @@ package http
 package js
 package yui
 
-import olon.http.js.JsCmds
+// SCALA3 Removing old import calls
+//import olon.http.js.JsCmds
 import olon.util.Helpers
 
 import scala.xml.NodeSeq

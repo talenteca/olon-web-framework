@@ -11,7 +11,6 @@ import olon.http._
 import olon.util._
 
 import scala.annotation._
-
 import scala.compiletime.uninitialized
 
 import Helpers._

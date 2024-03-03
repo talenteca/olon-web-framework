@@ -1647,7 +1647,8 @@ trait ScreenWizardRendered extends Loggable {
     def restore(): Unit
   }
 
-  protected def createSnapshot: Snapshot
+  // SCALA3 FIXME Removing `protected` for access from tests
+  def createSnapshot: Snapshot
 
   def noticeTypeToAttr(
       screen: AbstractScreen

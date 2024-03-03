@@ -31,13 +31,13 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
     }
 
-    "succeed with original value if session is available" withSFor "/" in {
+    "succeed with original value if session is available".withSFor("/") in {
       val future = LAFutureWithSession.withCurrentSession("works!")
 
       future.get(timeout) must_== Full("works!")
     }
 
-    "have access to session variables in LAFuture task" withSFor "/" in {
+    "have access to session variables in LAFuture task".withSFor("/") in {
       SessionVar1("dzien dobry")
 
       val future = LAFutureWithSession.withCurrentSession(SessionVar1.is)
@@ -45,7 +45,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.get(timeout) must_== Full("dzien dobry")
     }
 
-    "have access to request variables in LAFuture task" withSFor "/" in {
+    "have access to request variables in LAFuture task".withSFor("/") in {
       ReqVar1("guten tag")
 
       val future = LAFutureWithSession.withCurrentSession(ReqVar1.is)
@@ -53,7 +53,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.get(timeout) must_== Full("guten tag")
     }
 
-    "have access to session variables in onComplete()" withSFor "/" in {
+    "have access to session variables in onComplete()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       SessionVar1.is
@@ -73,7 +73,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       SessionVar1.is must eventually(beEqualTo("thorgal"))
     }
 
-    "have access to request variables in onComplete()" withSFor "/" in {
+    "have access to request variables in onComplete()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       ReqVar1.is
@@ -93,7 +93,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       ReqVar1.is must eventually(beEqualTo("thor"))
     }
 
-    "have access to session variables in onFail()" withSFor "/" in {
+    "have access to session variables in onFail()".withSFor("/") in {
       // workaround for a possible race condition in SessionVar
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       SessionVar1.is
@@ -113,7 +113,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       SessionVar1.is must eventually(beEqualTo("kaboom!"))
     }
 
-    "have access to request variables in onFail()" withSFor "/" in {
+    "have access to request variables in onFail()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       ReqVar1.is
@@ -133,7 +133,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       ReqVar1.is must eventually(beEqualTo("nope!"))
     }
 
-    "have access to session variables in onSuccess()" withSFor "/" in {
+    "have access to session variables in onSuccess()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       SessionVar1.is
@@ -150,7 +150,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       SessionVar1.is must eventually(beEqualTo("done"))
     }
 
-    "have access to request variables in onSuccess()" withSFor "/" in {
+    "have access to request variables in onSuccess()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       ReqVar1.is
@@ -167,7 +167,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       ReqVar1.is must eventually(beEqualTo("my preciousss"))
     }
 
-    "have access to session variables in chains of filter()" withSFor "/" in {
+    "have access to session variables in chains of filter()".withSFor("/") in {
       SessionVar1("see")
       SessionVar2("me")
 
@@ -181,7 +181,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
     }
 
-    "have access to request variables in chains of filter()" withSFor "/" in {
+    "have access to request variables in chains of filter()".withSFor("/") in {
       ReqVar1("see")
       ReqVar2("me")
 
@@ -193,7 +193,9 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       filtered.get(timeout) must eventually(beEqualTo("they see me rollin"))
     }
 
-    "have access to session variables in chains of withFilter()" withSFor "/" in {
+    "have access to session variables in chains of withFilter()".withSFor(
+      "/"
+    ) in {
       SessionVar1("come")
       SessionVar2("prey")
 
@@ -209,7 +211,9 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
     }
 
-    "have access to request variables in chains of withFilter()" withSFor "/" in {
+    "have access to request variables in chains of withFilter()".withSFor(
+      "/"
+    ) in {
       ReqVar1("hurt")
       ReqVar2("precious")
 
@@ -225,7 +229,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
     }
 
-    "have access to session variables in chains of map()" withSFor "/" in {
+    "have access to session variables in chains of map()".withSFor("/") in {
       SessionVar1("b")
       SessionVar2("c")
 
@@ -235,7 +239,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       mapped.get(timeout) must_== Full("abc")
     }
 
-    "have access to request variables in chains of map()" withSFor "/" in {
+    "have access to request variables in chains of map()".withSFor("/") in {
       ReqVar1("b")
       ReqVar2("c")
 
@@ -245,7 +249,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       mapped.get(timeout) must_== Full("abc")
     }
 
-    "have access to session variables in chains of flatMap()" withSFor "/" in {
+    "have access to session variables in chains of flatMap()".withSFor("/") in {
       SessionVar1("e")
       SessionVar2("f")
 
@@ -263,7 +267,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       mapped.get(timeout) must_== Full("def")
     }
 
-    "have access to request variables in chains of flatMap()" withSFor "/" in {
+    "have access to request variables in chains of flatMap()".withSFor("/") in {
       ReqVar1("e")
       ReqVar2("f")
 
@@ -281,7 +285,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       mapped.get(timeout) must_== Full("def")
     }
 
-    "have access to session variables in foreach()" withSFor "/" in {
+    "have access to session variables in foreach()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       SessionVar1.is
@@ -292,7 +296,7 @@ class LAFutureWithSessionSpec extends WebSpec with ThrownMessages {
       SessionVar1.is must eventually(beEqualTo("cookie"))
     }
 
-    "have access to request variables in foreach()" withSFor "/" in {
+    "have access to request variables in foreach()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       ReqVar1.is

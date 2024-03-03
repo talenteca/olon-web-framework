@@ -123,7 +123,7 @@ class ReqSpec extends Specification with XmlMatchers {
     ) extends mockReq {
       val testJson = jsonString
       val parsedJson =
-        tryo(JsonParser.parse(jsonString)) openOr json.JsonAST.JNothing
+        tryo(JsonParser.parse(jsonString)).openOr(json.JsonAST.JNothing)
 
       def bodyBytes = {
         testJson.getBytes("UTF-8")
@@ -135,7 +135,7 @@ class ReqSpec extends Specification with XmlMatchers {
           """<boom><slam attribute="do it">Oh yeah</slam></boom>"""
     ) extends mockReq {
       val testXml = xmlString
-      val parsedXml = tryo(XML.loadString(xmlString)) openOr "totally failed"
+      val parsedXml = tryo(XML.loadString(xmlString)).openOr("totally failed")
 
       def bodyBytes = {
         testXml.getBytes("UTF-8")

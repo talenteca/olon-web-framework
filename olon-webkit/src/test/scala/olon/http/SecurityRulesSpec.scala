@@ -11,7 +11,7 @@ import scala.concurrent.duration.SECONDS
 class HttpsRulesSpec extends Specification {
   "HttpsRules" should {
     "default to no required HTTPS" in {
-      HttpsRules().headers must be empty
+      HttpsRules().headers must beEmpty
     }
 
     "provide a secure variant with 1-year max age and including sub-domains" in {
@@ -112,7 +112,7 @@ class ContentSecurityPolicySpec extends Specification {
 
     "provide no headers with enforcement and logging disabled" in {
       ContentSecurityPolicy()
-        .headers(enforce = false, logViolations = false) must be empty
+        .headers(enforce = false, logViolations = false) must beEmpty
     }
 
     "correctly generate restriction strings for the various restriction types" in {

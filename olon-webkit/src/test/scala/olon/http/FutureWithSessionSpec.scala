@@ -33,13 +33,13 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
     }
 
-    "succeed with original value if session is available" withSFor "/" in {
+    "succeed with original value if session is available".withSFor("/") in {
       val future = FutureWithSession.withCurrentSession("works!")
 
       future.value must eventually(beEqualTo(Some(Success("works!"))))
     }
 
-    "have access to session variables in Future task" withSFor "/" in {
+    "have access to session variables in Future task".withSFor("/") in {
       SessionVar1("dzien dobry")
 
       val future = FutureWithSession.withCurrentSession(SessionVar1.is)
@@ -47,7 +47,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("dzien dobry"))))
     }
 
-    "have access to request variables in Future task" withSFor "/" in {
+    "have access to request variables in Future task".withSFor("/") in {
       ReqVar1("guten tag")
 
       val future = FutureWithSession.withCurrentSession(ReqVar1.is)
@@ -55,7 +55,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("guten tag"))))
     }
 
-    "have access to session variables in onComplete()" withSFor "/" in {
+    "have access to session variables in onComplete()".withSFor("/") in {
       // workaround for a possible race condition in SessionVar
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       SessionVar1.is
@@ -69,7 +69,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       SessionVar1.is must eventually(beEqualTo("thorgal"))
     }
 
-    "have access to request variables in onComplete()" withSFor "/" in {
+    "have access to request variables in onComplete()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       ReqVar1.is
@@ -83,7 +83,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       ReqVar1.is must eventually(beEqualTo("thor"))
     }
 
-    "have access to session variables in chains of map()" withSFor "/" in {
+    "have access to session variables in chains of map()".withSFor("/") in {
       SessionVar1("b")
       SessionVar2("c")
 
@@ -93,7 +93,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       mapped.value must eventually(beEqualTo(Some(Success("abc"))))
     }
 
-    "have access to request variables in chains of map()" withSFor "/" in {
+    "have access to request variables in chains of map()".withSFor("/") in {
       ReqVar1("b")
       ReqVar2("c")
 
@@ -103,7 +103,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       mapped.value must eventually(beEqualTo(Some(Success("abc"))))
     }
 
-    "have access to session variables in chains of flatMap()" withSFor "/" in {
+    "have access to session variables in chains of flatMap()".withSFor("/") in {
       SessionVar1("e")
       SessionVar2("f")
 
@@ -121,7 +121,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       mapped.value must eventually(beEqualTo(Some(Success("def"))))
     }
 
-    "have access to request variables in chains of flatMap()" withSFor "/" in {
+    "have access to request variables in chains of flatMap()".withSFor("/") in {
       ReqVar1("e")
       ReqVar2("f")
 
@@ -139,7 +139,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       mapped.value must eventually(beEqualTo(Some(Success("def"))))
     }
 
-    "have access to session variables in chains of andThen()" withSFor "/" in {
+    "have access to session variables in chains of andThen()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       SessionVar1.is
@@ -155,7 +155,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("rambo"))))
     }
 
-    "have access to request variables in chains of andThen()" withSFor "/" in {
+    "have access to request variables in chains of andThen()".withSFor("/") in {
       // workaround for a possible race condition in AnyVarTrait
       // https://groups.google.com/forum/#!topic/liftweb/V1pWy14Wl3A
       ReqVar1.is
@@ -171,7 +171,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("conan"))))
     }
 
-    "have access to session variables in failed projection" withSFor "/" in {
+    "have access to session variables in failed projection".withSFor("/") in {
       SessionVar1("on purpose")
 
       val future = FutureWithSession
@@ -186,7 +186,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
     }
 
-    "have access to request variables in failed projection" withSFor "/" in {
+    "have access to request variables in failed projection".withSFor("/") in {
       ReqVar1("on purpose")
 
       val future = FutureWithSession
@@ -201,7 +201,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       )
     }
 
-    "have access to session variables in fallbackTo() result" withSFor "/" in {
+    "have access to session variables in fallbackTo() result".withSFor("/") in {
       SessionVar1("result")
 
       val future = FutureWithSession
@@ -212,7 +212,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("fallback result"))))
     }
 
-    "have access to request variables in fallbackTo() result" withSFor "/" in {
+    "have access to request variables in fallbackTo() result".withSFor("/") in {
       ReqVar1("result")
 
       val future = FutureWithSession
@@ -223,7 +223,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("fallback result"))))
     }
 
-    "have access to session variables with recover()" withSFor "/" in {
+    "have access to session variables with recover()".withSFor("/") in {
       SessionVar1("g")
       SessionVar2("h")
 
@@ -235,7 +235,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("failed gh"))))
     }
 
-    "have access to request variables with recover()" withSFor "/" in {
+    "have access to request variables with recover()".withSFor("/") in {
       ReqVar1("g")
       ReqVar2("h")
 
@@ -247,7 +247,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("failed gh"))))
     }
 
-    "have access to session variables with recoverWith()" withSFor "/" in {
+    "have access to session variables with recoverWith()".withSFor("/") in {
       SessionVar1("i")
       SessionVar2("j")
 
@@ -262,7 +262,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("failed ij"))))
     }
 
-    "have access to request variables with recoverWith()" withSFor "/" in {
+    "have access to request variables with recoverWith()".withSFor("/") in {
       ReqVar1("k")
       ReqVar2("l")
 
@@ -277,7 +277,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("failed kl"))))
     }
 
-    "have access to session variables with transform()" withSFor "/" in {
+    "have access to session variables with transform()".withSFor("/") in {
       SessionVar1("john")
       SessionVar2("rambo")
 
@@ -296,7 +296,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("john rambo"))))
     }
 
-    "have access to request variables with transform()" withSFor "/" in {
+    "have access to request variables with transform()".withSFor("/") in {
       ReqVar1("chuck")
       ReqVar2("norris")
 
@@ -312,7 +312,9 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("chuck norris"))))
     }
 
-    "have access to session variables with Try-based transform()" withSFor "/" in {
+    "have access to session variables with Try-based transform()".withSFor(
+      "/"
+    ) in {
       SessionVar1("john")
       SessionVar2("rambo")
 
@@ -330,7 +332,9 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("john rambo"))))
     }
 
-    "have access to request variables with Try-based transform()" withSFor "/" in {
+    "have access to request variables with Try-based transform()".withSFor(
+      "/"
+    ) in {
       ReqVar1("chuck")
       ReqVar2("norris")
 
@@ -348,7 +352,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("chuck norris"))))
     }
 
-    "have access to session variables with transformWith()" withSFor "/" in {
+    "have access to session variables with transformWith()".withSFor("/") in {
       SessionVar1("john")
       SessionVar2("rambo")
 
@@ -370,7 +374,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("john rambo"))))
     }
 
-    "have access to request variables with transformWith()" withSFor "/" in {
+    "have access to request variables with transformWith()".withSFor("/") in {
       ReqVar1("chuck")
       ReqVar2("norris")
 
@@ -392,7 +396,7 @@ class FutureWithSessionSpec extends WebSpec with ThrownMessages {
       future.value must eventually(beEqualTo(Some(Success("chuck norris"))))
     }
 
-    "yield another session aware future with zip()" withSFor "/" in {
+    "yield another session aware future with zip()".withSFor("/") in {
       ReqVar1("a")
       SessionVar1("hero")
 

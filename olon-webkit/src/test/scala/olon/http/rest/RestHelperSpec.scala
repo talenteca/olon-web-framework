@@ -13,7 +13,8 @@ object RestHelperSpecBoot {
   }
 }
 
-class RestHelperSpec extends WebSpec(RestHelperSpecBoot.boot _) {
+// SCALA3 Removing `_` for passing function as a value
+class RestHelperSpec extends WebSpec(RestHelperSpecBoot.boot) {
   sequential // This is important for using SessionVars, etc.
 
   "RestHelper" should {
@@ -33,55 +34,56 @@ class RestHelperSpec extends WebSpec(RestHelperSpecBoot.boot _) {
       method = "GET"
     }
 
-    "set OPTIONS method" withReqFor testOptionsReq in { req =>
+    "set OPTIONS method".withReqFor(testOptionsReq) in { req =>
       req.options_? must_== true
     }
 
-    "give the correct response" withReqFor testOptionsReq in { req =>
+    "give the correct response".withReqFor(testOptionsReq) in { req =>
       RestHelperSpecRest(req)() must beLike { case Full(OkResponse()) =>
         ok
       }
     }
 
-    "set PATCH method" withReqFor testPatchReq in { req =>
+    "set PATCH method".withReqFor(testPatchReq) in { req =>
       req.patch_? must_== true
     }
 
-    "respond async with something that CanResolveAsync" withReqFor testFutureReq in {
-      req =>
-        val helper = FutureRestSpecHelper()
+    "respond async with something that CanResolveAsync".withReqFor(
+      testFutureReq
+    ) in { req =>
+      val helper = FutureRestSpecHelper()
 
-        try {
-          helper(req)()
+      try {
+        helper(req)()
 
-          failure("Failed to respond asynchronously.")
-        } catch {
-          case ContinuationException(_, _, resolverFunction) =>
-            val result = new LAFuture[LiftResponse]
+        failure("Failed to respond asynchronously.")
+      } catch {
+        case ContinuationException(_, _, resolverFunction) =>
+          val result = new LAFuture[LiftResponse]
 
-            resolverFunction({ response => result.satisfy(response) })
+          resolverFunction({ response => result.satisfy(response) })
 
-            helper.future.satisfy(JObject(Nil))
+          helper.future.satisfy(JObject(Nil))
 
-            result.get must beLike { case JsonResponse(_, _, _, code) =>
-              code must_== 200
-            }
-        }
+          result.get must beLike { case JsonResponse(_, _, _, code) =>
+            code must_== 200
+          }
+      }
     }
   }
 }
 
 object RestHelperSpecRest extends RestHelper {
   serve {
-    case "api" :: "info" :: Nil Options _  => OkResponse()
-    case "api" :: "patched" :: Nil Patch _ => OkResponse()
+    case ("api" :: "info" :: Nil) `Options` _  => OkResponse()
+    case ("api" :: "patched" :: Nil) `Patch` _ => OkResponse()
   }
 }
 
 case class FutureRestSpecHelper() extends RestHelper {
   val future = new LAFuture[JValue]
 
-  serve { case "api" :: "futured" :: Nil Get _ =>
+  serve { case ("api" :: "futured" :: Nil) `Get` _ =>
     future
   }
 }

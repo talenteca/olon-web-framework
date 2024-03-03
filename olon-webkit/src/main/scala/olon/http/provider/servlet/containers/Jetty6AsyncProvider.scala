@@ -7,9 +7,6 @@ package containers
 import jakarta.servlet.http.HttpServletRequest
 import olon.common._
 import olon.http._
-// SCALA3 Removing all imported calls
-//import olon.http.provider._
-//import olon.http.provider.servlet._
 import olon.util._
 
 object Jetty6AsyncProvider extends AsyncProviderMeta {

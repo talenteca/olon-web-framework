@@ -5,10 +5,6 @@ package servlet
 
 import jakarta.servlet.ServletContext
 import olon.common._
-
-// SCALA3 Removing old imported calls
-//import olon.http.provider._
-
 import olon.util._
 
 import java.io.InputStream

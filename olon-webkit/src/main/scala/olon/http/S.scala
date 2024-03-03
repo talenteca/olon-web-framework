@@ -6,6 +6,7 @@ import java.util.ResourceBundle
 import java.util.TimeZone
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
+import scala.reflect.ClassTag
 import scala.xml._
 
 import common._
@@ -15,7 +16,6 @@ import Helpers._
 import js._
 import provider._
 import http.rest.RestContinuation
-import scala.reflect.ClassTag
 
 class SJBridge {
   def s = S

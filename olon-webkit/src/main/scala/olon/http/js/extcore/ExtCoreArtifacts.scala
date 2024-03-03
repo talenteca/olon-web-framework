@@ -3,7 +3,8 @@ package http
 package js
 package extcore
 
-import olon.http.js.JsCmds
+// SCALA3 Removing old import calls
+//import olon.http.js.JsCmds
 
 import scala.xml.NodeSeq
 

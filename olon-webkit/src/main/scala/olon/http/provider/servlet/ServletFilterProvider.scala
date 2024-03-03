@@ -6,11 +6,8 @@ package servlet
 import jakarta.servlet._
 import jakarta.servlet.http._
 import olon.common._
-
-// SCALA3 Removing old imported calls
-//import olon.http._
-
 import olon.util._
+
 import scala.compiletime.uninitialized
 
 trait ServletFilterProvider extends Filter with HTTPProvider {

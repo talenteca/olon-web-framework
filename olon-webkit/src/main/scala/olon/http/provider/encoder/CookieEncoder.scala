@@ -3,8 +3,9 @@ package http
 package provider
 package encoder
 
-import olon.http.provider.HTTPCookie
-import olon.http.provider.SameSite
+// SCALA3 Removing old import calls
+//import olon.http.provider.HTTPCookie
+//import olon.http.provider.SameSite
 
 import java.util._
 

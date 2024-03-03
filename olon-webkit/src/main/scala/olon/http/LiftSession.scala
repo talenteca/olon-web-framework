@@ -6,9 +6,10 @@ import org.mozilla.javascript.UniqueTag
 
 import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
+import scala.compiletime.uninitialized
+import scala.reflect.ClassTag
 import scala.xml.Group
 import scala.xml._
-import scala.compiletime.uninitialized
 
 import collection.mutable.{HashMap, ListBuffer}
 import js.JE.{AnonFunc, JsObj, JsRaw}
@@ -22,7 +23,6 @@ import js._
 import provider._
 import json._
 import json.JsonAST.{JString, JValue}
-import scala.reflect.ClassTag
 
 object LiftSession {
 
@@ -616,7 +616,7 @@ class LiftSession(
           case (_, RunnerHolder(_, _, Full(_)))               => true
           case (RunnerHolder(a, _, _), RunnerHolder(b, _, _)) => a < b
           // SCALA3 Using `null` instead of `_` for the only remaining case
-          case null                                           => false
+          case null => false
         }
     }
 

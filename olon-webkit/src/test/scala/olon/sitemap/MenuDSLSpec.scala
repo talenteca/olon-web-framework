@@ -27,7 +27,7 @@ class MenuDslSpec extends Specification {
         If(() => System.currentTimeMillis % 2 == 0, "So sad for you!")
 
       val menu1 = Menu("Test") / "foo" >> worthlessTest
-      val menu2 = Menu("Test") / "foo" rule worthlessTest
+      val menu2 = (Menu("Test") / "foo").rule(worthlessTest)
 
       // Got a weird type error when trying to just use "must contain" :(
       menu1.toMenu.loc.params.exists(_ == worthlessTest) mustEqual true
@@ -36,7 +36,7 @@ class MenuDslSpec extends Specification {
 
     "handle submenus" in {
       val menu =
-        Menu("Foo") / "test" submenus (
+        (Menu("Foo") / "test").submenus(
           Menu("Bar") / "bar",
           Menu("Bat") / "bat"
         )
@@ -46,8 +46,8 @@ class MenuDslSpec extends Specification {
 
     "handle sub-submenus" in {
       val menu =
-        Menu("Foo") / "test" submenus (
-          Menu("Bar") / "bar" submenus (
+        (Menu("Foo") / "test").submenus(
+          (Menu("Bar") / "bar").submenus(
             Menu("BarOne") / "bar" / "one",
             Menu("BarTwo") / "bar" / "two"
           ),
@@ -67,8 +67,8 @@ class MenuDslSpec extends Specification {
   "MenuItems" should {
     "support nesting deeper than two levels" in {
       val menu =
-        Menu("Foo") / "test" submenus (
-          Menu("Bar") / "bar" submenus (
+        (Menu("Foo") / "test").submenus(
+          (Menu("Bar") / "bar").submenus(
             Menu("BarOne") / "bar" / "one",
             Menu("BarTwo") / "bar" / "two",
             Menu("BarThree") / "bar" / "three"

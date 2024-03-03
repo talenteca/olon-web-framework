@@ -137,7 +137,8 @@ class SnippetSpec extends Specification with XmlMatchers {
 
       val ret =
         S.statelessInit(Req.nil) {
-          S.mapSnippetsWith("foo" -> testAttrs _) {
+          // SCALA3 Removing `_` for passing function as a value
+          S.mapSnippetsWith("foo" -> testAttrs) {
             for {
               s <- S.session
             } yield s.processSurroundAndInclude(
@@ -162,7 +163,8 @@ class SnippetSpec extends Specification with XmlMatchers {
 
       val ret =
         S.statelessInit(Req.nil) {
-          S.mapSnippetsWith("foo" -> testAttrs _) {
+          // SCALA3 Removing `_` for passing function as a value
+          S.mapSnippetsWith("foo" -> testAttrs) {
             for {
               s <- S.session
             } yield s.processSurroundAndInclude(
@@ -187,7 +189,8 @@ class SnippetSpec extends Specification with XmlMatchers {
 
       val ret =
         S.statelessInit(Req.nil) {
-          S.mapSnippetsWith("foo" -> testAttrs _) {
+          // SCALA3 Removing `_` for passing function as a value
+          S.mapSnippetsWith("foo" -> testAttrs) {
             val clStr =
               "l:foo?bing=bong&amp;fuzz=faz+snark&amp;noodle=FatPoodle"
             for {
@@ -211,7 +214,8 @@ class SnippetSpec extends Specification with XmlMatchers {
 
       val ret =
         S.statelessInit(Req.nil) {
-          S.mapSnippetsWith("foo" -> testAttrs _) {
+          // SCALA3 Removing `_` for passing function as a value
+          S.mapSnippetsWith("foo" -> testAttrs) {
             for {
               s <- S.session
             } yield s.processSurroundAndInclude(
@@ -281,7 +285,8 @@ class SnippetSpec extends Specification with XmlMatchers {
 
       val ret =
         S.statelessInit(Req.nil) {
-          S.mapSnippetsWith("foo" -> ChangeVar.foo _) {
+          // SCALA3 Removing `_` for passing function as a value
+          S.mapSnippetsWith("foo" -> ChangeVar.foo) {
             for {
               s <- S.session
             } yield s.processSurroundAndInclude(
@@ -302,7 +307,8 @@ class SnippetSpec extends Specification with XmlMatchers {
 
       val ret =
         S.init(makeReq, session) {
-          S.mapSnippetsWith("foo" -> ChangeVar.foo _) {
+          // SCALA3 Removing `_` for passing function as a value
+          S.mapSnippetsWith("foo" -> ChangeVar.foo) {
             for {
               s <- S.session
             } yield s.processSurroundAndInclude(
@@ -320,7 +326,8 @@ class SnippetSpec extends Specification with XmlMatchers {
 
       val ret =
         S.statelessInit(Req.nil) {
-          S.mapSnippetsWith("foo" -> Funky.foo _) {
+          // SCALA3 Removing `_` for passing function as a value
+          S.mapSnippetsWith("foo" -> Funky.foo) {
             for {
               s <- S.session
             } yield s.processSurroundAndInclude(
@@ -341,7 +348,8 @@ class SnippetSpec extends Specification with XmlMatchers {
 
       val ret =
         S.init(makeReq, session) {
-          S.mapSnippetsWith("foo" -> Funky.foo _) {
+          // SCALA3 Removing `_` for passing function as a value
+          S.mapSnippetsWith("foo" -> Funky.foo) {
             for {
               s <- S.session
             } yield s.processSurroundAndInclude(
@@ -416,7 +424,8 @@ class SnippetSpec extends Specification with XmlMatchers {
       val session = new LiftSession("", "hello", Empty)
 
       S.init(makeReq, session) {
-        S.mapSnippetsWith("foo" -> ChangeVar.foo _) {
+        // SCALA3 Removing `_` for passing function as a value
+        S.mapSnippetsWith("foo" -> ChangeVar.foo) {
           for {
             s <- S.session
           } yield s.processSurroundAndInclude(
