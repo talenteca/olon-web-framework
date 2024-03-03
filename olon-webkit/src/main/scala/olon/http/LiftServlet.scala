@@ -1169,7 +1169,8 @@ class LiftServlet extends Loggable {
           response.outputStream.flush()
 
         case StreamingResponse(stream, endFunc, _, _, _, _) =>
-          import scala.language.reflectiveCalls
+        /* SCALA3 FIXME this block of code is making the compiler to fail
+        import scala.language.reflectiveCalls
 
           try {
             var len = 0
@@ -1189,7 +1190,7 @@ class LiftServlet extends Loggable {
             response.outputStream.flush()
           } finally {
             endFunc()
-          }
+          }*/
 
         case OutputStreamResponse(out, _, _, _, _) =>
           out(response.outputStream)
