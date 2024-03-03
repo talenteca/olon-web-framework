@@ -1845,7 +1845,9 @@ trait LiftScreen
       override protected def __nameSalt = randomString(20)
     }
 
-  protected def createSnapshot = {
+  // SCALA3 Renaming as a public alternative to create a screen snapshot for not
+  // causing an internal type conflict
+  def createScreenSnapshot = {
     val prev = PrevSnapshot.get
     new ScreenSnapshot(ScreenVars.get, prev)
   }
@@ -2073,7 +2075,8 @@ trait LiftScreen
     else {
       validate match {
         case Nil =>
-          val snapshot = createSnapshot
+          val snapshot = createScreenSnapshot
+          // SCALA3 forcing casting to upper level class
           PrevSnapshot.set(Full(snapshot))
           finish()
           redirectBack()

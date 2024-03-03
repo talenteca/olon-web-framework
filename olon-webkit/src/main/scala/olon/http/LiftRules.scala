@@ -282,7 +282,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * sure to set them early in the boot process.
     */
   @volatile var securityRules: () => SecurityRules = () => defaultSecurityRules
-  private[http] lazy val lockedSecurityRules = securityRules()
+
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  lazy val lockedSecurityRules = securityRules()
 
   /** Defines the resources that are protected by authentication and
     * authorization. If this function is not defined for the input data, the
@@ -515,7 +517,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
   /** For each unload hook registered, run them during destroy()
     */
-  private[http] def runUnloadHooks(): Unit = {
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  def runUnloadHooks(): Unit = {
     unloadHooks.toList.foreach { f =>
       tryo { f() }
     }
@@ -645,7 +648,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   @volatile var siteMapFailRedirectLocation: List[String] = List()
 
-  private[http] def notFoundOrIgnore(
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  def notFoundOrIgnore(
       requestState: Req,
       session: Box[LiftSession]
   ): Box[LiftResponse] = {
@@ -894,7 +898,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val viewDispatch = RulesSeq[ViewDispatchPF]
 
-  private[http] def snippet(name: String): Box[DispatchSnippet] =
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  def snippet(name: String): Box[DispatchSnippet] =
     NamedPF.applyBox(name, snippetDispatch.toList)
 
   /** If the request times out (or returns a non-Response) you can intercept the
@@ -1276,11 +1281,14 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     }) {}
   }
 
-  private[http] val reqCnt = new AtomicInteger(0)
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  val reqCnt = new AtomicInteger(0)
 
-  @volatile private[http] var ending = false
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  @volatile var ending = false
 
-  private[http] def bootFinished(): Unit = {
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  def bootFinished(): Unit = {
     _doneBoot = true
   }
 
@@ -1305,7 +1313,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val allAround = RulesSeq[LoanWrapper]
 
-  private[http] def dispatchTable(req: HTTPRequest): List[DispatchPF] = {
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  def dispatchTable(req: HTTPRequest): List[DispatchPF] = {
     req match {
       case null => dispatch.toList
       case _ =>
@@ -2017,7 +2026,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   def mimeHeaders = _mimeHeaders.get
 
-  private[http] def withMimeHeaders[T](map: Map[String, List[String]])(
+  // SCALA3 FIXME Removing private access to enable mocking/real calls
+  def withMimeHeaders[T](map: Map[String, List[String]])(
       f: => T
   ): T = _mimeHeaders.doWith(Full(map))(f)
 

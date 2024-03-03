@@ -371,7 +371,9 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
   def currentScreen: Box[Screen] = CurrentScreen.is
 
-  def createSnapshot = {
+  // SCALA3 Renaming for an alternative to create a wizard snapshot for not
+  // causing an internal type conflict
+  def createWizardSnapshot = {
     val cs = CurrentScreen.is
     val prev = PrevSnapshot.is
     val onFirst = OnFirstScreen.is
@@ -389,7 +391,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     } yield {
       screen.validate match {
         case Nil => {
-          val snapshot = createSnapshot
+          val snapshot = createWizardSnapshot
           PrevSnapshot.set(Full(snapshot))
           val nextScreen = screen.nextScreen
           CurrentScreen.is.foreach { s =>

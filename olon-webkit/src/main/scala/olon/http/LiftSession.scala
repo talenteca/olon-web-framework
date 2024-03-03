@@ -1626,7 +1626,7 @@ class LiftSession(
           .or(
             LiftSession
               .findSnippetClass(cls)
-              .flatMap(c => instantiateOrRedirect(c) or findSnippetObject(cls))
+              .flatMap(c => instantiateOrRedirect(c).or(findSnippetObject(cls)))
           ) match {
           case Full(inst: StatefulSnippet) =>
             inst.addName(cls)
