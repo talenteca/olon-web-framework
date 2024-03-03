@@ -120,7 +120,8 @@ abstract class WebSpec(boot: () => Any = () => {})
 
     /** Modifies the request to POST the given request body JSON.
       */
-    def withPost(jval: JValue) = withMods { mockReq =>
+    // SCALA3 Adding JValue type parameter
+    def withPost(jval: JValue[?]) = withMods { mockReq =>
       mockReq.body = jval
       mockReq.method = "POST"
     }
@@ -144,7 +145,8 @@ abstract class WebSpec(boot: () => Any = () => {})
 
     /** Modifies the request to PUT the given request body JSON.
       */
-    def withPut(jval: JValue) = withMods { mockReq =>
+    // SCALA3 Adding JValue type parameter
+    def withPut(jval: JValue[?]) = withMods { mockReq =>
       mockReq.body = jval
       mockReq.method = "PUT"
     }

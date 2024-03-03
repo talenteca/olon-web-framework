@@ -357,8 +357,9 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
       () => {
         violation match {
           case Full(violation) =>
-            LiftRules.contentSecurityPolicyViolationReport(violation) or
-              Full(OkResponse())
+            LiftRules
+              .contentSecurityPolicyViolationReport(violation)
+              .or(Full(OkResponse()))
 
           case _ =>
             logger.warn(

@@ -49,7 +49,7 @@ object Templates {
     what match {
       case Nil => Empty
       case x :: xs =>
-        (checkForLiftView(part, last, x) or checkForFunc(whole, x)) match {
+        (checkForLiftView(part, last, x).or(checkForFunc(whole, x))) match {
           case Full(ret) => Full(ret)
           case _         => findInViews(whole, part, last, xs)
         }
@@ -360,7 +360,8 @@ class StateInStatelessException(msg: String)
 
 /** Holds a pair of parameters
   */
-private case class ParamPair(v: Any, clz: Class[_])
+// SCALA3 Using `?` instead of `_`
+private case class ParamPair(v: Any, clz: Class[?])
 
 /** a trait that defines some ways of constructing an instance
   */
@@ -368,15 +369,17 @@ private sealed trait ConstructorType
 
 /** A unit constructor... just pass in null
   */
-private final case class UnitConstructor(c: java.lang.reflect.Constructor[_])
+// SCALA3 Using `?` instead of `_`
+private final case class UnitConstructor(c: java.lang.reflect.Constructor[?])
     extends ConstructorType {
   def makeOne[T]: T = c.newInstance().asInstanceOf[T]
 }
 
 /** A parameter and session constructor
   */
+// SCALA3 Using `?` instead of `_`
 private final case class PAndSessionConstructor(
-    c: java.lang.reflect.Constructor[_]
+    c: java.lang.reflect.Constructor[?]
 ) extends ConstructorType {
   def makeOne[T](p: Any, s: LiftSession): T =
     c.newInstance(p.asInstanceOf[Object], s).asInstanceOf[T]
@@ -384,7 +387,8 @@ private final case class PAndSessionConstructor(
 
 /** A parameter constructor
   */
-private final case class PConstructor(c: java.lang.reflect.Constructor[_])
+// SCALA3 Using `?` instead of `_`
+private final case class PConstructor(c: java.lang.reflect.Constructor[?])
     extends ConstructorType {
   def makeOne[T](p: Any): T =
     c.newInstance(p.asInstanceOf[Object]).asInstanceOf[T]

@@ -8,6 +8,8 @@ import olon.util._
 import scala.xml.NodeSeq
 import scala.xml.Text
 
+import scala.compiletime.uninitialized
+
 import Helpers._
 import auth._
 
@@ -63,7 +65,7 @@ trait Loc[T] {
 
   /** The value of the Loc based on params (either Loc.Value or Loc.CalcValue)
     */
-  def paramValue: Box[T] = calcValue.flatMap(f => f()) or staticValue
+  def paramValue: Box[T] = calcValue.flatMap(f => f()).or(staticValue)
 
   private lazy val staticValue: Box[T] = {
     allParams.collectFirst { case Loc.Value(v) =>
@@ -99,7 +101,7 @@ trait Loc[T] {
     * defaultValue oe paramValue
     */
   def currentValue: Box[T] =
-    overrideValue or requestValue.is or defaultValue or paramValue
+    overrideValue.or(requestValue.is).or(defaultValue).or(paramValue)
 
   def childValues: List[T] = Nil
 
@@ -243,10 +245,11 @@ trait Loc[T] {
 
   /** The snippets provided by `LocParam`s
     */
+  // SCALA3 Using `T` for defining value snippets correct type
   lazy val calcSnippets: SnippetTest =
     allParams
-      .collect { case v: Loc.ValueSnippets[_] => v.snippets }
-      .reduceLeftOption(_ orElse _)
+      .collect { case v: Loc.ValueSnippets[T] => v.snippets }
+      .reduceLeftOption(_.orElse(_))
       .getOrElse(Map.empty)
 
   /** Look up a snippet by name, taking into account the current `Loc` value.
@@ -336,7 +339,7 @@ trait Loc[T] {
     * Loc.ValueTemplate parameter will take precedence over a value returned by
     * the calcTemplate method.
     */
-  def template: Box[NodeSeq] = paramTemplate or calcTemplate
+  def template: Box[NodeSeq] = paramTemplate.or(calcTemplate)
 
   /** The first Loc.Title in the param list.
     */
@@ -350,13 +353,14 @@ trait Loc[T] {
     * Loc.Title parameter will take precedence over the value returned by the
     * linkText method.
     */
-  def title(in: T): NodeSeq = paramTitle.map(_.apply(in)) openOr linkText(in)
+  def title(in: T): NodeSeq = paramTitle.map(_.apply(in)).openOr(linkText(in))
 
   /** The title of the location given the current value associated with this
     * Loc. If no current value is available, this will use the name of this Loc
     * as the title.
     */
-  def title: NodeSeq = currentValue.map(title _) openOr Text(name)
+  // SCALA3 Removing `_` for passing function as a value
+  def title: NodeSeq = currentValue.map(title).openOr(Text(name))
 
   /** The link text to be displayed for a value of type T
     */
@@ -364,9 +368,11 @@ trait Loc[T] {
 
   /** The title of the location given the current value associated with this Loc
     */
-  def linkText: Box[NodeSeq] = currentValue.map(linkText _)
+  // SCALA3 Removing `_` for passing function as a value
+  def linkText: Box[NodeSeq] = currentValue.map(linkText)
 
-  private var _menu: Menu = _
+  // SCALA3 Using `uninitialized` instead of `_`
+  private var _menu: Menu = uninitialized
 
   private[sitemap] def menu_=(m: Menu): Unit = {
     _menu = m
@@ -394,7 +400,8 @@ trait Loc[T] {
     )
   }
 
-  def breadCrumbs: List[Loc[_]] = {
+  // SCALA3 Using `?` instead of `_`
+  def breadCrumbs: List[Loc[?]] = {
     if (_menu != null) {
       _menu.breadCrumbs ::: List(this)
     } else {
@@ -546,7 +553,8 @@ object Loc {
     * SiteMap
     */
   trait LocParam[-T] {
-    def onCreate(loc: Loc[_]): Unit = {}
+    // SCALA3 Using `?` instead of `_`
+    def onCreate(loc: Loc[?]): Unit = {}
   }
 
   /** A type alias for LocParam instances that are applicable to any Loc
@@ -559,7 +567,8 @@ object Loc {
     */
   case class HttpAuthProtected(role: (Req) => Box[Role]) extends AnyLocParam {
 
-    override def onCreate(loc: Loc[_]): Unit = {
+    // SCALA3 Using `?` instead of `_`
+    override def onCreate(loc: Loc[?]): Unit = {
       LiftRules.httpAuthProtectedResource.append(
         new LiftRules.HttpAuthProtectedResourcePF() {
           def isDefinedAt(in: Req) = in.path.partPath == loc.link.uriList
@@ -952,13 +961,14 @@ case class CompleteMenu(lines: Seq[MenuItem]) {
   lazy val breadCrumbs: Seq[MenuItem] = lines.flatMap(_.breadCrumbs)
 }
 
+// SCALA3 Using `?` instead of `_`
 case class MenuItem(
     text: NodeSeq,
     uri: NodeSeq,
     kids: Seq[MenuItem],
     current: Boolean,
     path: Boolean,
-    info: List[Box[() => _]]
+    info: List[Box[() => ?]]
 ) {
 
   private var _placeholder = false
@@ -967,28 +977,30 @@ case class MenuItem(
   private var _cssClass: Box[String] = Empty
   def cssClass: Box[String] = _cssClass
 
+  // SCALA3 Using `?` instead of `_`
   def this(
       text: NodeSeq,
       uri: NodeSeq,
       kids: Seq[MenuItem],
       current: Boolean,
       path: Boolean,
-      info: List[Box[() => _]],
+      info: List[Box[() => ?]],
       ph: Boolean
   ) = {
     this(text, uri, kids, current, path, info)
     _placeholder = ph
   }
 
+  // SCALA3 Using `?` instead of `_`
   def this(
       text: NodeSeq,
       uri: NodeSeq,
       kids: Seq[MenuItem],
       current: Boolean,
       path: Boolean,
-      info: List[Box[() => _]],
+      info: List[Box[() => ?]],
       ph: Boolean,
-      loc: Loc[_]
+      loc: Loc[?]
   ) = {
     this(text, uri, kids, current, path, info)
     _placeholder = ph

@@ -172,7 +172,7 @@ trait PaginatorSnippet[T] extends Paginator[T] {
     * by a URL query parameter.
     */
   override def first: Long =
-    S.param(offsetParam).map(toLong) openOr _first max 0
+    S.param(offsetParam).map(toLong).openOr(_first) max 0
 
   /** Sets the default starting record of the page (URL query parameters take
     * precedence over this)
@@ -236,10 +236,11 @@ trait PaginatorSnippet[T] extends Paginator[T] {
   def paginate: CssSel = {
     import scala.math._
 
+    // SCALA3 Using `?` instead of `_`
     ".first *" #> pageXml(0, firstXml) &
       ".prev *" #> pageXml(max(first - itemsPerPage, 0), prevXml) &
-      ".all-pages *" #> pagesXml(0 until numPages) _ &
-      ".zoomed-pages *" #> pagesXml(zoomedPages) _ &
+      ".all-pages *" #> pagesXml(0 until numPages) &
+      ".zoomed-pages *" #> pagesXml(zoomedPages) &
       ".next *" #> pageXml(
         max(0, min(first + itemsPerPage, itemsPerPage * (numPages - 1))),
         nextXml
@@ -293,8 +294,8 @@ trait SortedPaginatorSnippet[T, C]
   override def sort: SortState = super.sort match {
     case (col, ascending) =>
       (
-        S.param("sort").map(toInt) openOr col,
-        S.param("asc").map(toBoolean) openOr ascending
+        S.param("sort").map(toInt).openOr(col),
+        S.param("asc").map(toBoolean).openOr(ascending)
       )
   }
 
@@ -314,9 +315,8 @@ trait SortedPaginatorSnippet[T, C]
   override def paginate: CssSel = {
     val headerTransforms =
       headers.zipWithIndex.map { case ((binding, _), colIndex) =>
-        s".$binding *" #> {
-          ns: NodeSeq =>
-            <a href={sortedPageUrl(first, sortedBy(colIndex))}>{ns}</a>
+        s".$binding *" #> { (ns: NodeSeq) =>
+          <a href={sortedPageUrl(first, sortedBy(colIndex))}>{ns}</a>
         }
       }
 

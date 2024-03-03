@@ -71,8 +71,9 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
   // SCALA3 Using `private` instead of `private[this]`
   @volatile private var _screenList: List[Screen] = Nil
 
+  // SCALA3 Using `?` instead of `_`
   private object ScreenVars
-      extends TransientRequestVar[Map[String, (NonCleanAnyVar[_], Any)]](
+      extends TransientRequestVar[Map[String, (NonCleanAnyVar[?], Any)]](
         Map()
       ) {
     override lazy val __nameSalt = Helpers.nextFuncName
@@ -136,10 +137,11 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
   def noticeTypeToAttr(
       screen: AbstractScreen
   ): Box[NoticeType.Value => MetaData] = {
-    screen.inject[NoticeType.Value => MetaData] or
-      inject[NoticeType.Value => MetaData] or
-      WizardRules.inject[NoticeType.Value => MetaData] or
-      screen.noticeTypeToAttr(screen)
+    screen
+      .inject[NoticeType.Value => MetaData]
+      .or(inject[NoticeType.Value => MetaData])
+      .or(WizardRules.inject[NoticeType.Value => MetaData])
+      .or(screen.noticeTypeToAttr(screen))
   }
 
   /** Override this method to do setup the first time the screen is entered
@@ -301,8 +303,9 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     }
   }
 
+  // SCALA3 Using `?` instead of `_`
   class WizardSnapshot(
-      private[http] val screenVars: Map[String, (NonCleanAnyVar[_], Any)],
+      private[http] val screenVars: Map[String, (NonCleanAnyVar[?], Any)],
       val currentScreen: Box[Screen],
       private[http] val snapshot: Box[WizardSnapshot],
       private val firstScreen: Boolean
@@ -576,15 +579,17 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       WizardVarHandler.clear(name)
 
     override protected def wasInitialized(name: String, bn: String): Boolean = {
-      val old: Boolean = WizardVarHandler.get(bn) openOr false
+      val old: Boolean = WizardVarHandler.get(bn).openOr(false)
       WizardVarHandler.set(bn, this, true)
       old
     }
 
     override protected def testWasSet(name: String, bn: String): Boolean = {
-      WizardVarHandler.get(name).isDefined || (WizardVarHandler.get(
-        bn
-      ) openOr false)
+      WizardVarHandler.get(name).isDefined || (WizardVarHandler
+        .get(
+          bn
+        )
+        .openOr(false))
     }
 
     /** Different Vars require different mechanisms for synchronization. This
@@ -599,7 +604,8 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     def get[T](name: String): Box[T] =
       ScreenVars.is.get(name).map(_._2.asInstanceOf[T])
 
-    def set[T](name: String, from: WizardVar[_], value: T): Unit =
+    // SCALA3 Using `?` instead of `_`
+    def set[T](name: String, from: WizardVar[?], value: T): Unit =
       ScreenVars.set(ScreenVars.is + (name -> (from, value)))
 
     def clear(name: String): Unit =

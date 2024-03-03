@@ -67,7 +67,7 @@ object SessionMaster extends LiftActor with Loggable {
     ) :: Nil
 
   def getSession(req: Req, otherId: Box[String]): Box[LiftSession] = {
-    val dead = otherId.map(killedSessions.containsKey(_)) openOr false
+    val dead = otherId.map(killedSessions.containsKey(_)).openOr(false)
 
     if (dead) Failure("dead session", Empty, Empty)
     else {
@@ -78,7 +78,7 @@ object SessionMaster extends LiftActor with Loggable {
           case _ if req.stateless_? =>
             lockAndBump {
               req.sessionId.flatMap(a => Box !! nsessions.get(a))
-            } or Full(LiftRules.statelessSession.vend.apply(req))
+            }.or(Full(LiftRules.statelessSession.vend.apply(req)))
           case _ => getSession(req.request, otherId)
         }
       }
@@ -101,14 +101,17 @@ object SessionMaster extends LiftActor with Loggable {
 
   def getSession(id: String, otherId: Box[String]): Box[LiftSession] =
     lockAndBump {
-      val dead = killedSessions.containsKey(id) || (otherId.map(
-        killedSessions.containsKey(_)
-      ) openOr false)
+      val dead = killedSessions.containsKey(id) || (otherId
+        .map(
+          killedSessions.containsKey(_)
+        )
+        .openOr(false))
 
       if (dead) (Failure("Dead session", Empty, Empty))
       else {
         otherId
-          .flatMap(a => Box !! nsessions.get(a)) or (Box !! nsessions.get(id))
+          .flatMap(a => Box !! nsessions.get(a))
+          .or(Box !! nsessions.get(id))
       }
     }
 
@@ -124,18 +127,22 @@ object SessionMaster extends LiftActor with Loggable {
       otherId: Box[String]
   ): Box[LiftSession] =
     lockAndBump {
-      otherId.flatMap(a => Box !! nsessions.get(a)) or (Box !! nsessions.get(
-        httpSession.sessionId
-      ))
+      otherId
+        .flatMap(a => Box !! nsessions.get(a))
+        .or(
+          Box !! nsessions.get(
+            httpSession.sessionId
+          )
+        )
     }
 
   /** Returns a LiftSession or Empty if not found
     */
   def getSession(req: HTTPRequest, otherId: Box[String]): Box[LiftSession] =
     lockAndBump {
-      otherId.flatMap(a => Box !! nsessions.get(a)) or req.sessionId.flatMap(
-        id => Box !! nsessions.get(id)
-      )
+      otherId
+        .flatMap(a => Box !! nsessions.get(a))
+        .or(req.sessionId.flatMap(id => Box !! nsessions.get(id)))
     }
 
   /** Increments the count and last access time for the session

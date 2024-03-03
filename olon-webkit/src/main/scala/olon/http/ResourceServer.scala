@@ -77,7 +77,7 @@ object ResourceServer {
               }
             case x => x
           }
-        }) openOr 0L
+        }).openOr(0L)
       lastModCache.put(str, ret)
       ret
     }
@@ -135,9 +135,10 @@ object ResourceServer {
     */
   def detectContentType(path: String): String = {
     // Configure response with content type of resource
-    (LiftRules.context.mimeType(path) or
-      (Box !! URLConnection.getFileNameMap().getContentTypeFor(path))) openOr
-      "application/octet-stream"
+    (LiftRules.context
+      .mimeType(path)
+      .or((Box !! URLConnection.getFileNameMap().getContentTypeFor(path))))
+      .openOr("application/octet-stream")
   }
 
   private def isAllowed(path: List[String]) =

@@ -68,7 +68,7 @@ trait XMLApiHelper {
     */
   implicit def canBoolToResponse(in: Box[Boolean]): LiftResponse =
     buildResponse(
-      in openOr false,
+      in.openOr(false),
       in match {
         case Failure(msg, _, _) => Full(Text(msg))
         case _                  => Empty

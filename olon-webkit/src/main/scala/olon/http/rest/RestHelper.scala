@@ -46,8 +46,9 @@ trait RestHelper extends LiftRules.DispatchPF {
   /** Take any value and convert it into a JValue. Full box if it works, empty
     * if it does
     */
-  protected def anyToJValue(in: Any): Box[JValue] = Helpers.tryo {
-    implicit def formats = DefaultFormats
+  // SCALA3 Adding JValue type parameter
+  protected def anyToJValue(in: Any): Box[JValue[?]] = Helpers.tryo {
+    implicit def formats: Formats = DefaultFormats
     Extraction.decompose(in)
   }
 
@@ -206,7 +207,8 @@ trait RestHelper extends LiftRules.DispatchPF {
 
   /** The stable identifier for JsonPatch. You can use it as an extractor.
     */
-  protected lazy val JsonPatch = new TestPatch[JValue]
+  // SCALA3 Using `?` instead of `_`
+  protected lazy val JsonPatch = new TestPatch[JValue[?]]
     with JsonTest
     with JsonBody
 
@@ -217,8 +219,9 @@ trait RestHelper extends LiftRules.DispatchPF {
   /** a trait that extracts the JSON body from a request It is composed with a
     * TestXXX to get the correct thing for the extractor
     */
+  // SCALA3 Adding JValue type parameter
   protected trait JsonBody {
-    def body(r: Req): Box[JValue] = r.json
+    def body(r: Req): Box[JValue[?]] = r.json
   }
 
   /** a trait that extracts the XML body from a request It is composed with a
@@ -435,7 +438,8 @@ trait RestHelper extends LiftRules.DispatchPF {
 
   /** The stable identifier for JsonPost. You can use it as an extractor.
     */
-  protected lazy val JsonPost = new TestPost[JValue] with JsonTest with JsonBody
+  // SCALA3 Adding JValue type parameter
+  protected lazy val JsonPost = new TestPost[JValue[?]] with JsonTest with JsonBody
 
   /** The stable identifier for XmlPost. You can use it as an extractor.
     */
@@ -463,7 +467,8 @@ trait RestHelper extends LiftRules.DispatchPF {
 
   /** The stable identifier for JsonPut. You can use it as an extractor.
     */
-  protected lazy val JsonPut = new TestPut[JValue] with JsonTest with JsonBody
+  // SCALA3 Adding JValue type parameter
+  protected lazy val JsonPut = new TestPut[JValue[?]] with JsonTest with JsonBody
 
   /** The stable identifier for XmlPut. You can use it as an extractor.
     */
@@ -550,7 +555,7 @@ trait RestHelper extends LiftRules.DispatchPF {
       asyncResolveProvider.resolveAsync(
         asyncBoxContainer,
         { resolvedBox =>
-          boxToResp(resolvedBox).apply() openOr NotFoundResponse()
+          boxToResp(resolvedBox).apply().openOr(NotFoundResponse())
         }
       )
     })
@@ -651,7 +656,8 @@ trait RestHelper extends LiftRules.DispatchPF {
 
   /** Convert a JValue to a LiftResponse
     */
-  implicit def jsonToResp(in: JsonAST.JValue): LiftResponse =
+  // SCALA3 Adding JValue type parameter
+  implicit def jsonToResp(in: JsonAST.JValue[?]): LiftResponse =
     JsonResponse(in)
 
   /** Convert a JsExp to a LiftResponse
@@ -687,7 +693,8 @@ trait RestHelper extends LiftRules.DispatchPF {
   /** Take an original piece of JSON (most probably, JObject and replace all the
     * JFields with those in toMerge
     */
-  protected def mergeJson(original: JValue, toMerge: JValue): JValue = {
+  // SCALA3 Adding JValue type parameter
+  protected def mergeJson(original: JValue[?], toMerge: JValue[?]): JValue[?] = {
     def replace(lst: List[JField], f: JField): List[JField] =
       f :: lst.filterNot(_.name == f.name)
 
@@ -757,8 +764,10 @@ sealed trait JsonXmlSelect
 
 /** The Type for JSON
   */
-final case object JsonSelect extends JsonXmlSelect
+// SCALA3 Removing innecesary final for object declarations
+case object JsonSelect extends JsonXmlSelect
 
 /** The type for XML
   */
-final case object XmlSelect extends JsonXmlSelect
+// SCALA3 Removing innecesary final for object declarations
+case object XmlSelect extends JsonXmlSelect

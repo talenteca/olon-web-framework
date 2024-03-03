@@ -153,7 +153,7 @@ package olon {
       private def realTestS[T](
           newSession: Box[LiftSession]
       )(f: () => T)(req: Req): T = {
-        val session = newSession openOr LiftSession(req)
+        val session = newSession.openOr(LiftSession(req))
         S.init(Box !! req, session) {
           f()
         }

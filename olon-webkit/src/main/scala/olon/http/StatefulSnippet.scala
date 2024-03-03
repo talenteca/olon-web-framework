@@ -111,8 +111,9 @@ trait RenderDispatch {
 
   /** The predefined dispatch
     */
+  // SCALA3 Removing `_` for passing function as a value
   def dispatch: PartialFunction[String, NodeSeq => NodeSeq] = Map(
-    "render" -> render _
+    "render" -> render
   )
 
   /** You have to define this method

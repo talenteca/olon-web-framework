@@ -8,13 +8,17 @@ import olon.util._
 import java.util.Locale
 import java.util.ResourceBundle
 
+import scala.compiletime.uninitialized
+
 import Helpers._
 
 /** Implement this trait in order to integrate Lift with other underlaying web
   * containers. Not necessarily JEE containers.
   */
 trait HTTPProvider {
-  private var actualServlet: LiftServlet = _
+
+  // SCALA3 Using `uninitialized` instead of `_`
+  private var actualServlet: LiftServlet = uninitialized
 
   def liftServlet = actualServlet
 
@@ -60,8 +64,8 @@ trait HTTPProvider {
       CurrentReq.doWith(newReq) {
         URLRewriter.doWith(url =>
           NamedPF
-            .applyBox(resp.encodeUrl(url), LiftRules.urlDecorate.toList) openOr
-            resp.encodeUrl(url)
+            .applyBox(resp.encodeUrl(url), LiftRules.urlDecorate.toList)
+            .openOr(resp.encodeUrl(url))
         ) {
           if (
             !(isLiftRequest_?(newReq) &&
@@ -78,13 +82,15 @@ trait HTTPProvider {
     */
   protected def bootLift(loader: Box[String]): Unit = {
     try {
-      val b: Bootable = loader.map(b =>
-        Class
-          .forName(b)
-          .getDeclaredConstructor()
-          .newInstance()
-          .asInstanceOf[Bootable]
-      ) openOr DefaultBootstrap
+      val b: Bootable = loader
+        .map(b =>
+          Class
+            .forName(b)
+            .getDeclaredConstructor()
+            .newInstance()
+            .asInstanceOf[Bootable]
+        )
+        .openOr(DefaultBootstrap)
       preBoot()
       b.boot()
     } catch {
@@ -126,7 +132,7 @@ trait HTTPProvider {
       LiftRules.installServiceRequestTimer(NoOpServiceTimer)
     }
     try {
-      ResourceBundle getBundle (LiftRules.liftCoreResourceName)
+      ResourceBundle.getBundle (LiftRules.liftCoreResourceName)
     } catch {
       case _: Exception =>
         logger.error(

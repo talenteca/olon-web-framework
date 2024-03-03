@@ -122,7 +122,7 @@ object S extends S {
       extends AFuncHolder {
     def this(proxyTo: AFuncHolder) = this(proxyTo, Empty)
 
-    def owner: Box[String] = _owner or proxyTo.owner
+    def owner: Box[String] = _owner.or(proxyTo.owner)
 
     def apply(in: List[String]): Any = proxyTo.apply(in)
 
@@ -460,7 +460,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see
     *   Req
     */
-  def request: Box[Req] = _request.box or CurrentReq.box
+  def request: Box[Req] = _request.box.or(CurrentReq.box)
 
   /** If this is an Ajax request, return the original request that created the
     * page. The original request is useful because it has the original path
@@ -469,12 +469,14 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @return
     *   the original request or if that's not available, the current request
     */
-  def originalRequest: Box[Req] = _originalRequest.get or request
+  def originalRequest: Box[Req] = _originalRequest.get.or(request)
 
+  // SCALA3 Using `?` instead of `_`
   private[http] object CurrentLocation
-      extends RequestVar[Box[sitemap.Loc[_]]](request.flatMap(_.location))
+      extends RequestVar[Box[sitemap.Loc[?]]](request.flatMap(_.location))
 
-  def location: Box[sitemap.Loc[_]] = CurrentLocation.is or {
+  // SCALA3 Using `?` instead of `_`
+  def location: Box[sitemap.Loc[?]] = CurrentLocation.is or {
     // try again in case CurrentLocation was accessed before the request was available
     request flatMap { r => CurrentLocation(r.location) }
   }
@@ -688,16 +690,21 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see
     *   Req.isIE
     */
-  def legacyIeCompatibilityMode: Boolean = session.map(
-    _.legacyIeCompatibilityMode.is
-  ) openOr false // LiftRules.calcIEMode()
+  def legacyIeCompatibilityMode: Boolean = session
+    .map(
+      _.legacyIeCompatibilityMode.is
+    )
+    .openOr(false) // LiftRules.calcIEMode()
 
   /** Get the current instance of HtmlProperties
     */
   def htmlProperties: HtmlProperties = {
-    session.map(_.requestHtmlProperties.is) openOr
-      LiftRules.htmlProperties.vend(
-        S.request openOr Req.nil
+    session
+      .map(_.requestHtmlProperties.is)
+      .openOr(
+        LiftRules.htmlProperties.vend(
+          S.request.openOr(Req.nil)
+        )
       )
   }
 
@@ -723,9 +730,11 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   DispatchHolder
     */
   def highLevelSessionDispatchList: List[DispatchHolder] =
-    session map (_.highLevelSessionDispatcher.toList.map(t =>
-      DispatchHolder(t._1, t._2)
-    )) openOr Nil
+    session
+      .map(
+        _.highLevelSessionDispatcher.toList.map(t => DispatchHolder(t._1, t._2))
+      )
+      .openOr(Nil)
 
   /** Adds a dispatch function for the current session, as opposed to a global
     * dispatch through LiftRules.dispatch. An example would be if we wanted a
@@ -767,7 +776,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   # clearHighLevelSessionDispatcher
     */
   def addHighLevelSessionDispatcher(name: String, disp: LiftRules.DispatchPF) =
-    session map (_.highLevelSessionDispatcher += (name -> disp))
+    session.map(_.highLevelSessionDispatcher += (name -> disp))
 
   /** Removes a custom dispatch function for the current session. See
     * addHighLevelSessionDispatcher for an example of usage.
@@ -785,7 +794,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   # clearHighLevelSessionDispatcher
     */
   def removeHighLevelSessionDispatcher(name: String) =
-    session map (_.highLevelSessionDispatcher -= name)
+    session.map(_.highLevelSessionDispatcher -= name)
 
   /** Clears all custom dispatch functions from the current session. See
     * addHighLevelSessionDispatcher for an example of usage.
@@ -800,7 +809,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   # clearHighLevelSessionDispatcher
     */
   def clearHighLevelSessionDispatcher =
-    session map (_.highLevelSessionDispatcher.clear())
+    session.map(_.highLevelSessionDispatcher.clear())
 
   /** Return the list of RewriteHolders set for this session. See
     * addSessionRewriter for an example of how to use per-session rewrites.
@@ -811,9 +820,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   LiftRules # rewrite
     */
   def sessionRewriter: List[RewriteHolder] =
-    session map (_.sessionRewriter.toList.map(t =>
-      RewriteHolder(t._1, t._2)
-    )) openOr Nil
+    session
+      .map(_.sessionRewriter.toList.map(t => RewriteHolder(t._1, t._2)))
+      .openOr(Nil)
 
   /** Adds a per-session rewrite function. This can be used if you only want a
     * particular rewrite to be valid within a given session. Per-session
@@ -857,7 +866,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   # clearSessionRewriter
     */
   def addSessionRewriter(name: String, rw: LiftRules.RewritePF) =
-    session map (_.sessionRewriter += (name -> rw))
+    session.map(_.sessionRewriter += (name -> rw))
 
   /** Removes the given per-session rewriter. See addSessionRewriter for an
     * example of usage.
@@ -870,7 +879,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   # clearSessionRewriter
     */
   def removeSessionRewriter(name: String) =
-    session map (_.sessionRewriter -= name)
+    session.map(_.sessionRewriter -= name)
 
   /** Put the given Elem in the head tag. The Elems will be de-dupped so no
     * problems adding the same style tag multiple times
@@ -1073,7 +1082,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see
     *   # removeSessionRewriter
     */
-  def clearSessionRewriter = session map (_.sessionRewriter.clear())
+  def clearSessionRewriter = session.map(_.sessionRewriter.clear())
 
   /** Test the current request to see if it's a POST. This is a thin wrapper
     * over Req.post_?
@@ -1215,7 +1224,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                     (name, loc),
                     LiftRules.resourceBundleFactories.toList
                   )
-                  .map(List(_)) openOr Nil
+                  .map(List(_))
+                  .openOr(Nil)
               )
             )
         )
@@ -1380,7 +1390,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
 
   def uriAndQueryString: Box[String] = for {
     req <- this.request
-  } yield req.uri + (queryString.map(s => "?" + s) openOr "")
+  } yield req.uri + (queryString.map(s => "?" + s).openOr(""))
 
   /** Run any configured exception handlers and make sure errors in the handlers
     * are ignored
@@ -1395,10 +1405,12 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
         (Props.mode, req, orig),
         LiftRules.exceptionHandler.toList
       );
-    } openOr Full(
-      PlainTextResponse(
-        "An error has occurred while processing an error using the functions in LiftRules.exceptionHandler. Check the log for details.",
-        500
+    }.openOr(
+      Full(
+        PlainTextResponse(
+          "An error has occurred while processing an error using the functions in LiftRules.exceptionHandler. Check the log for details.",
+          500
+        )
       )
     )
   }
@@ -1943,8 +1955,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   }
 
   private[http] def withReq[T](req: Box[Req])(f: => T): T = {
-    CurrentReq.doWith(req openOr null) {
-      _request.doWith(req openOr null) {
+    CurrentReq.doWith(req.openOr(null)) {
+      _request.doWith(req.openOr(null)) {
         f
       }
     }
@@ -1995,7 +2007,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   the value from executing LiftRules.loggedInTest, or <code>false</code>
     *   if a test function is not defined.
     */
-  def loggedIn_? : Boolean = LiftRules.loggedInTest.map(_.apply()) openOr false
+  def loggedIn_? : Boolean = LiftRules.loggedInTest.map(_.apply()).openOr(false)
 
   /** Returns the 'Referer' HTTP header attribute.
     */
@@ -2026,7 +2038,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   <code>true</code> if mapped functions will currently last the life of
     *   the session.
     */
-  def functionLifespan_? : Boolean = _lifeTime.box openOr false
+  def functionLifespan_? : Boolean = _lifeTime.box.openOr(false)
 
   /** Get a list of current attributes. Each attribute item is a pair of
     * (key,value). The key is an Either that depends on whether the attribute is
@@ -2549,7 +2561,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *
     * Will return "Hello.world".
     */
-  def invokedAs: String = (currentSnippet or attr("type")) openOr ""
+  def invokedAs: String = (currentSnippet.or(attr("type"))).openOr("")
 
   /** Sets a HttpSession attribute
     *
@@ -2622,12 +2634,12 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * HTTP header, or if that does not exist, the DNS name or IP address of the
     * server.
     */
-  def hostName: String = request.map(_.hostName) openOr Req.localHostName
+  def hostName: String = request.map(_.hostName).openOr(Req.localHostName)
 
   /** The host and path of the request up to and including the context path.
     * This does not include the template path or query string.
     */
-  def hostAndPath: String = request.map(_.hostAndPath) openOr ""
+  def hostAndPath: String = request.map(_.hostAndPath).openOr("")
 
   /** Get a map of function name bindings that are used for form and other
     * processing. Using these bindings is considered advanced functionality.
@@ -2658,7 +2670,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   /** The current context path for the deployment.
     */
   def contextPath: String =
-    (request.map(_.contextPath) or session.map(_.contextPath)) openOr ""
+    (request.map(_.contextPath).or(session.map(_.contextPath))).openOr("")
 
   /** Finds a snippet function by name.
     *
@@ -2720,7 +2732,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     *   should failed snippets be ignored and have the original NodeSeq
     *   returned?
     */
-  def ignoreFailedSnippets: Boolean = _ignoreFailedSnippets.box openOr false
+  def ignoreFailedSnippets: Boolean = _ignoreFailedSnippets.box.openOr(false)
 
   private object _currentSnippet extends RequestVar[Box[String]](Empty)
 
@@ -2908,7 +2920,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * LiftRules.urlDecorate
     */
   def encodeURL(url: String) = {
-    URLRewriter.rewriteFunc map (_(url)) openOr url
+    URLRewriter.rewriteFunc.map(_(url)).openOr(url)
   }
 
   private[http] object _formGroup extends TransientRequestVar[Box[Int]](Empty)
@@ -2921,7 +2933,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       case _                          => true
     }
 
-  def disableTestFuncNames_? : Boolean = _disableTestFuncNames.box openOr false
+  def disableTestFuncNames_? : Boolean = _disableTestFuncNames.box.openOr(false)
 
   def disableTestFuncNames[T](f: => T): T =
     _disableTestFuncNames.doWith(true) {
@@ -2940,7 +2952,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   /** Generates a func-name based on the location in the call-site source code.
     */
   def generatePredictableFuncName: String = {
-    val bump: Long = ((_formGroup.is openOr 0) + 1000L) * 100000L
+    val bump: Long = ((_formGroup.is.openOr(0)) + 1000L) * 100000L
     val num: Int = formItemNumber.is
     formItemNumber.set(num + 1)
     import java.text._
@@ -3038,17 +3050,20 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       }.foldLeft(JsCmds.Noop)(_ & _)
 
       val onErrorFunc: String =
-        onError.map(f =>
-          JsCmds
-            .Run("function onError_" + key + "() {" + f.toJsCmd + """
+        onError
+          .map(f =>
+            JsCmds
+              .Run("function onError_" + key + "() {" + f.toJsCmd + """
   }
 
    """).toJsCmd
-        ) openOr ""
+          )
+          .openOr("")
 
-      val onErrorParam = onError.map(_ => "onError_" + key) openOr "null"
+      val onErrorParam = onError.map(_ => "onError_" + key).openOr("null")
 
-      val af: AFuncHolder = jsonCallback _
+      // SCALA3 Using `?` instead of `_`
+      val af: AFuncHolder = jsonCallback
       addFunctionMap(key, af)
 
       (
@@ -3082,7 +3097,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * then it is automatically cleaned up from functions caches.
     */
   def mapFuncToURI(uri: String, f: () => Unit): String = {
-    session map (_ attachRedirectFunc (uri, Box.legacyNullTest(f))) openOr uri
+    session.map(_.attachRedirectFunc(uri, Box.legacyNullTest(f))).openOr(uri)
   }
 
   /** Execute code synchronized to the current session object
@@ -3158,8 +3173,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * a JsCmd to be sent back to the browser. Note that if the passed JSON does
     * not parse, the function will not be invoked.
     */
+  // SCALA3 Adding JValue type parameter
   def jsonFmapFunc[T](
-      in: JValue => JsCmd
+      in: JValue[?] => JsCmd
   )(f: String => T)(implicit dummy: AvoidTypeErasureIssues1): T = {
     logger.trace("Avoiding type erasure issues 1 with " + dummy)
 
@@ -3315,7 +3331,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def messagesById(id: String)(
       f: => List[(NodeSeq, Box[String])]
-  ): List[NodeSeq] = f filter (_._2 map (_ equals id) openOr false) map (_._1)
+  ): List[NodeSeq] = f filter (_._2.map(_.equals(id)).openOr(false)) map (_._1)
 
   /** Returns all messages, associated with any id or not
     *
@@ -3348,7 +3364,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     f.filter(_._2.isEmpty == false)
       .foreach(_ match {
         case (node, id) =>
-          val key = id openOrThrowException ("legacy code")
+          val key = id.openOrThrowException("legacy code")
           res += (key -> (res.getOrElseUpdate(key, Nil) ::: List(node)))
       })
 

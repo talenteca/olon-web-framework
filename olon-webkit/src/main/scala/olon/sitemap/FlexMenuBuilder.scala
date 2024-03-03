@@ -33,16 +33,19 @@ trait FlexMenuBuilder extends Loggable {
 
   /** This is used to build a MenuItem for a single Loc
     */
+  // SCALA3 Using `?` instead of `_`
   protected def buildItemMenu[A](
       loc: Loc[A],
-      currLoc: Box[Loc[_]],
+      currLoc: Box[Loc[?]],
       expandAll: Boolean
   ): List[MenuItem] = {
-    val isInPath = currLoc.map { cur =>
-      def isInPath(loc: Loc[_]): Boolean =
-        (cur == loc) || loc.menu.kids.exists(k => isInPath(k.loc))
-      isInPath(loc)
-    } openOr false
+    val isInPath = (currLoc
+      .map { cur =>
+        def isInPath(loc: Loc[?]): Boolean =
+          (cur == loc) || loc.menu.kids.exists(k => isInPath(k.loc))
+        isInPath(loc)
+      })
+      .openOr(false)
 
     val kids: List[MenuItem] =
       if (expandAll) loc.buildKidMenuItems(loc.menu.kids) else Nil
@@ -213,7 +216,7 @@ trait FlexMenuBuilder extends Loggable {
          sm <- LiftRules.siteMap;
          req <- S.request
        } yield sm.buildMenu(req.location).lines
-     else S.request.map(_.buildMenu.lines)) openOr Nil
+     else S.request.map(_.buildMenu.lines)).openOr(Nil)
 
   def render: NodeSeq = {
 
@@ -235,15 +238,19 @@ trait FlexMenuBuilder extends Loggable {
                 if m.placeholder_? && kids.isEmpty =>
               emptyPlaceholder
             case m @ MenuItem(_, _, _, _, _, _) if m.placeholder_? =>
-              renderPlaceholder(m, buildLine _)
+              // SCALA3 Removing `_` for passing function as a value
+              renderPlaceholder(m, buildLine)
             case m @ MenuItem(_, _, _, true, _, _) if linkToSelf =>
               renderSelfLinked(m, k => ifExpandCurrent(buildLine(k)))
             case m @ MenuItem(_, _, _, true, _, _) =>
               renderSelfNotLinked(m, k => ifExpandCurrent(buildLine(k)))
             // Not current, but on the path, so we need to expand children to show the current one
             case m @ MenuItem(_, _, _, _, true, _) =>
-              renderItemInPath(m, buildLine _)
-            case m => renderItem(m, buildLine _)
+              // SCALA3 Removing `_` for passing function as a value
+              renderItemInPath(m, buildLine)
+            case m =>
+              // SCALA3 Removing `_` for passing function as a value
+              renderItem(m, buildLine)
           }
         }
 

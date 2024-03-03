@@ -120,8 +120,8 @@ trait SHtml extends Loggable {
     */
   def makeAjaxCall(in: JsExp, context: AjaxContext): JsExp = new JsExp {
     def toJsCmd =
-      "lift.ajax(" + in.toJsCmd + ", " + (context.success openOr "null") +
-        ", " + (context.failure openOr "null") +
+      "lift.ajax(" + in.toJsCmd + ", " + (context.success.openOr("null")) +
+        ", " + (context.failure.openOr("null")) +
         ", " + context.responseType.toString.encJs +
         ")"
   }
@@ -1312,7 +1312,8 @@ trait SHtml extends Loggable {
     //  (nonces, defaultNonce, SFuncHolder(process))
 
     // SCALA3 using `x*` instead of `x: _*`
-    ajaxSelect_*(nonces, defaultNonce, Empty, SFuncHolder(process _), attrs*)
+    // Removing `_` for passing function as a value
+    ajaxSelect_*(nonces, defaultNonce, Empty, SFuncHolder(process), attrs*)
   }
 
   /** Create a select box based on the list with a default value and the
@@ -1381,11 +1382,12 @@ trait SHtml extends Loggable {
     //  (nonces, defaultNonce, SFuncHolder(process))
 
     // SCALA3 using `x*` instead of `x: _*`
+    // Removing `_` for passing function as a value
     ajaxSelect_*(
       nonces,
       defaultNonce,
       Full(jsFunc),
-      SFuncHolder(process _),
+      SFuncHolder(process),
       attrs*
     )
   }
@@ -1653,10 +1655,10 @@ trait SHtml extends Loggable {
   }
 
   private def isRadio(in: MetaData): Boolean =
-    in.get("type").map(_.text equalsIgnoreCase "radio") getOrElse false
+    in.get("type").map(_.text.equalsIgnoreCase("radio")) getOrElse false
 
   private def isCheckbox(in: MetaData): Boolean =
-    in.get("type").map(_.text equalsIgnoreCase "checkbox") getOrElse false
+    in.get("type").map(_.text.equalsIgnoreCase("checkbox")) getOrElse false
 
   /** If you want to update the href of an &lt;a> tag, this method returns a
     * function that mutates the href by adding a function that will be executed
@@ -3066,7 +3068,8 @@ trait SHtml extends Loggable {
       onSubmit(radioOptions.find(_._2 == selection).map(_._1))
     }
 
-    S.fmapFunc(selectionHandler _)(funcName => {
+    // SCALA3 Removing `_` for passing function as a value
+    S.fmapFunc(selectionHandler)(funcName => {
       cssSelToValue
         .map { case (cssSel, value) =>
           s"$cssSel [name]" #> funcName &
@@ -3133,7 +3136,8 @@ trait SHtml extends Loggable {
     /** Convert a ChoiceItem into a span containing the control and the toString
       * of the key
       */
-    var htmlize: ChoiceItem[_] => NodeSeq = c =>
+    // SCALA3 Using `?` instead of `_`
+    var htmlize: ChoiceItem[?] => NodeSeq = c =>
       (<span>{c.xhtml}&nbsp;{c.key.toString}<br/> </span>)
   }
 
@@ -3307,14 +3311,16 @@ object Html5ElemAttr {
 
   /** The autofocus attribute
     */
-  final case object Autofocus extends SHtml.ElemAttr {
+  // SCALA3 Removing not requrired `final` for an object declaration
+  case object Autofocus extends SHtml.ElemAttr {
     // FIXME detect HTML5 browser and do the right thing
     def apply(in: Elem): Elem = in % ("autofocus" -> "true")
   }
 
   /** The required attribute
     */
-  final case object Required extends SHtml.ElemAttr {
+  // SCALA3 Removing not requrired `final` for an object declaration
+  case object Required extends SHtml.ElemAttr {
     // FIXME detect HTML5 browser and do the right thing
     def apply(in: Elem): Elem = in % ("required" -> "true")
   }
@@ -3336,7 +3342,7 @@ object Html5ElemAttr {
   * <code>S.redirectTo(whence)</code>
   */
 trait Whence {
-  protected val whence = S.referer openOr "/"
+  protected val whence = S.referer.openOr("/")
 }
 
 /** Memoize the CSS Selector Transform and the most recent NodeSeq sent to the
