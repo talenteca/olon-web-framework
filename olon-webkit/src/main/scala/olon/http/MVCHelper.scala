@@ -199,16 +199,19 @@ trait MVCHelper extends LiftRules.DispatchPF {
   /** Validate what, if it passes validation, then redirect to the new URL, else
     * display the messages using S.error and redisplay the current page.
     */
+  // SCALA3 Moving `validate` and `save` as argument since a custom type on the
+  // fly is breaking the compiler
   protected def saveRedir(
-      what: {
-        def validate: List[FieldError];
-        def save(): Boolean
-      },
+      validate: () => List[FieldError],
+      save: () => Boolean,
       where: String
   ) = () => {
-    what.validate match {
-      case Nil => what.save(); S.redirectTo(where)
-      case xs  => S.error(xs)
+    validate() match {
+      case Nil =>
+        save()
+        S.redirectTo(where)
+      case xs =>
+        S.error(xs)
     }
   }
 }
