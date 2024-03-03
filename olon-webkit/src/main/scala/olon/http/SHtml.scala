@@ -656,7 +656,8 @@ trait SHtml extends Loggable {
       editForm: => NodeSeq,
       onSubmit: () => JsCmd
   ): NodeSeq = {
-    import olon.http.js
+    // SCALA3 Removing old import calls
+    //import olon.http.js
     import js.{jquery, JsCmd, JsCmds, JE}
     import jquery.JqJsCmds
     import JsCmds.{Noop, SetHtml}

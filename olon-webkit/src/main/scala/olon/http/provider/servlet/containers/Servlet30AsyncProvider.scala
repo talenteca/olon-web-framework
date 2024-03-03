@@ -6,8 +6,13 @@ package containers
 
 import olon.common._
 import olon.http._
-import olon.http.provider._
-import olon.http.provider.servlet._
+
+// SCALA3 Removing all imported calls
+//import olon.http.provider._
+//import olon.http.provider.servlet._
+
+// SCALA3 Using reflective selectable calls
+import scala.reflect.Selectable.reflectiveSelectable
 
 object Servlet30AsyncProvider extends AsyncProviderMeta {
 

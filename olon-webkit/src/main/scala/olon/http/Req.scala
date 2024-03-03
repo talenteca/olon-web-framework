@@ -311,7 +311,7 @@ class OnDiskFileParamHolder(
     */
   def length: Long = if (localPath == null) 0 else Files.size(localPath)
 
-  protected override def finalize: Unit = {
+  protected override def finalize(): Unit = {
     tryo(Files.delete(localPath))
   }
 }

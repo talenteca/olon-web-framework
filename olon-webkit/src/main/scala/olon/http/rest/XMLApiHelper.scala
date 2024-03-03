@@ -2,7 +2,9 @@ package olon
 package http
 package rest
 
-import olon._
+// SCALA3 Removing old imported calls
+//import olon._
+
 import olon.common._
 
 import scala.xml.Elem

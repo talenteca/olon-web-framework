@@ -615,7 +615,8 @@ class LiftSession(
           case (RunnerHolder(_, _, Full(_)), _)               => false
           case (_, RunnerHolder(_, _, Full(_)))               => true
           case (RunnerHolder(a, _, _), RunnerHolder(b, _, _)) => a < b
-          case _                                              => false
+          // SCALA3 Using `null` instead of `_` for the only remaining case
+          case null                                           => false
         }
     }
 

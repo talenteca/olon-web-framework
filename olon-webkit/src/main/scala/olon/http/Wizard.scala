@@ -1,7 +1,8 @@
 package olon
 package http
 
-import olon._
+// SCALA3 Removing old imported calls
+//import olon._
 
 import scala.reflect.ClassTag
 import scala.xml._

@@ -6,9 +6,11 @@ package containers
 
 import olon.common._
 import olon.http._
-import olon.http.provider._
-import olon.http.provider.servlet._
 import olon.util._
+
+// SCALA3 Removing all imported calls
+//import olon.http.provider._
+//import olon.http.provider.servlet._
 
 object Jetty7AsyncProvider extends AsyncProviderMeta {
   // contSupport below gets inferred as a Class[?0] existential.

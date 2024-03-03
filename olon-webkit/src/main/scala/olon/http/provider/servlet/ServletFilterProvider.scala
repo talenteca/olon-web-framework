@@ -6,7 +6,10 @@ package servlet
 import jakarta.servlet._
 import jakarta.servlet.http._
 import olon.common._
-import olon.http._
+
+// SCALA3 Removing old imported calls
+//import olon.http._
+
 import olon.util._
 import scala.compiletime.uninitialized
 
