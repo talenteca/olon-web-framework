@@ -36,7 +36,7 @@ object Extraction {
     // SCALA3 using `?` instead of `_`
     // SCALA3 Using `ClassTag` instead of `Manifest`
     def allTypes(mf: ClassTag[?]): List[Class[?]] =
-      // SCALA3 FIXME allTypes is not compatible with the change from `Manifest` to `ClassTag`
+      // SCALA3 FIXME allTypes is not compatible with the change from `Manifest` to `ClassTag`, please fix
       List(mf.runtimeClass)
       // SCALA3 ORIGINAL
       // mf.runtimeClass :: (mf.typeArguments flatMap allTypes)

@@ -12,6 +12,8 @@ import olon.util._
 
 import scala.annotation._
 
+import scala.compiletime.uninitialized
+
 import Helpers._
 
 /** A common trait between Menu and something that can be converted to a Menu.
@@ -86,7 +88,8 @@ object Menu extends MenuSingleton {
 
     /** The method to add a path element to the URL representing this menu item
       */
-    def /(pathElement: LocPath): ParamMenuable[T] with WithSlash =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def /(pathElement: LocPath): ParamMenuable[T] & WithSlash =
       new ParamMenuable[T](
         name,
         linkText,
@@ -153,10 +156,12 @@ object Menu extends MenuSingleton {
         params,
         submenus
       )
+
+    // SCALA3 Using `&` instead of the `with` type operator
     def buildSlashOne(
         newPath: List[LocPath],
         newHead: Boolean
-    ): BuiltType with WithSlash = new ParamMenuable[T](
+    ): BuiltType & WithSlash = new ParamMenuable[T](
       name,
       linkText,
       parser,
@@ -252,7 +257,8 @@ object Menu extends MenuSingleton {
 
     /** Convert a Menuable into a Menu when you need a Menu.
       */
-    implicit def toMenu(able: ParamMenuable[_]): Menu = able.toMenu
+    // SCALA3 Using `?` instead of `_`
+    implicit def toMenu(able: ParamMenuable[?]): Menu = able.toMenu
 
     /** Convert a Menuable into a Loc[T]
       */
@@ -274,7 +280,8 @@ object Menu extends MenuSingleton {
 
     /** The method to add a path element to the URL representing this menu item
       */
-    def /(pathElement: LocPath): ParamsMenuable[T] with WithSlash =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def /(pathElement: LocPath): ParamsMenuable[T] & WithSlash =
       new ParamsMenuable[T](
         name,
         linkText,
@@ -286,7 +293,8 @@ object Menu extends MenuSingleton {
         Nil
       ) with WithSlash
 
-    def path(pathElement: String): ParamsMenuable[T] with WithSlash =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def path(pathElement: String): ParamsMenuable[T] & WithSlash =
       new ParamsMenuable[T](
         name,
         linkText,
@@ -323,10 +331,12 @@ object Menu extends MenuSingleton {
         params,
         submenus
       )
+
+    // SCALA3 Using `&` instead of the `with` type operator
     def buildSlashOne(
         newPath: List[LocPath],
         newHead: Boolean
-    ): BuiltType with WithSlash = new ParamsMenuable[T](
+    ): BuiltType & WithSlash = new ParamsMenuable[T](
       name,
       linkText,
       parser,
@@ -423,7 +433,8 @@ object Menu extends MenuSingleton {
 
     /** Convert a Menuable into a Menu when you need a Menu.
       */
-    implicit def toMenu(able: ParamsMenuable[_]): Menu = able.toMenu
+    // SCALA3 Using `?` instead of `_`
+    implicit def toMenu(able: ParamsMenuable[?]): Menu = able.toMenu
 
     /** Convert a Menuable into a Loc[T]
       */
@@ -440,11 +451,13 @@ object Menu extends MenuSingleton {
 
     /** The method to add a path element to the URL representing this menu item
       */
-    def /(pathElement: LocPath): Menuable with WithSlash =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def /(pathElement: LocPath): Menuable & WithSlash =
       new Menuable(name, linkText, pathElement :: Nil, false, Nil, Nil)
         with WithSlash
 
-    def path(pathElement: String): Menuable with WithSlash =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def path(pathElement: String): Menuable & WithSlash =
       new Menuable(name, linkText, pathElement :: Nil, false, Nil, Nil)
         with WithSlash
   }
@@ -547,10 +560,12 @@ object Menu extends MenuSingleton {
     def headMatch: Boolean
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType
+
+    // SCALA3 Using `&` instead of the `with` type operator
     def buildSlashOne(
         newPath: List[LocPath],
         newHead: Boolean
-    ): BuiltType with WithSlash
+    ): BuiltType & WithSlash
   }
 
   trait WithSlash {
@@ -570,7 +585,8 @@ object Menu extends MenuSingleton {
 
     /** The method to add a path element to the URL representing this menu item
       */
-    def /(pathElement: LocPath): BuiltType with WithSlash =
+    // SCALA3 Using `&` instead of the `with` type operator
+    def /(pathElement: LocPath): BuiltType & WithSlash =
       buildSlashOne(path ::: List(pathElement), headMatch)
   }
 
@@ -588,10 +604,12 @@ object Menu extends MenuSingleton {
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
       new Menuable(name, linkText, newPath, newHead, params, submenus)
+
+    // SCALA3 Using `&` instead of the `with` type operator
     def buildSlashOne(
         newPath: List[LocPath],
         newHead: Boolean
-    ): BuiltType with WithSlash =
+    ): BuiltType & WithSlash =
       new Menuable(name, linkText, newPath, newHead, params, submenus)
         with WithSlash
 
@@ -696,12 +714,15 @@ sealed trait MenuSingleton {
     new PreParamsMenu[T](name, linkText, parser, encoder)
 }
 
-case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
+// SCALA3 Using `?` instead of `_`
+case class Menu(loc: Loc[?], private val convertableKids: ConvertableToMenu*)
     extends HasKids
     with ConvertableToMenu {
   lazy val kids: Seq[Menu] = convertableKids.map(_.toMenu)
   private[sitemap] var _parent: Box[HasKids] = Empty
-  private[sitemap] var siteMap: SiteMap = _
+
+  // SCALA3 Using `uninitialized` instead of `_`
+  private[sitemap] var siteMap: SiteMap = uninitialized
 
   private[sitemap] def init(siteMap: SiteMap): Unit = {
     this.siteMap = siteMap
@@ -737,12 +758,14 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
 
   def toMenu = this
 
-  def findLoc(req: Req): Box[Loc[_]] =
+  // SCALA3 Using `?` instead of `_`
+  def findLoc(req: Req): Box[Loc[?]] =
     if (loc.doesMatch_?(req)) Full(loc)
     else first(kids)(_.findLoc(req))
 
-  def locForGroup(group: String): Seq[Loc[_]] =
-    (if (loc.inGroup_?(group)) List[Loc[_]](loc) else Nil) ++
+  // SCALA3 Using `?` instead of `_`
+  def locForGroup(group: String): Seq[Loc[?]] =
+    (if (loc.inGroup_?(group)) List[Loc[?]](loc) else Nil) ++
       kids.flatMap(_.locForGroup(group))
 
   override def buildUpperLines(
@@ -767,7 +790,8 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
     _parent.toList.flatMap(p => p.buildUpperLines(p, actual, kids))
   }
 
-  def makeMenuItem(path: List[Loc[_]]): Box[MenuItem] =
+  // SCALA3 Using `?` instead of `_`
+  def makeMenuItem(path: List[Loc[?]]): Box[MenuItem] =
     loc.buildItem(
       kids.toList.flatMap(
         _.makeMenuItem(path)
@@ -778,22 +802,26 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
 
   /** Make a menu item only of the current loc is in the given group
     */
-  def makeMenuItem(path: List[Loc[_]], group: String): Box[MenuItem] =
+  // SCALA3 Using `?` instead of `_`
+  def makeMenuItem(path: List[Loc[?]], group: String): Box[MenuItem] =
     if (loc.inGroup_?(group)) makeMenuItem(path)
     else Empty
 
-  private def _inPath(in: List[Loc[_]]): Boolean = in match {
+  // SCALA3 Using `?` instead of `_`
+  private def _inPath(in: List[Loc[?]]): Boolean = in match {
     case Nil                => false
     case x :: _ if x eq loc => true
     case _ :: xs            => _inPath(xs)
   }
 
-  private def _lastInPath(path: List[Loc[_]]): Boolean = path match {
+  // SCALA3 Using `?` instead of `_`
+  private def _lastInPath(path: List[Loc[?]]): Boolean = path match {
     case Nil => false
     case xs  => xs.last eq loc
   }
 
-  def breadCrumbs: List[Loc[_]] = _parent match {
+  // SCALA3 Using `?` instead of `_`
+  def breadCrumbs: List[Loc[?]] = _parent match {
     case Full(m: Menu) => m.loc.breadCrumbs
     case _             => Nil
   }

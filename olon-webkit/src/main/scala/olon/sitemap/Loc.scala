@@ -238,7 +238,7 @@ trait Loc[T] {
     */
   protected def reqCalcStateless(): Boolean = {
     val (np, param) = foundStatelessCalc
-    (np.map(_.f()) or param.map(_.f(currentValue))) openOr false
+    (np.map(_.f()).or(param.map(_.f(currentValue)))).openOr(false)
   }
 
   /** The snippets provided by `LocParam`s
@@ -475,7 +475,7 @@ trait Loc[T] {
   def inGroup_?(group: String): Boolean = groupSet.contains(group)
 
   def init(): Unit = {
-    params.foreach(_ onCreate (this))
+    params.foreach(_.onCreate(this))
   }
 
 }

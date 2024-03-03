@@ -209,7 +209,8 @@ class LiftServlet extends Loggable {
   trait ProcessingStep {
     def process(req: Req): Box[LiftResponse]
 
-    def processFunc: (Req) => Box[LiftResponse] = process _
+    // SCALA3 Removing `_` for function passing as a value
+    def processFunc: (Req) => Box[LiftResponse] = process
   }
 
   /** To save memory these are only created once and should just be holders for
@@ -252,14 +253,16 @@ class LiftServlet extends Loggable {
 
       val role =
         NamedPF.applyBox(req, LiftRules.httpAuthProtectedResource.toList)
-      role.map(_ match {
-        case Full(r) =>
-          LiftRules.authentication.verified_?(req) match {
-            case true => checkRoles(r, userRoles.get)
-            case _    => false
-          }
-        case _ => LiftRules.authentication.verified_?(req)
-      }) openOr true
+      role
+        .map(_ match {
+          case Full(r) =>
+            LiftRules.authentication.verified_?(req) match {
+              case true => checkRoles(r, userRoles.get)
+              case _    => false
+            }
+          case _ => LiftRules.authentication.verified_?(req)
+        })
+        .openOr(true)
     }
 
     def process(req: Req) =

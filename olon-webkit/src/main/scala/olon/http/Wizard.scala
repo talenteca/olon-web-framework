@@ -273,7 +273,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
   protected def allTemplatePath: List[String] = WizardRules.allTemplatePath.vend
 
   protected def allTemplate: NodeSeq =
-    Templates(allTemplatePath) openOr allTemplateNodeSeq
+    Templates(allTemplatePath).openOr(allTemplateNodeSeq)
 
   /** What additional attributes should be put on the
     */
@@ -432,7 +432,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
           SetHtml(FormGUID, renderHtml())
         }
       }
-    }) openOr AjaxOnDone.is
+    }).openOr(AjaxOnDone.is)
   }
 
   def prevScreen(): JsCmd = {
@@ -450,7 +450,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       }
 
       SetHtml(FormGUID, renderHtml())
-    }) openOr AjaxOnDone.is
+    }).openOr(AjaxOnDone.is)
   }
 
   // SCALA3 Using `ClassTag` instead of `Manifest`
@@ -520,7 +520,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       override protected def otherFuncVendors(
           what: ClassTag[ValueType]
       ): Box[(ValueType, ValueType => Any) => NodeSeq] =
-        Wizard.this.vendForm(manifest) or WizardRules.vendForm(manifest)
+        Wizard.this.vendForm(manifest).or(WizardRules.vendForm(manifest))
     }
 
     Wizard.this._register(this)

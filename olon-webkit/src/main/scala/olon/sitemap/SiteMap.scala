@@ -25,7 +25,8 @@ case class SiteMap(
       populate: List[MenuItem]
   ): List[MenuItem] = populate
 
-  private var locs: Map[String, Loc[_]] = Map.empty
+  // SCALA3 Using `?` instead of `_`
+  private var locs: Map[String, Loc[?]] = Map.empty
 
   private var locPath: Set[List[String]] = Set()
 
@@ -40,14 +41,15 @@ case class SiteMap(
   kids.foreach(_.init(this))
   kids.foreach(_.validate)
 
-  private[sitemap] def addLoc(in: Loc[_]): Unit = {
+  // SCALA3 Using `?` instead of `_`
+  private[sitemap] def addLoc(in: Loc[?]): Unit = {
     val name = in.name
     if (locs.isDefinedAt(name))
       throw new SiteMapException(
         "Location " + name + " defined twice " +
           locs(name) + " and " + in
       )
-    else locs = locs + (name -> in.asInstanceOf[Loc[_]])
+    else locs = locs + (name -> in.asInstanceOf[Loc[?]])
 
     if (
       SiteMap.enforceUniqueLinks && !in.link.external_? &&
@@ -68,14 +70,17 @@ case class SiteMap(
     globalParamFuncs.flatMap(f => if (f.isDefinedAt(r)) List(f(r)) else Nil)
   }
 
-  def findLoc(name: String): Box[Loc[_]] = Box(locs.get(name))
+  // SCALA3 Using `?` instead of `_`
+  def findLoc(name: String): Box[Loc[?]] = Box(locs.get(name))
 
-  def findLoc(req: Req): Box[Loc[_]] = first(kids)(_.findLoc(req))
+  // SCALA3 Using `?` instead of `_`
+  def findLoc(req: Req): Box[Loc[?]] = first(kids)(_.findLoc(req))
 
   /** Find all the menu items for a given group. This method returns a linear
     * sequence of menu items
     */
-  def locForGroup(group: String): Seq[Loc[_]] =
+  // SCALA3 Using `?` instead of `_`
+  def locForGroup(group: String): Seq[Loc[?]] =
     kids
       .flatMap(_.locForGroup(group))
       .filter(_.testAccess match {
@@ -93,8 +98,10 @@ case class SiteMap(
 
   /** Build a menu based on the current location
     */
-  def buildMenu(current: Box[Loc[_]]): CompleteMenu = {
-    val path: List[Loc[_]] = current match {
+  // SCALA3 Using `?` instead of `_`
+  def buildMenu(current: Box[Loc[?]]): CompleteMenu = {
+    // SCALA3 Using `?` instead of `_`
+    val path: List[Loc[?]] = current match {
       case Full(loc) => loc.breadCrumbs
       case _         => Nil
     }
@@ -117,7 +124,8 @@ sealed class SiteMapSingleton {
     */
   @volatile var enforceUniqueLinks = true
 
-  def findLoc(name: String): Box[Loc[_]] = for (
+  // SCALA3 Using `?` instead of `_`
+  def findLoc(name: String): Box[Loc[?]] = for (
     sm <- LiftRules.siteMap; loc <- sm.findLoc(name)
   ) yield loc
 
@@ -146,6 +154,7 @@ sealed class SiteMapSingleton {
     (sm: SiteMap) => {
       var fired = false
 
+      // SCALA3 Removing `_` for passing function as a value
       def theFunc: Menu => List[Menu] =
         (menu: Menu) => {
           if (fired) {
@@ -153,7 +162,7 @@ sealed class SiteMapSingleton {
           } else if (pf.isDefinedAt(menu)) {
             fired = true
             pf(menu)
-          } else List(menu.rebuild(doAMenuItem _))
+          } else List(menu.rebuild(doAMenuItem))
         }
 
       def doAMenuItem(in: List[Menu]): List[Menu] =
@@ -207,14 +216,16 @@ sealed class SiteMapSingleton {
     * Loc.LocParam[Any] val MyMatcher = SiteMap.buildMenuMatcher(_ ==
     * MyMarkerLocParam) </pre></code> </p>
     */
+  // SCALA3 Using `?` instead of `_`
   def buildMenuMatcher(
-      matchFunc: Loc.LocParam[_] => Boolean
+      matchFunc: Loc.LocParam[?] => Boolean
   ): UnapplyLocMatcher = new UnapplyLocMatcher {
     def unapply(menu: Menu): Option[Menu] =
       menu.loc.params.find(matchFunc).map(_ => menu)
   }
 
-  def findAndTestLoc(name: String): Box[Loc[_]] =
+  // SCALA3 Using `?` instead of `_`
+  def findAndTestLoc(name: String): Box[Loc[?]] =
     findLoc(name).flatMap(l =>
       l.testAccess match {
         case Left(true) => Full(l)
@@ -229,7 +240,7 @@ sealed class SiteMapSingleton {
     } yield {
       val linkText = text match {
         case x if x.length > 0 => x
-        case _                 => loc.linkText openOr Text(loc.name)
+        case _                 => loc.linkText.openOr(Text(loc.name))
       }
       <a href={link}>{linkText}</a>
     }
