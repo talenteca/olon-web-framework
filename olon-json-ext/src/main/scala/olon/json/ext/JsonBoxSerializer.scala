@@ -91,7 +91,10 @@ class JsonBoxSerializer extends Serializer[Box[?]] {
   }
 
   private val typeHoldingFailure = new ParameterizedType {
-    def getActualTypeArguments = Array(classOf[Failure])
+    // SCALA3 Adding type for method overriding
+    def getActualTypeArguments: Array[java.lang.reflect.Type] = Array(
+      classOf[Failure]
+    )
     def getOwnerType = classOf[Box[Failure]]
     def getRawType = classOf[Box[Failure]]
   }

@@ -3,6 +3,7 @@ package json
 package ext
 
 import org.joda.time._
+
 import scala.reflect.ClassTag
 
 object JodaTimeSerializers {
