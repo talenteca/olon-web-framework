@@ -30,6 +30,8 @@ lazy val libs = new {
 
   type ModuleMap = String => ModuleID
 
+  lazy val scala3Staging = "org.scala-lang" %% "scala3-staging" //% scalaVersion.value
+
   lazy val commons_codec = Seq("commons-codec" % "commons-codec" % "1.11")
 
   lazy val commons_fileupload = Seq(
@@ -268,7 +270,8 @@ lazy val olon_json = Project("olon-json", file("olon-json"))
       Seq(libs.scalap) ++
         libs.paranamer ++
         libs.scala_xml ++
-        libs.json4s
+        libs.json4s :+
+        (libs.scala3Staging % scalaVersion.value)
   )
 
 lazy val olon_json_ext = Project("olon-json-ext", file("olon-json-ext"))

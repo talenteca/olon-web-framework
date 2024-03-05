@@ -34,12 +34,41 @@ object Extraction {
       json: JValue
   )(implicit formats: Formats, mf: ClassTag[A]): A = {
     // SCALA3 using `?` instead of `_`
-    // SCALA3 Using `ClassTag` instead of `Manifest`
-    def allTypes(mf: ClassTag[?]): List[Class[?]] =
-      // SCALA3 FIXME allTypes is not compatible with the change from `Manifest` to `ClassTag`, please fix
-      List(mf.runtimeClass)
-      // SCALA3 ORIGINAL
-      // mf.runtimeClass :: (mf.typeArguments flatMap allTypes)
+    // SCALA3 Using `ClassTag` with an added "runtime multi-stage programming" instead of `Manifest`
+    // SCALA3 we load the compiler explicitly on runtime to be able to use it
+    // for "runtime multi-stage programmming"
+    import scala.quoted.{staging, Quotes, Expr}
+    given staging.Compiler = staging.Compiler.make(getClass.getClassLoader)
+    // method which returns all "base" (without arguments) types from the classtag
+    // TODO: replace the classtag with izumi.reflect TypeTag! ClassTag here will not work
+    // (it does not store the type arguments). 
+    def allTypes(mf: ClassTag[?]): Seq[Class[?]] = staging.run {
+      (quotes: Quotes) ?=>
+        import quotes.reflect._
+        // We get the symbol from string and change it into a TypeRepr, which gives
+        // us information about types.
+        val symbol = Symbol.classSymbol(mf.runtimeClass.toString)
+        val typeRef = symbol.typeRef
+        // We get all of the type arguments
+        def getAllArgs(tpe: TypeRepr): Seq[TypeRepr] =
+          tpe match
+            case AppliedType(base, args) => base +: args.flatMap(getAllArgs)
+            case other                   => Seq(other)
+        // we change the TypeRepr sequence into something we can splice into the code (Expr)
+        val seq: Seq[Expr[Class[_]]] =
+          getAllArgs(typeRef).map { tpe =>
+            Literal(ClassOfConstant(tpe)).asExprOf[Class[_]]
+          }
+        val returned: Expr[Seq[Class[_]]] = Expr.ofSeq(seq)
+        returned
+    }
+    // SCALA3 FIXME allTypes is not compatible with the change from `Manifest` to `ClassTag`, please fix
+    // List(mf.runtimeClass)
+    // SCALA3 ORIGINAL
+    // allTypes(mf)
+
+    // SCALA 3 the above replaces the below code, which was used in scala 2 thanks to scala.reflect.Manifest
+    // mf.runtimeClass :: (mf.typeArguments flatMap allTypes)
 
     try {
       val types = allTypes(mf)
