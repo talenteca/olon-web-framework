@@ -32,7 +32,9 @@ object JsonCommand {
     (String, Option[String], JValue[?])
   ] =
     for {
-      case JString(command) <- (in \ "command") // SCALA3 added "case" to force the compiler to use withFilter
+      case JString(
+        command
+      ) <- (in \ "command") // SCALA3 added "case" to force the compiler to use withFilter
       params <- in \ "params"
       if params != JNothing
     } yield {
