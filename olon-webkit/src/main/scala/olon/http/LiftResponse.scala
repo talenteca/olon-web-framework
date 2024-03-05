@@ -437,7 +437,8 @@ final case class InMemoryResponse(
 }
 
 final case class StreamingResponse(
-    data: { def read(buf: Array[Byte]): Int },
+    // SCALA3 Moving the structural type `data` to a simple function argument
+    read: (Array[Byte]) => Int,
     onEnd: () => Unit,
     size: Long,
     headers: List[(String, String)],

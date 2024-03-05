@@ -1168,29 +1168,22 @@ class LiftServlet extends Loggable {
           response.outputStream.write(bytes)
           response.outputStream.flush()
 
-        case StreamingResponse(stream, endFunc, _, _, _, _) =>
-        /* SCALA3 FIXME this block of code is making the compiler to fail
-        import scala.language.reflectiveCalls
-
+        case StreamingResponse(read, endFunc, _, _, _, _) =>
           try {
             var len = 0
             val ba = new Array[Byte](8192)
             val os = response.outputStream
-            stream match {
-              case jio: java.io.InputStream => len = jio.read(ba)
-              case stream                   => len = stream.read(ba)
-            }
+            // SCALA3 Using normal function calls instead of the old structural types
+            read(ba)
             while (len >= 0) {
               if (len > 0) os.write(ba, 0, len)
-              stream match {
-                case jio: java.io.InputStream => len = jio.read(ba)
-                case stream                   => len = stream.read(ba)
-              }
+              // SCALA3 Using normal function calls instead of the old structural types
+              read(ba)
             }
             response.outputStream.flush()
           } finally {
             endFunc()
-          }*/
+          }
 
         case OutputStreamResponse(out, _, _, _, _) =>
           out(response.outputStream)

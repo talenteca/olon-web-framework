@@ -100,9 +100,9 @@ object ResourceServer {
       "Expires" -> toInternetDate(millis + 30.days)
     ) openOr {
       val stream = url.openStream
-      val uc = url.openConnection
+      val uc = url.openConnection()
       StreamingResponse(
-        stream,
+        stream.read,
         () => stream.close,
         uc.getContentLength,
         (if (lastModified == 0L) Nil
