@@ -150,7 +150,9 @@ ThisBuild / scalacOptions ++= Seq(
   "80",
   "-Xfatal-warnings",
   "-Wunused:imports",
-  // SCALA3 ignored option "-Ywarn-unused"
+  // SCALA3 FIXME temporary silence warnings
+  "-Wconf:any:silent"
+  // SCALA3 FIXME temporary ignored option "-Ywarn-unused"
 )
 
 ThisBuild / scalafmtOnCompile := true
