@@ -374,12 +374,13 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
   // SCALA3 Renaming for an alternative to create a wizard snapshot for not
   // causing an internal type conflict
-  def createWizardSnapshot = {
+  def createWizardSnapshot: WizardSnapshot = {
     val cs = CurrentScreen.is
     val prev = PrevSnapshot.is
     val onFirst = OnFirstScreen.is
     new WizardSnapshot(ScreenVars.is, cs, prev, onFirst)
   }
+  override def createSnapshot: Snapshot = createWizardSnapshot
 
   /** This method will be called within a transactional block when the last
     * screen is completed

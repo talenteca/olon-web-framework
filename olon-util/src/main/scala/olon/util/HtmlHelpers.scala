@@ -65,7 +65,7 @@ trait AttrHelper[+Holder[X]] {
   type Info
 
   def apply(key: String): Holder[Info] = convert(findAttr(key))
-  def apply(prefix: String, key: String): Holder[Info] =
+  def applyReturnsHolderTODO(prefix: String, key: String): Holder[Info] =
     convert(findAttr(prefix, key))
 
   def apply(key: String, default: => Info): Info =
