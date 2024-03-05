@@ -146,7 +146,7 @@ ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-language:implicitConversions",
-  // SCALA3 ignored option "-Ypatmat-exhaust-depth",
+  // SCALA3 FIXME ignored option "-Ypatmat-exhaust-depth",
   "80",
   "-Xfatal-warnings",
   "-Wunused:imports",
