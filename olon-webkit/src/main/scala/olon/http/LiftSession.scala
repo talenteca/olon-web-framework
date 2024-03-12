@@ -1,6 +1,7 @@
 package olon
 package http
 
+import izumi.reflect.Tag
 import org.mozilla.javascript.Scriptable
 import org.mozilla.javascript.UniqueTag
 
@@ -3209,8 +3210,15 @@ class LiftSession(
             reified <-
               if (func.manifest == jvmanifest) Some(payload)
               else {
-                try { Some(payload.extract(defaultFormats, func.manifest)) }
-                catch {
+                try {
+                  type A
+                  Some(
+                    payload.extract[A](
+                      defaultFormats,
+                      func.manifest.asInstanceOf[Tag[A]]
+                    )
+                  ) // SCALA3 investigate
+                } catch {
                   case e: Exception =>
                     logger.error(
                       "Failed to extract " + payload + " as " + func.manifest,
@@ -3503,7 +3511,7 @@ private object SnippetNode {
 // SCALA3 Using `ClassTag` instead of `Manifest`
 sealed trait RoundTripInfo {
   def name: String
-  def manifest: ClassTag[?]
+  def manifest: Tag[?]
 }
 
 /** The companion objects. Has tasty implicits
@@ -3512,20 +3520,20 @@ object RoundTripInfo {
 
   // SCALA3 Using `ClassTag` instead of `Manifest`
   implicit def lazyListBuilder[T](in: (String, T => LazyList[Any]))(implicit
-      m: ClassTag[T]
+      m: Tag[T]
   ): RoundTripInfo =
     LazyListRoundTrip(in._1, in._2)(m)
 
   // SCALA3 Using `ClassTag` instead of `Manifest`
   implicit def simpleBuilder[T](in: (String, T => Any))(implicit
-      m: ClassTag[T]
+      m: Tag[T]
   ): RoundTripInfo =
     SimpleRoundTrip(in._1, in._2)(m)
 
   // SCALA3 Using `ClassTag` instead of `Manifest`
   implicit def handledBuilder[T](
       in: (String, (T, RoundTripHandlerFunc) => Unit)
-  )(implicit m: ClassTag[T]): RoundTripInfo =
+  )(implicit m: Tag[T]): RoundTripInfo =
     HandledRoundTrip(in._1, in._2)(m)
 }
 
@@ -3564,17 +3572,17 @@ trait RoundTripHandlerFunc {
 
 // SCALA3 Using `ClassTag` instead of `Manifest`
 final case class LazyListRoundTrip[T](name: String, func: T => LazyList[Any])(
-    implicit val manifest: ClassTag[T]
+    implicit val manifest: Tag[T]
 ) extends RoundTripInfo
 
 // SCALA3 Using `ClassTag` instead of `Manifest`
 final case class SimpleRoundTrip[T](name: String, func: T => Any)(implicit
-    val manifest: ClassTag[T]
+    val manifest: Tag[T]
 ) extends RoundTripInfo
 
 // SCALA3 Using `ClassTag` instead of `Manifest`
 final case class HandledRoundTrip[T](
     name: String,
     func: (T, RoundTripHandlerFunc) => Unit
-)(implicit val manifest: ClassTag[T])
+)(implicit val manifest: Tag[T])
     extends RoundTripInfo

@@ -1,6 +1,8 @@
 package olon
 package json
 
+import izumi.reflect.Tag
+
 import scala.reflect.ClassTag
 
 /** Functions to serialize and deserialize a case class. Custom serializer can
@@ -44,14 +46,14 @@ object Serialization {
 
   /** Deserialize from a String.
     */
-  // SCALA3 Using `ClassTag` instead of `Manifest`
-  def read[A](json: String)(implicit formats: Formats, mf: ClassTag[A]): A =
+  // SCALA3 Using `izumi.reflect.Tag` instead of `Manifest`
+  def read[A](json: String)(implicit formats: Formats, mf: Tag[A]): A =
     parse(json).extract(formats, mf)
 
   /** Deserialize from a Reader.
     */
-  // SCALA3 Using `ClassTag` instead of `Manifest`
-  def read[A](in: Reader)(implicit formats: Formats, mf: ClassTag[A]): A =
+  // SCALA3 Using `izumi.reflect.Tag` instead of `Manifest`
+  def read[A](in: Reader)(implicit formats: Formats, mf: Tag[A]): A =
     JsonParser.parse(in).extract(formats, mf)
 
   /** Create Serialization formats with given type hints. <p> Example:<pre> val

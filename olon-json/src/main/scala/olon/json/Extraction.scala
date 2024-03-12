@@ -1,6 +1,8 @@
 package olon
 package json
 
+import izumi.reflect.Tag
+
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.{Constructor => JConstructor}
 import java.lang.{Boolean => JavaBoolean}
@@ -13,7 +15,6 @@ import java.lang.{Short => JavaShort}
 import java.sql.Timestamp
 import java.util.Date
 import scala.collection.immutable.ArraySeq
-import scala.reflect.ClassTag
 
 /** Function to extract values from JSON AST using case classes.
   *
@@ -32,38 +33,36 @@ object Extraction {
   // SCALA3 Using `ClassTag` instead of `Manifest`
   def extract[A](
       json: JValue
-  )(implicit formats: Formats, mf: ClassTag[A]): A = {
+  )(implicit formats: Formats, mf: Tag[A]): A = {
     // SCALA3 using `?` instead of `_`
-    // SCALA3 Using `ClassTag` with an added "runtime multi-stage programming" instead of `Manifest`
-    // SCALA3 we load the compiler explicitly on runtime to be able to use it
-    // for "runtime multi-stage programmming"
-    import scala.quoted.{staging, Quotes, Expr}
-    given staging.Compiler = staging.Compiler.make(getClass.getClassLoader)
-    // method which returns all "base" (without arguments) types from the classtag
-    // TODO: replace the classtag with izumi.reflect TypeTag! ClassTag here will not work
-    // (it does not store the type arguments). 
-    def allTypes(mf: ClassTag[?]): Seq[Class[?]] = staging.run {
-      (quotes: Quotes) ?=>
-        import quotes.reflect._
-        // We get the symbol from string and change it into a TypeRepr, which gives
-        // us information about types.
-        val symbol = Symbol.classSymbol(mf.runtimeClass.toString)
-        val typeRef = symbol.typeRef
-        // We get all of the type arguments
-        def getAllArgs(tpe: TypeRepr): Seq[TypeRepr] =
-          tpe match
-            case AppliedType(base, args) => base +: args.flatMap(getAllArgs)
-            case other                   => Seq(other)
-        // we change the TypeRepr sequence into something we can splice into the code (Expr)
-        val seq: Seq[Expr[Class[_]]] =
-          getAllArgs(typeRef).map { tpe =>
-            Literal(ClassOfConstant(tpe)).asExprOf[Class[_]]
-          }
-        val returned: Expr[Seq[Class[_]]] = Expr.ofSeq(seq)
-        returned
-    }
-    // SCALA3 FIXME allTypes is not compatible with the change from `Manifest` to `ClassTag`, please fix
-    // List(mf.runtimeClass)
+
+    // SCALA3 replaced Manifests with izumi.reflect.Tag
+    def allTypes(mf: Tag[?]): Seq[Class[?]] =
+      import izumi.reflect.macrortti.LightTypeTag
+      def getAllArgs(tpe: LightTypeTag): Seq[LightTypeTag] =
+        Seq(tpe) ++ tpe.typeArgs.flatMap(getAllArgs(_))
+      def getClassOf(name: String) = {
+        name match
+          case "scala.Long"    => classOf[scala.Long]
+          case "scala.Double"  => classOf[scala.Double]
+          case "scala.Float"   => classOf[scala.Float]
+          case "scala.Byte"    => classOf[scala.Byte]
+          case "scala.BigInt"  => classOf[scala.BigInt]
+          case "scala.Boolean" => classOf[scala.Boolean]
+          case "scala.Short"   => classOf[scala.Short]
+          case "scala.Int"     => classOf[scala.Int]
+          case _               => Class.forName(name)
+      }
+      val res = getAllArgs(mf.tag).map(_.repr).map { (scalaRepr: String) =>
+        // olon.json.SerializationExamples::Project -> olon.json.SerializationExamples$Project
+        val javaName = scalaRepr.replace("::", "$")
+        getClassOf(javaName)
+      }
+      println("allTypes: " + res)
+      println(classOf[scala.Long])
+      println(res contains classOf[scala.Long])
+      res
+
     // SCALA3 ORIGINAL
     // allTypes(mf)
 
@@ -72,6 +71,7 @@ object Extraction {
 
     try {
       val types = allTypes(mf)
+      println(json)
       extract0(json, types.head, types.tail).asInstanceOf[A]
     } catch {
       case e: MappingException => throw e
@@ -86,7 +86,7 @@ object Extraction {
   // SCALA3 Using `ClassTag` instead of `Manifest`
   def extractOpt[A](
       json: JValue
-  )(implicit formats: Formats, mf: ClassTag[A]): Option[A] =
+  )(implicit formats: Formats, mf: Tag[A]): Option[A] =
     try { Some(extract(json)(formats, mf)) }
     catch { case _: MappingException => None }
 
@@ -375,10 +375,9 @@ object Extraction {
         try {
           if (jconstructor.getDeclaringClass == classOf[java.lang.Object])
             fail("No information known about type")
-
           // SCALA3 using `x*` instead of `_*`
           val instance = jconstructor.newInstance(
-            args.map(_.asInstanceOf[AnyRef]).toArray*
+            args.map(_.asInstanceOf[AnyRef]).toArray: _*
           )
           setFields(instance.asInstanceOf[AnyRef], json, jconstructor)
         } catch {

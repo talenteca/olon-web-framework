@@ -75,6 +75,8 @@ lazy val libs = new {
   // lazy val scala_parser =
   //   Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2")
 
+  lazy val izumi_reflect = "dev.zio" %% "izumi-reflect" % "2.3.8"
+
   // Scala XML version 2.2.0 has conflicts with NU validator and breaks tests
   lazy val scala_xml = Seq("org.scala-lang.modules" %% "scala-xml" % "2.1.0")
 
@@ -271,7 +273,7 @@ lazy val olon_json = Project("olon-json", file("olon-json"))
         libs.paranamer ++
         libs.scala_xml ++
         libs.json4s :+
-        (libs.scala3Staging % scalaVersion.value)
+        libs.izumi_reflect
   )
 
 lazy val olon_json_ext = Project("olon-json-ext", file("olon-json-ext"))

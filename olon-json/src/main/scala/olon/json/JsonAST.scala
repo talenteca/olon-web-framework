@@ -1,6 +1,8 @@
 package olon
 package json
 
+import izumi.reflect.Tag
+
 import java.lang.StringBuilder
 import scala.reflect.ClassTag
 
@@ -718,7 +720,7 @@ object JsonAST {
     // SCALA3 Using `ClassTag` instead of `Manifest`
     def extract[A](implicit
         formats: Formats,
-        mf: ClassTag[A]
+        mf: Tag[A]
     ): A =
       Extraction.extract(this)(formats, mf)
 
@@ -752,7 +754,7 @@ object JsonAST {
     // SCALA3 Using `ClassTag` instead of `Manifest`
     def extractOpt[A](implicit
         formats: Formats,
-        mf: ClassTag[A]
+        mf: Tag[A]
     ): Option[A] =
       Extraction.extractOpt(this)(formats, mf)
 
@@ -777,7 +779,7 @@ object JsonAST {
     // SCALA3 Using `ClassTag` instead of `Manifest`
     def extractOrElse[A](
         default: => A
-    )(implicit formats: Formats, mf: ClassTag[A]): A =
+    )(implicit formats: Formats, mf: Tag[A]): A =
       Extraction.extractOpt(this)(formats, mf).getOrElse(default)
 
     def toOpt: Option[JValue[?]] = this match {
