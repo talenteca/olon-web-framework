@@ -206,6 +206,7 @@ private[json] object Meta {
       def fieldMapping(t: Type): (Mapping, Boolean) = {
         t match {
           case pType: ParameterizedType =>
+            println("ptype " + pType)
             val raw = rawClassOf(pType)
             val info = TypeInfo(raw, Some(pType))
 

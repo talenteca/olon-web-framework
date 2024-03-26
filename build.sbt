@@ -54,6 +54,8 @@ lazy val libs = new {
   // SCALA3 Using old scalap for Scala 2 as an experiment only, we might want to
   // rewrite for Scala 3 using tastyp
   lazy val scalap = "org.scala-lang" % "scalap" % versions.scala2Version
+  // lazy val scalap3 = "org.json4s" %% "json4s-scalap" % "4.0.7"
+  // lazy val staging = "org.scala-lang" %% "scala3-staging" % scalaVersion.value
 
   // SCALA3 Using old scala-compiler for Scala 2 as an experiment only, we might
   // want to rewrite for Scala 3 compiler
@@ -269,7 +271,7 @@ lazy val olon_json = Project("olon-json", file("olon-json"))
     description := "JSON Library",
     Test / parallelExecution := false,
     libraryDependencies ++=
-      Seq(libs.scalap) ++
+      Seq(libs.scalap, libs.scala3Staging % scalaVersion.value) ++
         libs.paranamer ++
         libs.scala_xml ++
         libs.json4s :+

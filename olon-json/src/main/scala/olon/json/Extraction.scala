@@ -59,8 +59,6 @@ object Extraction {
         getClassOf(javaName)
       }
       println("allTypes: " + res)
-      println(classOf[scala.Long])
-      println(res contains classOf[scala.Long])
       res
 
     // SCALA3 ORIGINAL
