@@ -60,6 +60,8 @@ object Scala3SigReader {
       // println(t.typeSymbol)
       if defn.ScalaPrimitiveValueClasses.contains(t.typeSymbol) then
         t.typeSymbol
+      else if t.typeArgs.isEmpty then
+        t.typeSymbol // TODO investigate when this rhs should not be accessed
       else
         t match
           case AppliedType(_, typeArgs) if typeArgs.size <= typeArgIndex =>
@@ -82,9 +84,12 @@ object Scala3SigReader {
   def readField(name: String, clazz: Class[?], typeArgIndex: Int): Class[?] = {
     given staging.Compiler = staging.Compiler.make(this.getClass.getClassLoader)
 
+    println("readField " + name + " " + clazz + " " + typeArgIndex)
     staging.withQuotes { // (quotes: Quotes) ?=>
       import quotes.reflect._
-      val sym = TypeRepr.typeConstructorOf(clazz).typeSymbol
+      val sym = Symbol.classSymbol(
+        clazz.getCanonicalName()
+      ) // TypeRepr.typeConstructorOf(clazz).typeSymbol
       val methodSymbolMaybe =
         sym.fieldMembers
           .filter(_.name == name)
@@ -97,8 +102,10 @@ object Scala3SigReader {
       quotes: Quotes
   )(methodSymbol: quotes.reflect.Symbol, typeArgIdx: Int) = {
     import quotes.reflect._
-    val t = methodSymbol.typeRef.widen.dealias match
-      case MethodType(paramNames, paramTypes, retTpe) => paramTypes(typeArgIdx)
+    val t =
+      methodSymbol.owner.typeRef.memberType(methodSymbol).widen.dealias match
+        case MethodType(paramNames, paramTypes, retTpe) =>
+          paramTypes(typeArgIdx)
 
     def findPrimitive(t: TypeRepr): Symbol =
       if defn.ScalaPrimitiveValueClasses.contains(t) then t.typeSymbol
