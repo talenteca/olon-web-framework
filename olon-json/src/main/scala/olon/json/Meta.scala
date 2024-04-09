@@ -180,7 +180,7 @@ private[json] object Meta {
           val typeArgs = x.getActualTypeArguments.toList.zipWithIndex
             .map { case (t, idx) =>
               if (t == classOf[java.lang.Object])
-                ScalaSigReader.readConstructor(
+                Scala3SigReader.readConstructor(
                   context.argName,
                   context.containingClass,
                   idx,
@@ -452,7 +452,7 @@ private[json] object Meta {
               if (arg == classOf[java.lang.Object])
                 context
                   .map(ctx =>
-                    ScalaSigReader.readConstructor(
+                    Scala3SigReader.readConstructor(
                       ctx.argName,
                       ctx.containingClass,
                       idx,
@@ -502,7 +502,7 @@ private[json] object Meta {
           ptype.getActualTypeArguments()(i) match {
             case c: Class[_] =>
               if (c == classOf[java.lang.Object])
-                ScalaSigReader.readConstructor(
+                Scala3SigReader.readConstructor(
                   context.argName,
                   context.containingClass,
                   i,

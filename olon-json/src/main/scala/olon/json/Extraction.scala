@@ -352,7 +352,7 @@ object Extraction {
                         .zipWithIndex
                         .map { case (t, idx) =>
                           if (t == classOf[java.lang.Object])
-                            ScalaSigReader.readField(name, a.getClass, idx)
+                            Scala3SigReader.readField(name, a.getClass, idx)
                           else t
                         }
                     )
