@@ -2,7 +2,6 @@ package olon.json
 import scala.quoted._
 
 object Scala3SigReader {
-  given staging.Compiler = staging.Compiler.make(this.getClass.getClassLoader)
 
   def readConstructor(
       argName: String,
@@ -10,10 +9,16 @@ object Scala3SigReader {
       typeArgIndex: Int,
       argNames: List[String]
   ): Class[?] = {
+    given staging.Compiler = staging.Compiler.make(this.getClass.getClassLoader)
+
     staging.withQuotes {
       import quotes.reflect._
       // TypeRepr.typeConstructorOf(clazz) // <- did not work
       val cl = Symbol.classSymbol(clazz.getCanonicalName())
+      println(
+        "READ CONSTRUCTOR " + argName + " | " + cl + " | " + argNames + " | " + typeArgIndex
+      )
+
       val argNamesWithSymbols = // TODO think about an alternative
         argNames.map(_.replace("$minus", "-"))
       val cstr = findConstructor(cl, argNamesWithSymbols).getOrElse(
@@ -47,11 +52,21 @@ object Scala3SigReader {
       argIdx: Int,
       typeArgIndex: Int
   ): Class[?] = {
+    // println("findArgType " + typeArgIndex)
     import quotes.reflect._
     def findPrimitive(t: TypeRepr): Symbol =
-      if defn.ScalaPrimitiveValueClasses.contains(t) then t.typeSymbol
-      // else extract
-      else Meta.fail("Unexpected type info " + t.show)
+      // println("findPrimitive " + t)
+      def throwError() = Meta.fail("Unexpected type info " + t.show)
+      // println(t.typeSymbol)
+      if defn.ScalaPrimitiveValueClasses.contains(t.typeSymbol) then
+        t.typeSymbol
+      else
+        t match
+          case AppliedType(_, typeArgs) if typeArgs.size <= typeArgIndex =>
+            findPrimitive(typeArgs(0))
+          case AppliedType(_, typeArgs) =>
+            findPrimitive(typeArgs(typeArgIndex))
+          case _ => throwError()
 
     toClass(
       findPrimitive(
@@ -65,11 +80,13 @@ object Scala3SigReader {
   }
 
   def readField(name: String, clazz: Class[?], typeArgIndex: Int): Class[?] = {
-    staging.withQuotes {
+    given staging.Compiler = staging.Compiler.make(this.getClass.getClassLoader)
+
+    staging.withQuotes { // (quotes: Quotes) ?=>
       import quotes.reflect._
       val sym = TypeRepr.typeConstructorOf(clazz).typeSymbol
       val methodSymbolMaybe =
-        sym.methodMembers
+        sym.fieldMembers
           .filter(_.name == name)
           .headOption // TODO add iteration through parents
       findArgTypeForField(methodSymbolMaybe.get, typeArgIndex)

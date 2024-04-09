@@ -55,7 +55,7 @@ object Extraction {
       }
       val res = getAllArgs(mf.tag).map(_.repr).map { (scalaRepr: String) =>
         // olon.json.SerializationExamples::Project -> olon.json.SerializationExamples$Project
-        val javaName = scalaRepr.replace("::", "$")
+        val javaName = scalaRepr.replace("::", "$").split('[')(0)
         getClassOf(javaName)
       }
       println("allTypes: " + res)

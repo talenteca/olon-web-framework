@@ -23,10 +23,10 @@ object SerializationExamples extends Specification {
     )
   )
 
-  // "Project serialization example" in {
-  //   val ser = swrite(project)
-  //   read[Project](ser) mustEqual project
-  // }
+  "Project serialization example" in {
+    val ser = swrite(project)
+    read[Project](ser) mustEqual project
+  }
 
   case class Project(
       name: String,
@@ -38,10 +38,10 @@ object SerializationExamples extends Specification {
   case class Team(role: String, members: List[Employee])
   case class Employee(name: String, experience: Int)
 
-  // "Null example" in {
-  //   val ser = swrite(Nullable(null))
-  //   read[Nullable](ser) mustEqual Nullable(null)
-  // }
+  "Null example" in {
+    val ser = swrite(Nullable(null))
+    read[Nullable](ser) mustEqual Nullable(null)
+  }
 
   case class Nullable(name: String)
 
@@ -52,153 +52,153 @@ object SerializationExamples extends Specification {
     read[Lotto](ser) mustEqual lotto
   }
 
-  // "Primitive-wrapping case class serialization example" in {
-  //   val primitives = Primitives(
-  //     124,
-  //     123L,
-  //     126.5,
-  //     127.5.floatValue,
-  //     "128",
-  //     Symbol("s"),
-  //     125,
-  //     129.byteValue,
-  //     true
-  //   )
-  //   val ser = swrite(primitives)
-  //   read[Primitives](ser) mustEqual primitives
-  // }
+  "Primitive-wrapping case class serialization example" in {
+    val primitives = Primitives(
+      124,
+      123L,
+      126.5,
+      127.5.floatValue,
+      "128",
+      Symbol("s"),
+      125,
+      129.byteValue,
+      true
+    )
+    val ser = swrite(primitives)
+    read[Primitives](ser) mustEqual primitives
+  }
 
-  // "Primitive Int serialization" in {
-  //   read[Int](swrite(42)) mustEqual 42
-  // }
+  "Primitive Int serialization" in {
+    read[Int](swrite(42)) mustEqual 42
+  }
 
-  // "Primitive Long serialization" in {
-  //   read[Long](swrite(42L)) mustEqual 42L
-  // }
+  "Primitive Long serialization" in {
+    read[Long](swrite(42L)) mustEqual 42L
+  }
 
-  // "Primitive Double serialization" in {
-  //   read[Double](swrite(3.14)) mustEqual 3.14
-  // }
+  "Primitive Double serialization" in {
+    read[Double](swrite(3.14)) mustEqual 3.14
+  }
 
-  // "Primitive Float serialization" in {
-  //   read[Float](swrite(3.14.floatValue)) mustEqual 3.14.floatValue
-  // }
+  "Primitive Float serialization" in {
+    read[Float](swrite(3.14.floatValue)) mustEqual 3.14.floatValue
+  }
 
-  // "Primitive Short serialization" in {
-  //   read[Short](swrite(88.shortValue)) mustEqual 88.shortValue
-  // }
+  "Primitive Short serialization" in {
+    read[Short](swrite(88.shortValue)) mustEqual 88.shortValue
+  }
 
-  // "Primitive Byte serialization" in {
-  //   read[Byte](swrite(129.byteValue)) mustEqual 129.byteValue
-  // }
+  "Primitive Byte serialization" in {
+    read[Byte](swrite(129.byteValue)) mustEqual 129.byteValue
+  }
 
-  // "Primitive Boolean serialization" in {
-  //   read[Boolean](swrite(false)) mustEqual false
-  // }
+  "Primitive Boolean serialization" in {
+    read[Boolean](swrite(false)) mustEqual false
+  }
 
-//   "String serialization" in {
-//     val rt = "Roll Tide, Farmer!!"
-//     read[String](swrite(rt)) mustEqual rt
-//   }
+  "String serialization" in {
+    val rt = "Roll Tide, Farmer!!"
+    read[String](swrite(rt)) mustEqual rt
+  }
 
-//   "Symbol serialization" in {
-//     read[Symbol](swrite(Symbol("j"))) mustEqual Symbol("j")
-//   }
+  "Symbol serialization" in {
+    read[Symbol](swrite(Symbol("j"))) mustEqual Symbol("j")
+  }
 
-//   "Multidimensional list example" in {
-//     val ints = Ints(List(List(1, 2), List(3), List(4, 5)))
-//     val ser = swrite(ints)
-//     read[Ints](ser) mustEqual ints
-//   }
+  "Multidimensional list example" in {
+    val ints = Ints(List(List(1, 2), List(3), List(4, 5)))
+    val ser = swrite(ints)
+    read[Ints](ser) mustEqual ints
+  }
 
-//   "Map serialization example" in {
-//     val p = PersonWithAddresses(
-//       "joe",
-//       Map(
-//         "address1" -> Address("Bulevard", "Helsinki"),
-//         "address2" -> Address("Soho", "London")
-//       )
-//     )
-//     val ser = swrite(p)
-//     read[PersonWithAddresses](ser) mustEqual p
-//   }
+  "Map serialization example" in {
+    val p = PersonWithAddresses(
+      "joe",
+      Map(
+        "address1" -> Address("Bulevard", "Helsinki"),
+        "address2" -> Address("Soho", "London")
+      )
+    )
+    val ser = swrite(p)
+    read[PersonWithAddresses](ser) mustEqual p
+  }
 
-//   "Recursive type serialization example" in {
-//     val r1 = Rec(1, Nil)
-//     val r2 = Rec(2, Nil)
-//     val r3 = Rec(3, r1 :: r2 :: Nil)
+  "Recursive type serialization example" in {
+    val r1 = Rec(1, Nil)
+    val r2 = Rec(2, Nil)
+    val r3 = Rec(3, r1 :: r2 :: Nil)
 
-//     val ser = swrite(r3)
-//     read[Rec](ser) mustEqual r3
-//   }
+    val ser = swrite(r3)
+    read[Rec](ser) mustEqual r3
+  }
 
-//   "Set serialization example" in {
-//     val s = SetContainer(Set("foo", "bar"))
-//     val ser = swrite(s)
-//     read[SetContainer](ser) mustEqual s
-//   }
+  "Set serialization example" in {
+    val s = SetContainer(Set("foo", "bar"))
+    val ser = swrite(s)
+    read[SetContainer](ser) mustEqual s
+  }
 
-//   "Array serialization example" in {
-//     val s = ArrayContainer(Array("foo", "bar"))
-//     val ser = swrite(s);
-//     val unser = read[ArrayContainer](ser)
-//     s.array.toList mustEqual unser.array.toList
-//   }
+  "Array serialization example" in {
+    val s = ArrayContainer(Array("foo", "bar"))
+    val ser = swrite(s);
+    val unser = read[ArrayContainer](ser)
+    s.array.toList mustEqual unser.array.toList
+  }
 
-//   "Seq serialization example" in {
-//     val s = SeqContainer(List("foo", "bar"))
-//     val ser = swrite(s)
-//     read[SeqContainer](ser) mustEqual s
-//   }
+  "Seq serialization example" in {
+    val s = SeqContainer(List("foo", "bar"))
+    val ser = swrite(s)
+    read[SeqContainer](ser) mustEqual s
+  }
 
-//   "Option serialization example" in {
-//     val ser = swrite(Some(List(1, 2)))
-//     (read[Option[List[Int]]](ser) mustEqual Some(List(1, 2))) and
-//       (read[Option[List[Int]]]("") mustEqual None)
-//   }
+  "Option serialization example" in {
+    val ser = swrite(Some(List(1, 2)))
+    (read[Option[List[Int]]](ser) mustEqual Some(List(1, 2))) and
+      (read[Option[List[Int]]]("") mustEqual None)
+  }
 
-//   "None Option of tuple serialization example" in {
-//     // This is a regression test case, failed in lift json
-//     val s = OptionOfTupleOfDouble(None)
-//     val ser = swrite(s)
-//     read[OptionOfTupleOfDouble](ser) mustEqual s
-//   }
+  "None Option of tuple serialization example" in {
+    // This is a regression test case, failed in lift json
+    val s = OptionOfTupleOfDouble(None)
+    val ser = swrite(s)
+    read[OptionOfTupleOfDouble](ser) mustEqual s
+  }
 
-//   "Case class with internal state example" in {
-//     val m = Members("s", 1)
-//     val ser = swrite(m)
-//     (ser mustEqual """{"x":"s","y":1}""") and
-//       (read[Members](ser) mustEqual m)
-//   }
+  "Case class with internal state example" in {
+    val m = Members("s", 1)
+    val ser = swrite(m)
+    (ser mustEqual """{"x":"s","y":1}""") and
+      (read[Members](ser) mustEqual m)
+  }
 
-//   "Case class from type constructors example" in {
-//     val p = ProperType(TypeConstructor(Chicken(10)), Pair(25, Player("joe")))
-//     val ser = swrite(p)
-//     read[ProperType](ser) mustEqual p
-//   }
+  "Case class from type constructors example" in {
+    val p = ProperType(TypeConstructor(Chicken(10)), Pair(25, Player("joe")))
+    val ser = swrite(p)
+    read[ProperType](ser) mustEqual p
+  }
 
-//   case class Ints(x: List[List[Int]])
+  case class Ints(x: List[List[Int]])
 
-//   case class Rec(n: Int, xs: List[Rec])
+  case class Rec(n: Int, xs: List[Rec])
 
-//   case class Members(x: String, y: Int) {
-//     val foo1 = "foo"
-//     lazy val foo2 = "foo"
-//   }
+  case class Members(x: String, y: Int) {
+    val foo1 = "foo"
+    lazy val foo2 = "foo"
+  }
 }
 
 object ShortTypeHintExamples extends TypeHintExamples {
   implicit val formats: Formats =
     Serialization.formats(ShortTypeHints(classOf[Fish] :: classOf[Dog] :: Nil))
 
-  // "Deserialization succeeds even if jsonClass is not the first field" in {
-  //   val ser = """{"animals":[],"pet":{"name":"pluto","jsonClass":"Dog"}}"""
-  //   Serialization.read[Animals](ser) mustEqual Animals(Nil, Dog("pluto"))
-  // }
+  "Deserialization succeeds even if jsonClass is not the first field" in {
+    val ser = """{"animals":[],"pet":{"name":"pluto","jsonClass":"Dog"}}"""
+    Serialization.read[Animals](ser) mustEqual Animals(Nil, Dog("pluto"))
+  }
 }
 
 object FullTypeHintExamples extends TypeHintExamples {
-//   import Serialization.{read, write => swrite}
+  import Serialization.{read, write => swrite}
 
   // SCALA3 Using `?` instead of `_`
   implicit val formats: Formats = Serialization.formats(
@@ -213,33 +213,33 @@ object FullTypeHintExamples extends TypeHintExamples {
     )
   )
 
-//   "Ambiguous field decomposition example" in {
-//     val a = Ambiguous(False())
+  "Ambiguous field decomposition example" in {
+    val a = Ambiguous(False())
 
-//     val ser = swrite(a)
-//     read[Ambiguous](ser) mustEqual a
-//   }
+    val ser = swrite(a)
+    read[Ambiguous](ser) mustEqual a
+  }
 
-//   "Ambiguous parameterized field decomposition example" in {
-//     val o = AmbiguousP(Chicken(23))
+  "Ambiguous parameterized field decomposition example" in {
+    val o = AmbiguousP(Chicken(23))
 
-//     val ser = swrite(o)
-//     read[AmbiguousP](ser) mustEqual o
-//   }
+    val ser = swrite(o)
+    read[AmbiguousP](ser) mustEqual o
+  }
 
-//   "Option of ambiguous field decomposition example" in {
-//     val o = OptionOfAmbiguous(Some(True()))
+  "Option of ambiguous field decomposition example" in {
+    val o = OptionOfAmbiguous(Some(True()))
 
-//     val ser = swrite(o)
-//     read[OptionOfAmbiguous](ser) mustEqual o
-//   }
+    val ser = swrite(o)
+    read[OptionOfAmbiguous](ser) mustEqual o
+  }
 
-//   "Option of ambiguous parameterized field decomposition example" in {
-//     val o = OptionOfAmbiguousP(Some(Falcon(200.0)))
+  "Option of ambiguous parameterized field decomposition example" in {
+    val o = OptionOfAmbiguousP(Some(Falcon(200.0)))
 
-//     val ser = swrite(o)
-//     read[OptionOfAmbiguousP](ser) mustEqual o
-//   }
+    val ser = swrite(o)
+    read[OptionOfAmbiguousP](ser) mustEqual o
+  }
 }
 
 object CustomTypeHintFieldNameExample extends TypeHintExamples {
@@ -253,11 +253,11 @@ object CustomTypeHintFieldNameExample extends TypeHintExamples {
     override val typeHintFieldName = "$type$"
   }
 
-  // "Serialized JSON contains configured field name" in {
-  //   val animals = Animals(Dog("pluto") :: Fish(1.2) :: Nil, Dog("pluto"))
-  //   val ser = swrite(animals)
-  //   ser mustEqual """{"animals":[{"$type$":"Dog","name":"pluto"},{"$type$":"Fish","weight":1.2}],"pet":{"$type$":"Dog","name":"pluto"}}"""
-  // }
+  "Serialized JSON contains configured field name" in {
+    val animals = Animals(Dog("pluto") :: Fish(1.2) :: Nil, Dog("pluto"))
+    val ser = swrite(animals)
+    ser mustEqual """{"animals":[{"$type$":"Dog","name":"pluto"},{"$type$":"Fish","weight":1.2}],"pet":{"$type$":"Dog","name":"pluto"}}"""
+  }
 }
 
 trait TypeHintExamples extends Specification {
@@ -265,24 +265,24 @@ trait TypeHintExamples extends Specification {
 
   implicit val formats: Formats
 
-  // "Polymorphic List serialization example" in {
-  //   val animals =
-  //     Animals(Dog("pluto") :: Fish(1.2) :: Dog("devil") :: Nil, Dog("pluto"))
-  //   val ser = swrite(animals)
-  //   read[Animals](ser) mustEqual animals
-  // }
+  "Polymorphic List serialization example" in {
+    val animals =
+      Animals(Dog("pluto") :: Fish(1.2) :: Dog("devil") :: Nil, Dog("pluto"))
+    val ser = swrite(animals)
+    read[Animals](ser) mustEqual animals
+  }
 
-  // "Parameterized type serialization example" in {
-  //   val objs = Objs(Obj(Fish(1.2)) :: Obj(Dog("pluto")) :: Nil)
-  //   val ser = swrite(objs)
-  //   read[Objs](ser) mustEqual objs
-  // }
+  "Parameterized type serialization example" in {
+    val objs = Objs(Obj(Fish(1.2)) :: Obj(Dog("pluto")) :: Nil)
+    val ser = swrite(objs)
+    read[Objs](ser) mustEqual objs
+  }
 
-  // "Tuple serialization example" in {
-  //   val t: (Animal, Animal) = (Fish(1.5), Dog("pluto"))
-  //   val ser = swrite(t)
-  //   read[(Animal, Animal)](ser) mustEqual t
-  // }
+  "Tuple serialization example" in {
+    val t: (Animal, Animal) = (Fish(1.5), Dog("pluto"))
+    val ser = swrite(t)
+    read[(Animal, Animal)](ser) mustEqual t
+  }
 }
 
 case class Animals(animals: List[Animal], pet: Animal)
@@ -381,35 +381,35 @@ object CustomSerializerExamples extends Specification {
   implicit val formats: Formats = Serialization.formats(NoTypeHints) +
     new IntervalSerializer + new PatternSerializer + new DateSerializer + new IndexedSeqSerializer
 
-  // "Interval serialization example" in {
-  //   val i = new Interval(1, 4)
-  //   val ser = swrite(i)
-  //   ser mustEqual """{"start":1,"end":4}"""
-  //   val i2 = read[Interval](ser)
-  //   i2.startTime mustEqual i.startTime
-  //   i2.endTime mustEqual i.endTime
-  // }
+  "Interval serialization example" in {
+    val i = new Interval(1, 4)
+    val ser = swrite(i)
+    ser mustEqual """{"start":1,"end":4}"""
+    val i2 = read[Interval](ser)
+    i2.startTime mustEqual i.startTime
+    i2.endTime mustEqual i.endTime
+  }
 
-  // "Pattern serialization example" in {
-  //   val pat = Pattern.compile("^Curly")
-  //   val pser = swrite(pat)
-  //   pser mustEqual """{"$pattern":"^Curly"}"""
-  //   read[Pattern](pser).pattern mustEqual pat.pattern
-  // }
+  "Pattern serialization example" in {
+    val pat = Pattern.compile("^Curly")
+    val pser = swrite(pat)
+    pser mustEqual """{"$pattern":"^Curly"}"""
+    read[Pattern](pser).pattern mustEqual pat.pattern
+  }
 
-  // "Date serialization example" in {
-  //   val d = EPOCH_TIME
-  //   val dser = swrite(d)
-  //   dser mustEqual """{"$dt":"1970-01-01T00:00:00.000Z"}"""
-  //   read[Date](dser) mustEqual d
-  // }
+  "Date serialization example" in {
+    val d = EPOCH_TIME
+    val dser = swrite(d)
+    dser mustEqual """{"$dt":"1970-01-01T00:00:00.000Z"}"""
+    read[Date](dser) mustEqual d
+  }
 
-  // "Indexed serialization example" in {
-  //   val xs = Indexed(Vector("a", "b", "c"))
-  //   val iser = swrite(xs)
-  //   iser mustEqual """{"xs":["a","b","c"]}"""
-  //   read[Indexed](iser).xs.toList mustEqual List("a", "b", "c")
-  // }
+  "Indexed serialization example" in {
+    val xs = Indexed(Vector("a", "b", "c"))
+    val iser = swrite(xs)
+    iser mustEqual """{"xs":["a","b","c"]}"""
+    read[Indexed](iser).xs.toList mustEqual List("a", "b", "c")
+  }
 }
 
 case class Indexed(xs: IndexedSeq[String])
@@ -435,22 +435,22 @@ object CustomClassWithTypeHintsExamples extends Specification {
   }
   implicit val formats: Formats = Serialization.formats(hints)
 
-  // "Custom class serialization using provided serialization and deserialization functions" in {
-  //   val m = Meeting("The place", new DateTime(1256681210802L))
-  //   val ser = swrite(m)
-  //   val m2 = read[Meeting](ser)
-  //   m.place mustEqual m2.place
-  //   m.time.time mustEqual m2.time.time
-  // }
+  "Custom class serialization using provided serialization and deserialization functions" in {
+    val m = Meeting("The place", new DateTime(1256681210802L))
+    val ser = swrite(m)
+    val m2 = read[Meeting](ser)
+    m.place mustEqual m2.place
+    m.time.time mustEqual m2.time.time
+  }
 
-  // "List of custom classes example" in {
-  //   val ts = Times(List(new DateTime(123L), new DateTime(234L)))
-  //   val ser = swrite(ts)
-  //   val ts2 = read[Times](ser)
-  //   ts2.times(0).time mustEqual 123L
-  //   ts2.times(1).time mustEqual 234L
-  //   ts2.times.size mustEqual 2
-  // }
+  "List of custom classes example" in {
+    val ts = Times(List(new DateTime(123L), new DateTime(234L)))
+    val ser = swrite(ts)
+    val ts2 = read[Times](ser)
+    ts2.times(0).time mustEqual 123L
+    ts2.times(1).time mustEqual 234L
+    ts2.times.size mustEqual 2
+  }
 }
 
 case class Meeting(place: String, time: DateTime)
