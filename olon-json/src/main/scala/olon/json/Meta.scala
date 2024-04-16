@@ -205,6 +205,14 @@ private[json] object Meta {
 
       def fieldMapping(t: Type): (Mapping, Boolean) = {
         t match {
+          case pType: ParameterizedType if primitive_?(rawClassOf(pType)) =>
+            // SCALA3 Since for Scala 3 we added a typeParameter for JValue,
+            // we would fail to assign the json value directly, instead trying
+            // to create a constructor for JValue (and failing). Here we add an
+            // additional check for that case
+            (Value(rawClassOf(pType)), false)
+          // TODO SCALA 3 check if the above does not break anything in Scala 3 or Scala 2 (when we anable cross compilation)
+          // also test other "primitives" found in the primitives collection
           case pType: ParameterizedType =>
             println("ptype " + pType)
             val raw = rawClassOf(pType)
