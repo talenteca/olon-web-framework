@@ -96,10 +96,14 @@ object ExtractionBugs extends Specification {
     }
   }
 
+  // Moved to a non-method context
+  case class Holder(items: List[(String, String)])
+  // MSF: This currently doesn't work with scala primitives?! The type arguments appear as
+  // java.lang.Object instead of scala.Int. :/
+  case class Holder2(items: List[(String, Integer)]) // Holder2$4$ _$Holder2
+
   "deserialize list of homogonous tuples w/ array tuples disabled" in {
     implicit val formats = DefaultFormats
-
-    case class Holder(items: List[(String, String)])
 
     val holder = Holder(List(("string", "string")))
     val serialized = compactRender(Extraction.decompose(holder))
@@ -110,10 +114,6 @@ object ExtractionBugs extends Specification {
 
   "deserialize a list of heterogenous tuples w/ array tuples disabled" in {
     implicit val formats = DefaultFormats
-
-    // MSF: This currently doesn't work with scala primitives?! The type arguments appear as
-    // java.lang.Object instead of scala.Int. :/
-    case class Holder2(items: List[(String, Integer)])
 
     val holder = Holder2(List(("string", 10)))
     val serialized = compactRender(Extraction.decompose(holder))
@@ -127,8 +127,6 @@ object ExtractionBugs extends Specification {
       override val tuplesAsArrays = true
     }
 
-    case class Holder(items: List[(String, String)])
-
     val holder = Holder(List(("string", "string")))
     val serialized = compactRender(Extraction.decompose(holder))
 
@@ -136,18 +134,15 @@ object ExtractionBugs extends Specification {
     deserialized must_== holder
   }
 
-  "deserialize a list of heterogenous tuples w/ array tuples enabled" in {
+  "deserialize a list of heterogenous tuples w/ array tuples enabled" in { // problematic test case
     implicit val formats = new DefaultFormats {
       override val tuplesAsArrays = true
     }
 
-    // MSF: This currently doesn't work with scala primitives?! The type arguments appear as
-    // java.lang.Object instead of scala.Int. :/
-    case class Holder2(items: List[(String, Integer)])
-
     val holder = Holder2(List(("string", 10)))
     val serialized = compactRender(Extraction.decompose(holder))
 
+    println("serialized " + serialized)
     val deserialized = parse(serialized).extract[Holder2]
     deserialized must_== holder
   }
@@ -170,12 +165,12 @@ object ExtractionBugs extends Specification {
     extracted must_== ("apple", "sammich", "bacon")
   }
 
+  class Holder3(bacon: String) {
+    throw new Exception("I'm an exception for " + bacon + "!")
+  }
+
   "throw the correct exceptions when things go wrong during extraction" in {
     implicit val formats: Formats = DefaultFormats
-
-    class Holder(bacon: String) {
-      throw new Exception("I'm an exception for " + bacon + "!")
-    }
 
     val correctArgsAstRepresentation: JObject = JObject(
       List(
@@ -184,7 +179,7 @@ object ExtractionBugs extends Specification {
     )
 
     correctArgsAstRepresentation
-      .extract[Holder] must throwA[MappingException].like { case e =>
+      .extract[Holder3] must throwA[MappingException].like { case e =>
       e.getMessage mustEqual "An exception was thrown in the class constructor during extraction"
       e.getCause.getCause.getMessage mustEqual "I'm an exception for apple!"
     }

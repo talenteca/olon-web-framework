@@ -106,9 +106,13 @@ object Scala3SigReader {
       methodSymbol.owner.typeRef.memberType(methodSymbol).widen.dealias match
         case MethodType(paramNames, paramTypes, retTpe) =>
           paramTypes(typeArgIdx)
+        case AppliedType(_, args) =>
+          // will be entered when methodSymbol is a var
+          args(typeArgIdx)
 
     def findPrimitive(t: TypeRepr): Symbol =
-      if defn.ScalaPrimitiveValueClasses.contains(t) then t.typeSymbol
+      if defn.ScalaPrimitiveValueClasses.contains(t.typeSymbol) then
+        t.typeSymbol
       else Meta.fail("Unexpected type info " + t.show)
     toClass(findPrimitive(t))
   }
