@@ -1,4 +1,4 @@
-package bootstrap.liftweb
+package bootstrap.olon
 
 import olon._
 import util._
