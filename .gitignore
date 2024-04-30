@@ -79,3 +79,5 @@ project/metals.sbt
 .vscode
 
 .credentials
+
+__pycache__
