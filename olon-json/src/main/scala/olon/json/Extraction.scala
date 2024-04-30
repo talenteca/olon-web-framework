@@ -58,7 +58,6 @@ object Extraction {
         val javaName = scalaRepr.replace("::", "$").split('[')(0)
         getClassOf(javaName)
       }
-      println("allTypes: " + res)
       res
 
     // SCALA3 ORIGINAL
@@ -69,7 +68,6 @@ object Extraction {
 
     try {
       val types = allTypes(mf)
-      println(json)
       extract0(json, types.head, types.tail).asInstanceOf[A]
     } catch {
       case e: MappingException => throw e

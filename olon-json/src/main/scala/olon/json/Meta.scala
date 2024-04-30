@@ -214,7 +214,6 @@ private[json] object Meta {
           // TODO SCALA 3 check if the above does not break anything in Scala 3 or Scala 2 (when we anable cross compilation)
           // also test other "primitives" found in the primitives collection
           case pType: ParameterizedType =>
-            println("ptype " + pType)
             val raw = rawClassOf(pType)
             val info = TypeInfo(raw, Some(pType))
 
@@ -271,6 +270,7 @@ private[json] object Meta {
     if (primitive_?(clazz)) {
       Value(rawClassOf(clazz))
     } else {
+      // TODO memoize the Format as well to avoid conflicts with different Formats
       mappings.memoize(
         (clazz, typeArgs),
         { case (t, _) =>

@@ -64,8 +64,6 @@ private[json] object ScalaSigReader {
 
   // SCALA3 using `?` instead of `_`
   private def findClass(sig: ScalaSig, clazz: Class[?]): Option[ClassSymbol] = { // ScalaSig => (class)Symbol
-    println(sig)
-    println(clazz)
     sig.symbols // TODO fieldMembers and method members of a class
       .collect {
         case c: ClassSymbol if !c.isModule => c
@@ -167,8 +165,6 @@ private[json] object ScalaSigReader {
 
   // SCALA3 using `?` instead of `_`
   private def findScalaSig(clazz: Class[?]): Option[ScalaSig] = {
-    println("clazz: " + clazz)
-    println(ScalaSigParser.parse(clazz))
     ScalaSigParser
       .parse(clazz)
       .orElse(findScalaSig(clazz.getDeclaringClass)) // TODO guess: class Symbol

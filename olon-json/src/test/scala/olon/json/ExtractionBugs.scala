@@ -96,29 +96,36 @@ object ExtractionBugs extends Specification {
     }
   }
 
-  // Moved to a non-method context
-  case class Holder(items: List[(String, String)])
   // MSF: This currently doesn't work with scala primitives?! The type arguments appear as
   // java.lang.Object instead of scala.Int. :/
-  case class Holder2(items: List[(String, Integer)]) // Holder2$4$ _$Holder2
+
+  // Moved to a non-method context - we cannot read the type from a local context
+  // Used in a local context previously, a mapping is generated for them that is memoized.
+  // This can break the tests, since a mapping with an incorrect format can be obtained
+  // from a cache. As a quick fix, we changed the names into 2 different ones for different formats
+  // to avoid this.
+  case class Holder_1(items: List[(String, String)])
+  case class Holder_2(items: List[(String, String)])
+  case class Holder2_1(items: List[(String, Integer)])
+  case class Holder2_2(items: List[(String, Integer)])
 
   "deserialize list of homogonous tuples w/ array tuples disabled" in {
     implicit val formats = DefaultFormats
 
-    val holder = Holder(List(("string", "string")))
+    val holder = Holder_1(List(("string", "string")))
     val serialized = compactRender(Extraction.decompose(holder))
 
-    val deserialized = parse(serialized).extract[Holder]
+    val deserialized = parse(serialized).extract[Holder_1]
     deserialized must_== holder
   }
 
   "deserialize a list of heterogenous tuples w/ array tuples disabled" in {
     implicit val formats = DefaultFormats
 
-    val holder = Holder2(List(("string", 10)))
+    val holder = Holder2_1(List(("string", 10)))
     val serialized = compactRender(Extraction.decompose(holder))
 
-    val deserialized = parse(serialized).extract[Holder2]
+    val deserialized = parse(serialized).extract[Holder2_1]
     deserialized must_== holder
   }
 
@@ -127,10 +134,10 @@ object ExtractionBugs extends Specification {
       override val tuplesAsArrays = true
     }
 
-    val holder = Holder(List(("string", "string")))
+    val holder = Holder_2(List(("string", "string")))
     val serialized = compactRender(Extraction.decompose(holder))
 
-    val deserialized = parse(serialized).extract[Holder]
+    val deserialized = parse(serialized).extract[Holder_2]
     deserialized must_== holder
   }
 
@@ -139,11 +146,11 @@ object ExtractionBugs extends Specification {
       override val tuplesAsArrays = true
     }
 
-    val holder = Holder2(List(("string", 10)))
+    val holder = Holder2_2(List(("string", 10)))
     val serialized = compactRender(Extraction.decompose(holder))
 
-    println("serialized " + serialized)
-    val deserialized = parse(serialized).extract[Holder2]
+    // println("serialized " + serialized)
+    val deserialized = parse(serialized).extract[Holder2_2]
     deserialized must_== holder
   }
 
