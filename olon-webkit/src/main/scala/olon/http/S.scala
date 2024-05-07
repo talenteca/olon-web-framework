@@ -2387,7 +2387,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       * addition to the attributes
       */
     def ~(prefix: String, key: String): Option[NodeSeq] =
-      applyReturnsHolderTODO(prefix, key).toOption.map(Text(_))
+      apply(prefix, key).toOption.map(Text(_))
   }
 
   /** Sometimes, in the course of eager evaluation, it becomes necessary to
@@ -2512,7 +2512,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       * addition to the attributes
       */
     def ~(prefix: String, key: String): Option[NodeSeq] =
-      applyReturnsHolderTODO(prefix, key).toOption.map(Text(_))
+      apply(prefix, key).toOption.map(Text(_))
   }
 
   /** Returns the LiftSession parameter denominated by 'what'.
