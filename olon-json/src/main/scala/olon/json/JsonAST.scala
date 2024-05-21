@@ -47,7 +47,12 @@ object JsonAST {
     * concat(JInt(1), JInt(2)) == JArray(List(JInt(1), JInt(2)))
     * }}}
     */
-  def concat(values: JValue[?]*) = values.foldLeft(JNothing: JValue[?])(_ ++ _)
+  def concat(values: JValue[?]*): JValue[?] = { // Scala 2 workaround
+    values.foldLeft(JNothing: JValue[None.type])(
+      ((_: JValue[None.type]) ++ (_: JValue[None.type]))
+        .asInstanceOf[(JValue[None.type], JValue[?]) => JValue[None.type]]
+    )
+  }
 
   object JValue extends Merge.Mergeable
 
@@ -316,10 +321,15 @@ object JsonAST {
       *   Direct children of this `JValue` if it is a `[[JObject]]` or
       *   `[[JArray]]`, or `[[JNothing]]` otherwise.
       */
-    def children: List[JValue[?]] = this match {
-      case JObject(l) => l map (_.value)
-      case JArray(l)  => l
-      case _          => Nil
+    def children: List[JValue[?]] = {
+      if (this.isInstanceOf[JObject])
+        this.asInstanceOf[JObject].obj map (_.value)
+      else if (this.isInstanceOf[JArray]) this.asInstanceOf[JArray].arr
+      else Nil
+      // this match {
+      // case JObject(l) => l map (_.value)
+      // case JArray(l)  => l
+      // case _          => Nil
     }
 
     /** Fold over `JValue`s by applying a function to each element.
@@ -655,7 +665,7 @@ object JsonAST {
       * res0: JArray(List(JInt(1), JInt(2), JInt(3)))
       * }}}
       */
-    def ++(other: JValue[?]) = {
+    def ++[T](other: JValue[T]) = {
       def append(value1: JValue[?], value2: JValue[?]): JValue[?] =
         (value1, value2) match {
           case (JNothing, x)              => x
@@ -782,10 +792,15 @@ object JsonAST {
     )(implicit formats: Formats, mf: Tag[A]): A =
       Extraction.extractOpt(this)(formats, mf).getOrElse(default)
 
-    def toOpt: Option[JValue[?]] = this match {
-      case JNothing => None
-      case json     => Some(json)
+    def toOpt: Option[JValue[?]] = {
+      if (this.isInstanceOf[JNothing.type]) None
+      else Some(this)
     }
+
+    //   this match {
+    //   case JNothing => None
+    //   case json     => Some(json)
+    // }
   }
 
   case object JNothing extends JValue[None.type] {

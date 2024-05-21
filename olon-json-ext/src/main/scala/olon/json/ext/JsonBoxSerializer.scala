@@ -95,8 +95,8 @@ class JsonBoxSerializer extends Serializer[Box[?]] {
     def getActualTypeArguments: Array[java.lang.reflect.Type] = Array(
       classOf[Failure]
     )
-    def getOwnerType = classOf[Box[Failure]]
-    def getRawType = classOf[Box[Failure]]
+    def getOwnerType: java.lang.reflect.Type = classOf[Box[Failure]]
+    def getRawType: java.lang.reflect.Type = classOf[Box[Failure]]
   }
 
   private def serializeException(exception: Box[Throwable]) = exception match {
