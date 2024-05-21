@@ -1,7 +1,6 @@
 package olon
 package http
 
-import org.mockito.Mockito._
 import org.specs2._
 
 import scala.xml._
@@ -12,8 +11,18 @@ import common._
 import js.pageScript
 
 class LiftMergeSpec extends Specification with XmlMatchers {
-  val mockReq = mock[Req]()
-  doReturn("/context-path").when(mockReq).contextPath;
+  val mockReq = new Req(
+    path = Req.parsePath("/context-path"),
+    contextPath = "/context-path",
+    requestType = GetRequest,
+    contentType = null,
+    request = null,
+    nanoStart = 0,
+    nanoEnd = 0,
+    _stateless_? = false,
+    paramCalculator = null,
+    addlParams = null
+  )
 
   val testSession = new LiftSession("/context-path", "underlying id", Empty)
 
@@ -36,7 +45,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
   eventExtractingTestRules.extractInlineJavaScript = true
 
   "LiftMerge when doing the final page merge" should {
-    "merge head segments in the page body in order into main head" in new WithRules(
+    "merge head segments in the page body in order into main head" in WithRules(
       testRules
     ) {
       val result =
@@ -70,7 +79,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
       ): NodeSeq)
     }
 
-    "merge tail segments in the page body in order at the end of the body" in new WithRules(
+    "merge tail segments in the page body in order at the end of the body" in WithRules(
       testRules
     ) {
       val result =
@@ -106,7 +115,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
       ): NodeSeq)
     }
 
-    "not merge tail segments in the head" in new WithRules(testRules) {
+    "not merge tail segments in the head" in WithRules(testRules) {
       val result =
         testSession.merge(
           <html>
@@ -142,7 +151,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
       ): NodeSeq)
     }
 
-    "normalize absolute link hrefs everywhere" in new WithLiftContext(
+    "normalize absolute link hrefs everywhere" in WithLiftContext(
       testRules,
       testSession
     ) {
@@ -179,7 +188,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "/context-path/testlink3" :: Nil
     }
 
-    "normalize absolute script srcs everywhere" in new WithLiftContext(
+    "normalize absolute script srcs everywhere" in WithLiftContext(
       testRules,
       testSession
     ) {
@@ -215,7 +224,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "/context-path/testscript2" :: Nil
     }
 
-    "normalize absolute a hrefs everywhere" in new WithLiftContext(
+    "normalize absolute a hrefs everywhere" in WithLiftContext(
       testRules,
       testSession
     ) {
@@ -255,7 +264,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "/context-path/testa5" :: Nil
     }
 
-    "normalize absolute form actions everywhere" in new WithLiftContext(
+    "normalize absolute form actions everywhere" in WithLiftContext(
       testRules,
       testSession
     ) {
@@ -295,7 +304,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "/context-path/testform5" :: Nil
     }
 
-    "not rewrite script srcs anywhere" in new WithLiftContext(
+    "not rewrite script srcs anywhere" in WithLiftContext(
       testRules,
       testSession
     ) {
@@ -332,7 +341,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "testscript3" :: Nil
     }
 
-    "not rewrite link hrefs anywhere" in new WithLiftContext(
+    "not rewrite link hrefs anywhere" in WithLiftContext(
       testRules,
       testSession
     ) {
@@ -369,7 +378,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "testlink3" :: Nil
     }
 
-    "rewrite a hrefs everywhere" in new WithLiftContext(
+    "rewrite a hrefs everywhere" in WithLiftContext(
       testRules,
       testSession
     ) {
@@ -406,7 +415,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "rewritten" :: Nil
     }
 
-    "rewrite form actions everywhere" in new WithLiftContext(
+    "rewrite form actions everywhere" in WithLiftContext(
       testRules,
       testSession
     ) {
@@ -443,7 +452,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "rewritten" :: Nil
     }
 
-    "include a page script in the page tail if events are extracted" in new WithLiftContext(
+    "include a page script in the page tail if events are extracted" in WithLiftContext(
       eventExtractingTestRules,
       testSession
     ) {
@@ -476,7 +485,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
       }
     }
 
-    "include a page script in the page tail even if the page doesn't have a head and body" in new WithLiftContext(
+    "include a page script in the page tail even if the page doesn't have a head and body" in WithLiftContext(
       eventExtractingTestRules,
       testSession
     ) {

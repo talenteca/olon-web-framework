@@ -1,5 +1,6 @@
 package olon.json
 import scala.quoted._
+import scala.tasty.inspector._
 
 object Scala3SigReader {
 
@@ -15,9 +16,6 @@ object Scala3SigReader {
       import quotes.reflect._
       // TypeRepr.typeConstructorOf(clazz) // <- did not work
       val cl = Symbol.classSymbol(clazz.getCanonicalName())
-      println(
-        "READ CONSTRUCTOR " + argName + " | " + cl + " | " + argNames + " | " + typeArgIndex
-      )
 
       val argNamesWithSymbols = // TODO think about an alternative
         argNames.map(_.replace("$minus", "-"))
@@ -96,6 +94,35 @@ object Scala3SigReader {
           .headOption // TODO add iteration through parents
       findArgTypeForField(methodSymbolMaybe.get, typeArgIndex)
     }
+
+    // IDEA: use tasty-inspector-like library to achieve the same effect, while executing less phases
+    // like in tasty-inspector. The one provided with scala does not allow us to use ByteStreams
+    // (via read resource as stream) or get the classes via parent classloader
+    // Below is an unsuccessful attempt to use unchanged tasty-inspector
+
+    // val name = clazz.getName
+    // val subPath = name.substring(name.lastIndexOf('.') + 1) + ".tasty"
+
+    // abstract class InspectorWithResult extends Inspector {
+    //   var result: Option[Class[?]] = None
+    // }
+    // val inspector = new InspectorWithResult {
+    //   // override var result: Option[Class[?]] = None
+    //   def inspect(using Quotes)(tastys: List[Tasty[quotes.type]]): Unit = {
+    //     import quotes.reflect._
+    //     val sym = Symbol.classSymbol(
+    //       clazz.getCanonicalName()
+    //     ) // TypeRepr.typeConstructorOf(clazz).typeSymbol
+    //     val methodSymbolMaybe =
+    //       sym.fieldMembers
+    //         .filter(_.name == name)
+    //         .headOption // TODO add iteration through parents
+    //     result = Some(findArgTypeForField(methodSymbolMaybe.get, typeArgIndex))
+    //   }
+    // }
+    // TastyInspector.inspectTastyFiles(List(subPath))(inspector)
+    // println("result: " + inspector.result.get)
+    // inspector.result.get
   }
 
   private def findArgTypeForField(using

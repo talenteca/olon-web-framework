@@ -2,7 +2,6 @@ package olon.http.provider.servlet
 
 import olon.http.provider._
 import olon.mockweb.WebSpec
-import org.mockito.Mockito._
 
 object OfflineRequestSnapshotSpec extends WebSpec {
 

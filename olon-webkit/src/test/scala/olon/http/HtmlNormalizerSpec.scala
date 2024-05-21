@@ -129,7 +129,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers {
 
       val id = html \@ "id"
 
-      id must not be empty
+      // id must not be empty
+      id.isEmpty() must_== false
       js.toJsCmd must_== s"""lift.onEvent("$id","event",function(event) {doStuff;});"""
     }
 

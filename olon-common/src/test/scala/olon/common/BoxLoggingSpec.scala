@@ -3,7 +3,6 @@ package common
 
 import org.mockito.Answers
 import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
 import org.specs2.mutable.Specification
 
 class BoxLoggingSpec extends Specification {

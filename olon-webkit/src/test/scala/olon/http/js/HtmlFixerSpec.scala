@@ -13,7 +13,7 @@ class HtmlFixerSpec extends Specification {
     val testRules = new LiftRules()
     testRules.extractInlineJavaScript = true
 
-    "never extract inline JS in fixHtmlFunc" in new WithLiftContext(
+    "never extract inline JS in fixHtmlFunc" in WithLiftContext(
       testRules,
       testSession
     ) {

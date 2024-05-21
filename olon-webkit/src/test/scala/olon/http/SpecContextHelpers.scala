@@ -48,16 +48,32 @@ trait SSetup extends Around {
 
 /** Wraps a spec in a context where `rules` are the Lift rules in effect.
   */
-class WithRules(val rules: LiftRules) extends BaseAround with LiftRulesSetup
+// class WithRules(val rules: LiftRules) extends BaseAround with LiftRulesSetup
+def WithRules[T](rules: LiftRules)(body: => T) =
+  LiftRulesMocker.devTestLiftRulesInstance.doWith(rules) {
+    body
+  }
 
 /** Wraps a spec in a context where `rules` are the Lift rules in effect,
   * `session` is the current Lift session, and `req`, if specified, is the
   * current request.
   */
-class WithLiftContext(
-    val rules: LiftRules,
-    val session: LiftSession,
-    val req: Box[Req] = Empty
-) extends BaseAround
-    with LiftRulesSetup
-    with SSetup
+// class WithLiftContext(
+//     val rules: LiftRules,
+//     val session: LiftSession,
+//     val req: Box[Req] = Empty
+// ) extends BaseAround
+//     with LiftRulesSetup
+//     with SSetup
+
+def WithLiftContext[T](
+    rules: LiftRules,
+    session: LiftSession,
+    req: Box[Req] = Empty
+)(body: => T) = {
+  LiftRulesMocker.devTestLiftRulesInstance.doWith(rules) {
+    S.init(req, session) {
+      body
+    }
+  }
+}
