@@ -15,7 +15,7 @@ ThisBuild / organizationName := "Talenteca"
 
 lazy val versions = new {
 
-  val scala3Version = "3.4.1-RC1"
+  val scala3Version = "3.4.2" // 3.5.0-RC1
 
   val scala2Version = "2.13.12"
 
@@ -147,18 +147,27 @@ ThisBuild / libraryDependencies ++=
     libs.specs2Matchers ++
     libs.scalacheck
 
-ThisBuild / scalacOptions ++= Seq(
-  "-deprecation",
-  "-feature",
-  "-language:implicitConversions",
-  // SCALA3 FIXME ignored option "-Ypatmat-exhaust-depth",
-  "80",
-  "-Xfatal-warnings",
-  "-Wunused:imports",
-  // SCALA3 FIXME temporary silence warnings
-  "-Wconf:any:silent"
-  // SCALA3 FIXME temporary ignored option "-Ywarn-unused"
-)
+ThisBuild / scalacOptions ++= 
+  Seq(
+    "-deprecation",
+    "-feature",
+    "-language:implicitConversions",
+    // SCALA3 FIXME ignored option "-Ypatmat-exhaust-depth",
+    "80",
+    // "-Xfatal-warnings",
+    "-Wunused:imports",
+    // SCALA3 FIXME temporary silence warnings
+    // "-Wconf:any:silent",
+    // SCALA3 FIXME temporary ignored option "-Ywarn-unused"
+    "-Xsource:3"
+  ) //++ {
+    // scalaBinaryVersion.value match {
+    //   case "2.13" =>
+    //     Seq("-Xsource:3")
+    //   case "3" =>
+    //     Seq.empty
+    // }
+  // }
 
 ThisBuild / scalafmtOnCompile := true
 
@@ -270,11 +279,17 @@ lazy val olon_json = Project("olon-json", file("olon-json"))
     description := "JSON Library",
     Test / parallelExecution := false,
     libraryDependencies ++=
-      Seq(libs.scalap, libs.scala3Staging % scalaVersion.value) ++
         libs.paranamer ++
         libs.scala_xml ++
         libs.json4s :+
-        libs.izumi_reflect
+        libs.izumi_reflect :+ {
+          scalaBinaryVersion.value match {
+            case "2.13" =>
+              libs.scalap
+            case "3" =>
+              libs.scala3Staging % scalaVersion.value
+          }
+        }
   )
 
 lazy val olon_json_ext = Project("olon-json-ext", file("olon-json-ext"))

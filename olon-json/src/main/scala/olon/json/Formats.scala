@@ -237,11 +237,11 @@ private[json] object ClassDelta {
 /** Do not use any type hints.
   */
 case object NoTypeHints extends TypeHints {
-  val hints = Nil
+  val hints: List[Class[_]] = Nil
   // SCALA3 using `?` instead of `_`
-  def hintFor(clazz: Class[?]) =
+  def hintFor(clazz: Class[?]): String =
     sys.error("NoTypeHints does not provide any type hints.")
-  def classFor(hint: String) = None
+  def classFor(hint: String): Option[Class[_]] = None
 }
 
 /** Use short class name as a type hint.
@@ -287,7 +287,7 @@ object DefaultFormats extends DefaultFormats {
 trait DefaultFormats extends Formats {
   import java.text.{ParseException, SimpleDateFormat}
 
-  val dateFormat = new DateFormat {
+  val dateFormat: olon.json.DateFormat = new DateFormat {
     def parse(s: String) = try {
       Some(formatter.parse(s))
     } catch {

@@ -37,12 +37,12 @@ object Extraction {
     // SCALA3 using `?` instead of `_`
 
     // SCALA3 replaced Manifests with izumi.reflect.Tag
-    def allTypes(mf: Tag[?]): Seq[Class[?]] =
+    def allTypes(mf: Tag[?]): Seq[Class[?]] = {
       import izumi.reflect.macrortti.LightTypeTag
       def getAllArgs(tpe: LightTypeTag): Seq[LightTypeTag] =
         Seq(tpe) ++ tpe.typeArgs.flatMap(getAllArgs(_))
       def getClassOf(name: String) = {
-        name match
+        name match {
           case "scala.Long"    => classOf[scala.Long]
           case "scala.Double"  => classOf[scala.Double]
           case "scala.Float"   => classOf[scala.Float]
@@ -52,6 +52,7 @@ object Extraction {
           case "scala.Short"   => classOf[scala.Short]
           case "scala.Int"     => classOf[scala.Int]
           case _               => Class.forName(name)
+        }
       }
       val res = getAllArgs(mf.tag).map(_.repr).map { (scalaRepr: String) =>
         // olon.json.SerializationExamples::Project -> olon.json.SerializationExamples$Project
@@ -59,6 +60,7 @@ object Extraction {
         getClassOf(javaName)
       }
       res
+    }
 
     // SCALA3 ORIGINAL
     // allTypes(mf)
@@ -350,7 +352,7 @@ object Extraction {
                         .zipWithIndex
                         .map { case (t, idx) =>
                           if (t == classOf[java.lang.Object])
-                            Scala3SigReader.readField(name, a.getClass, idx)
+                            ScalaSigReader.readField(name, a.getClass, idx)
                           else t
                         }
                     )

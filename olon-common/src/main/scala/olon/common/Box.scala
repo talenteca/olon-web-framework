@@ -3,7 +3,6 @@ package common
 
 import java.util.{ArrayList => JavaArrayList}
 import java.util.{Iterator => JavaIterator}
-import scala.language.existentials
 import scala.reflect.ClassTag
 
 /** A bridge to make using Lift `[[Box]]` from Java easier.

@@ -1,8 +1,8 @@
 package olon.json
-import scala.quoted._
-import scala.tasty.inspector._
 
-object Scala3SigReader {
+import scala.quoted._
+
+object ScalaSigReader {
 
   def readConstructor(
       argName: String,

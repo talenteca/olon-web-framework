@@ -59,7 +59,7 @@ final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
     new JavaIterator[T] {
       def hasNext() = it.hasNext
       def next(): T = it.next()
-      override def remove() = throw new UnsupportedOperationException()
+      override def remove(): Unit = throw new UnsupportedOperationException()
     }
   }
 
@@ -220,7 +220,7 @@ final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
     new JavaIterator[T] {
       def hasNext() = it.hasNext
       def next(): T = it.next()
-      override def remove() = throw new UnsupportedOperationException()
+      override def remove(): Unit = throw new UnsupportedOperationException()
     }
   }
 

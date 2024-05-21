@@ -2,14 +2,14 @@ package olon
 package common
 
 // SCALA3 for using `uninitialized` instead of `_`
-import scala.compiletime.uninitialized
+// import scala.compiletime.uninitialized
 
-private[common] trait LinkedListElem[T1, T2] {
+private[common] trait LinkedListElem[T1, T2] extends LinkListElemCompat[T2] {
   private[common] var _prev: LinkedListElem[T1, T2] = null
   private[common] var _next: LinkedListElem[T1, T2] = null
   private[common] def value1: T1
-  // SCALA3 using `uninitialized` instead of `_`
-  private[common] var value2: T2 = uninitialized
+  // // SCALA3 using `uninitialized` instead of `_`
+  // private[common] var value2: T2 = VersionCompat.uninitialized
 
   private[common] def remove: Unit = {
     _prev._next = _next
