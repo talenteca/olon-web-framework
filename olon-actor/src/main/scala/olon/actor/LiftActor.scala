@@ -429,7 +429,7 @@ trait LiftActor
   def !?(msg: Any): Any = {
     val future = new LAFuture[Any]
     this ! MsgWithResp(msg, future)
-    future.get
+    future.get()
   }
 
   /** Send a message to the Actor and wait for up to timeout milliseconds for
@@ -459,7 +459,7 @@ trait LiftActor
   def !!(msg: Any): Box[Any] = {
     val future = new LAFuture[Any]
     this ! MsgWithResp(msg, future)
-    Full(future.get)
+    Full(future.get())
   }
 
   override protected def testTranslate(f: Any => Boolean)(v: Any) = v match {

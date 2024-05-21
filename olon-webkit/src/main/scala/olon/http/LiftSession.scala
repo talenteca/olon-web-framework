@@ -2571,12 +2571,9 @@ class LiftSession(
               processOrDefer(true)(
                 processSurroundAndInclude(
                   page,
-                  // SCALA3 Removing innecesary `openOr` call to prevent
-                  // serialized product types
-                  // TODO seems to be the cause of the issue with olon.webapptest.ToHeadUsages
                   nodeFuture
                     .get(15000)
-                    //.openOr(NodeSeq.Empty)
+                    .openOr(NodeSeq.Empty)
                 )
               )
           }
@@ -2605,9 +2602,11 @@ class LiftSession(
             case DataAttributeProcessorAnswerFork(nodeFunc) =>
               processOrDefer(true)(nodeFunc())
             case DataAttributeProcessorAnswerFuture(nodeFuture) =>
-              // SCALA3 Removing innecesary `openOr` call to prevent serialized
-              // product types
-              processOrDefer(true)(nodeFuture.get(15000))
+              processOrDefer(true)(
+                nodeFuture
+                  .get(15000)
+                  .openOr(NodeSeq.Empty)
+              )
           }
 
         case v: Elem =>

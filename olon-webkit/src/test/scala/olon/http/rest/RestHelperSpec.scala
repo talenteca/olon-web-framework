@@ -65,7 +65,7 @@ class RestHelperSpec extends WebSpec(RestHelperSpecBoot.boot) {
 
           helper.future.satisfy(JObject(Nil))
 
-          result.get must beLike { case JsonResponse(_, _, _, code) =>
+          result.get() must beLike { case JsonResponse(_, _, _, code) =>
             code must_== 200
           }
       }

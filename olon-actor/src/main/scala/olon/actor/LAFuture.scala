@@ -64,14 +64,14 @@ class LAFuture[T](
   // SCALA3 temporary deactivating tailrec anotation because `synchronized`
   // breaks tail recursion
   // @scala.annotation.tailrec
-  final def get: T = synchronized {
+  final def get(): T = synchronized {
     if (satisfied) item
     else if (aborted) throw new AbortedFutureException(failure)
     else {
       this.wait()
       if (satisfied) item
       else if (aborted) throw new AbortedFutureException(failure)
-      else get
+      else get()
     }
   }
 
