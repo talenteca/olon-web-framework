@@ -1,7 +1,6 @@
 package olon
 package actor
 
-import scala.compiletime.uninitialized
 
 import common._
 
@@ -22,7 +21,10 @@ trait LAScheduler {
   def execute(f: () => Unit): Unit
 }
 
-object LAScheduler extends LAScheduler with Loggable {
+object LAScheduler
+    extends LAScheduler
+    with Loggable
+    with VersionCompat.LASchedulerCompat {
   @volatile
   var onSameThread = false
 
@@ -72,10 +74,6 @@ object LAScheduler extends LAScheduler with Loggable {
     }
   }
 
-  // SCALA3 using `uninitialized` instead of `_`
-  @volatile
-  var exec: ILAExecute = uninitialized
-
   /** Execute some code on another thread
     *
     * @param f
@@ -101,44 +99,42 @@ object LAScheduler extends LAScheduler with Loggable {
   }
 }
 
+private[actor] class MailboxItem[T](val item: T)
+    extends VersionCompat.MailboxItemCompat[T] {
+
+  /*
+  def find(f: MailboxItem => Boolean): Box[MailboxItem] =
+  if (f(this)) Full(this) else next.find(f)
+   */
+
+  def remove(): Unit = {
+    prev.next = next
+    next.prev = prev
+  }
+
+  def insertAfter(newItem: MailboxItem[T]): MailboxItem[T] = {
+    next.prev = newItem
+    newItem.prev = this
+    newItem.next = this.next
+    next = newItem
+    newItem
+  }
+
+  def insertBefore(newItem: MailboxItem[T]): MailboxItem[T] = {
+    prev.next = newItem
+    newItem.prev = this.prev
+    newItem.next = this
+    prev = newItem
+    newItem
+  }
+}
+
 trait SpecializedLiftActor[T] extends SimpleActor[T] {
   @volatile private var processing = false
-  private val baseMailbox: MailboxItem = new SpecialMailbox
+  private val baseMailbox: MailboxItem[T] = new SpecialMailbox
   @volatile private var msgList: List[T] = Nil
   @volatile private var priorityMsgList: List[T] = Nil
   @volatile private var startCnt = 0
-
-  private class MailboxItem(val item: T) {
-    // SCALA3 using `uninitialized` instead of `_`
-    var next: MailboxItem = uninitialized
-    var prev: MailboxItem = uninitialized
-
-    /*
-    def find(f: MailboxItem => Boolean): Box[MailboxItem] =
-    if (f(this)) Full(this) else next.find(f)
-     */
-
-    def remove(): Unit = {
-      prev.next = next
-      next.prev = prev
-    }
-
-    def insertAfter(newItem: MailboxItem): MailboxItem = {
-      next.prev = newItem
-      newItem.prev = this
-      newItem.next = this.next
-      next = newItem
-      newItem
-    }
-
-    def insertBefore(newItem: MailboxItem): MailboxItem = {
-      prev.next = newItem
-      newItem.prev = this.prev
-      newItem.next = this
-      prev = newItem
-      newItem
-    }
-  }
 
   private class SpecialMailbox extends MailboxItem(null.asInstanceOf[T]) {
     // override def find(f: MailboxItem => Boolean): Box[MailboxItem] = Empty
@@ -147,9 +143,9 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
   }
 
   private def findMailboxItem(
-      start: MailboxItem,
-      f: MailboxItem => Boolean
-  ): Box[MailboxItem] =
+      start: MailboxItem[T],
+      f: MailboxItem[T] => Boolean
+  ): Box[MailboxItem[T]] =
     start match {
       case _: SpecialMailbox => Empty
       case x if f(x)         => Full(x)

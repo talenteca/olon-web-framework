@@ -2,7 +2,6 @@ package olon
 package actor
 
 import scala.collection.mutable.ArrayBuffer
-import scala.compiletime.uninitialized
 
 import common._
 
@@ -12,9 +11,7 @@ import common._
 class LAFuture[T](
     val scheduler: LAScheduler = LAScheduler,
     context: Box[LAFuture.Context] = Empty
-) {
-  // SCALA3 using `uninitialized` instead of `_`
-  private var item: T = uninitialized
+) extends VersionCompat.LAFutureCompat[T] {
   private var failure: Box[Nothing] = Empty
   private var satisfied = false
   private var aborted = false
