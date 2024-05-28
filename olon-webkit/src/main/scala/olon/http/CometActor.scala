@@ -10,7 +10,7 @@ import olon.util._
 
 import java.util.Locale
 import scala.collection.mutable.ListBuffer
-import scala.compiletime.uninitialized
+// import scala.compiletime.uninitialized
 import scala.xml.Elem
 import scala.xml.Node
 import scala.xml.NodeSeq
@@ -415,8 +415,8 @@ trait BaseCometActor
   /** If we're going to cache the last rendering, here's the private cache
     */
   // SCALA3 Using `private` instead of `private[this]`
-  // SCALA3 Using `uninitialized` instead of `_`
-  private var _realLastRendering: RenderOut = uninitialized
+  // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
+  private var _realLastRendering: RenderOut = _
 
   /** Get the current render clock for the CometActor
     * @return
@@ -486,13 +486,13 @@ trait BaseCometActor
       d.filter(d => (m - d.timestamp) < 120000L)
     }
 
-  // Using `uninitialized` instead of `_`
-  private var _theSession: LiftSession = uninitialized
+  // Using `uninitialized` instead of `_` (reverted for scala 2.13)
+  private var _theSession: LiftSession = _
 
   def theSession = _theSession
 
-  // Using `uninitialized` instead of `_`
-  @volatile private var _defaultHtml: NodeSeq = uninitialized
+  // Using `uninitialized` instead of `_` (reverted for scala 2.13)
+  @volatile private var _defaultHtml: NodeSeq = _
 
   /** The template that was passed to this component during comet
     * initializations

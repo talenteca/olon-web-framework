@@ -7,7 +7,7 @@ import org.mozilla.javascript.UniqueTag
 
 import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
-import scala.compiletime.uninitialized
+// import scala.compiletime.uninitialized
 import scala.reflect.ClassTag
 import scala.xml.Group
 import scala.xml._
@@ -2208,7 +2208,7 @@ class LiftSession(
     * session handles lift tags, alter this partial function.
     */
   @volatile
-  var liftTagProcessing: List[LiftRules.LiftTagPF] = uninitialized
+  var liftTagProcessing: List[LiftRules.LiftTagPF] = _ // (reverted scala.compiletime.uninitialised for scala 2.13)
 
   /** The basic partial function that does lift tag processing
     */
