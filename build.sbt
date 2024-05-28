@@ -131,9 +131,9 @@ lazy val libs = new {
     Seq("org.specs2" %% "specs2-matcher-extra" % versions.specs2 % Provided)
 
   // Mockito version 5.6.0 freezes the tests
-  // lazy val mockito = Seq(
-  //   "org.mockito" % "mockito-core" % "4.11.0" % Test
-  // )
+  lazy val mockito = Seq(
+    "org.mockito" % "mockito-core" % "4.11.0" % Test
+  )
 
   lazy val json4s = Seq("org.json4s" %% "json4s-native" % "4.0.6" % Test)
 }
@@ -145,6 +145,7 @@ ThisBuild / scalaVersion := versions.scala3Version
 ThisBuild / libraryDependencies ++=
   libs.specs2Core ++
     libs.specs2Matchers ++
+    libs.mockito ++
     libs.scalacheck
 
 ThisBuild / scalacOptions ++= 
@@ -159,7 +160,12 @@ ThisBuild / scalacOptions ++=
     // SCALA3 FIXME temporary silence warnings
     // "-Wconf:any:silent",
     // SCALA3 FIXME temporary ignored option "-Ywarn-unused"
-    "-Xsource:3"
+    
+    "-Xsource:3",
+    // "-Xmigration",
+    // "-quickfix:cat=scala3-migration"
+    // "-Wconf:any:warning-verbose"
+    // ""
   ) //++ {
     // scalaBinaryVersion.value match {
     //   case "2.13" =>

@@ -24,7 +24,9 @@ class NamedCometPerTabSpec extends Specification {
 
   "A NamedCometDispatcher" should {
     step {
-      val cometA = new CometA { override def name = Full("1") }
+      val cometA = new CometA {
+        override def name: olon.common.Full[String] = Full("1")
+      }
       cometA.localSetup()
 
       // HACK! to ensure tests doesn't fail when trying to access actor before they've been registered

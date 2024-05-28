@@ -45,11 +45,14 @@ class JsonFormatsSpec extends Specification with TypeHintExamples {
   // SCALA3 Using `?` instead of `_`
   "parameter name reading strategy can be changed" in {
     object TestReader extends ParameterNameReader {
-      def lookupParameterNames(constructor: java.lang.reflect.Constructor[?]) =
+      def lookupParameterNames(
+          constructor: java.lang.reflect.Constructor[?]
+      ): List[String] =
         List("name", "age")
     }
     implicit val formats = new DefaultFormats {
-      override val parameterNameReader = TestReader
+      override val parameterNameReader: olon.json.ParameterNameReader =
+        TestReader
     }
     val json = parse("""{"name":"joe","age":35}""")
     json.extract[NamesNotSameAsInJson] mustEqual NamesNotSameAsInJson("joe", 35)

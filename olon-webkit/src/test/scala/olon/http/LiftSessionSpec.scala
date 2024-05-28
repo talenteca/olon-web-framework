@@ -41,7 +41,7 @@ class LiftSessionSpec extends Specification with BeforeEach {
 
   sequential
 
-  override def before = receivedMessages = Vector[Int]()
+  override def before: Unit = receivedMessages = Vector[Int]()
 
   "A LiftSession" should {
 

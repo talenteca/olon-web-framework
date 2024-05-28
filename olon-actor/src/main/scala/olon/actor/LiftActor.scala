@@ -1,7 +1,6 @@
 package olon
 package actor
 
-
 import common._
 
 trait ILAExecute {

@@ -18,7 +18,8 @@ import js._
 /** 200 response but without body.
   */
 case class OkResponse() extends LiftResponse with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 200)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 200)
 }
 
 trait HeaderDefaults {
@@ -36,7 +37,7 @@ case class CreatedResponse(
     mime: String,
     addlHeaders: List[(String, String)] = XmlResponse.addlHeaders
 ) extends XmlNodeResponse {
-  def docType = Empty
+  def docType: olon.common.Empty.type = Empty
 
   def code = 201
 
@@ -80,19 +81,22 @@ object CreatedResponse {
 /** 202 response but without body.
   */
 case class AcceptedResponse() extends LiftResponse with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 202)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 202)
 }
 
 /** 204 response but without body.
   */
 case class NoContentResponse() extends LiftResponse with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 204)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 204)
 }
 
 /** 205 response but without body.
   */
 case class ResetContentResponse() extends LiftResponse with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 205)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 205)
 }
 
 /** 400 Bad Request
@@ -104,7 +108,7 @@ case class ResetContentResponse() extends LiftResponse with HeaderDefaults {
 case class BadRequestResponse(message: String = "")
     extends LiftResponse
     with HeaderDefaults {
-  def toResponse =
+  def toResponse: olon.http.InMemoryResponse =
     InMemoryResponse(message.getBytes("UTF-8"), headers, cookies, 400)
 }
 object BadResponse {
@@ -120,7 +124,7 @@ object BadResponse {
 /** 401 Unauthorized Response.
   */
 case class UnauthorizedResponse(realm: String) extends LiftResponse {
-  def toResponse = InMemoryResponse(
+  def toResponse: olon.http.InMemoryResponse = InMemoryResponse(
     Array(),
     List("WWW-Authenticate" -> ("Basic realm=\"" + realm + "\"")),
     Nil,
@@ -154,7 +158,7 @@ class UnauthorizedDigestResponse(
     nonce: String,
     opaque: String
 ) extends UnauthorizedResponse(realm) {
-  override def toResponse = InMemoryResponse(
+  override def toResponse: olon.http.InMemoryResponse = InMemoryResponse(
     Array(),
     List(
       "WWW-Authenticate" -> (
@@ -181,7 +185,7 @@ object ForbiddenResponse {
 case class ForbiddenResponse(message: String)
     extends LiftResponse
     with HeaderDefaults {
-  def toResponse = InMemoryResponse(
+  def toResponse: olon.http.InMemoryResponse = InMemoryResponse(
     message.getBytes("UTF-8"),
     "Content-Type" -> "text/plain; charset=utf-8" :: headers,
     cookies,
@@ -200,7 +204,7 @@ object NotFoundResponse {
 case class NotFoundResponse(message: String)
     extends LiftResponse
     with HeaderDefaults {
-  def toResponse = InMemoryResponse(
+  def toResponse: olon.http.InMemoryResponse = InMemoryResponse(
     message.getBytes("UTF-8"),
     "Content-Type" -> "text/plain; charset=utf-8" :: headers,
     cookies,
@@ -214,7 +218,8 @@ case class NotFoundResponse(message: String)
   * understand the method no matter the circumstances.
   */
 case class MethodNotAllowedResponse() extends LiftResponse with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 405)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 405)
 }
 
 /** 406 Not Acceptable
@@ -225,7 +230,7 @@ case class MethodNotAllowedResponse() extends LiftResponse with HeaderDefaults {
 case class NotAcceptableResponse(msg: String)
     extends LiftResponse
     with HeaderDefaults {
-  def toResponse =
+  def toResponse: olon.http.InMemoryResponse =
     InMemoryResponse(msg.getBytes("UTF-8"), headers, cookies, 406)
 }
 
@@ -238,7 +243,8 @@ object NotAcceptableResponse {
   * The requested Resource used to exist but no longer does.
   */
 case class GoneResponse() extends LiftResponse with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 410)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 410)
 }
 
 /** 415 Resource Gone
@@ -248,7 +254,8 @@ case class GoneResponse() extends LiftResponse with HeaderDefaults {
 case class UnsupportedMediaTypeResponse()
     extends LiftResponse
     with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 415)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 415)
 }
 
 /** 500 Internal Server Error
@@ -259,7 +266,8 @@ case class UnsupportedMediaTypeResponse()
 case class InternalServerErrorResponse()
     extends LiftResponse
     with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 500)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 500)
 }
 
 /** 501 Not Implemented
@@ -269,7 +277,8 @@ case class InternalServerErrorResponse()
   * the request method and is not capable of supporting it for any resource.
   */
 case class NotImplementedResponse() extends LiftResponse with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 501)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 501)
 }
 
 /** 502 Bad Gateway
@@ -278,7 +287,8 @@ case class NotImplementedResponse() extends LiftResponse with HeaderDefaults {
   * from the upstream server it accessed in attempting to fulfill the request.
   */
 case class BadGatewayResponse() extends LiftResponse with HeaderDefaults {
-  def toResponse = InMemoryResponse(Array(), headers, cookies, 502)
+  def toResponse: olon.http.InMemoryResponse =
+    InMemoryResponse(Array(), headers, cookies, 502)
 }
 
 /** 503 Bad Gateway
@@ -287,7 +297,7 @@ case class BadGatewayResponse() extends LiftResponse with HeaderDefaults {
   * from the upstream server it accessed in attempting to fulfill the request.
   */
 case class ServiceUnavailableResponse(retryAfter: Long) extends LiftResponse {
-  def toResponse = InMemoryResponse(
+  def toResponse: olon.http.InMemoryResponse = InMemoryResponse(
     Array(),
     List("Retry-After" -> retryAfter.toString),
     Nil,
@@ -308,7 +318,7 @@ case class JavaScriptResponse(
     cookies: List[HTTPCookie],
     code: Int
 ) extends LiftResponse {
-  def toResponse = {
+  def toResponse: olon.http.InMemoryResponse = {
     val bytes = js.toJsCmd.getBytes("UTF-8")
     InMemoryResponse(
       bytes,
@@ -369,7 +379,7 @@ case class JsonResponse(
     cookies: List[HTTPCookie],
     code: Int
 ) extends LiftResponse {
-  def toResponse = {
+  def toResponse: olon.http.InMemoryResponse = {
     val bytes = json.toJsCmd.getBytes("UTF-8")
     InMemoryResponse(
       bytes,
@@ -417,7 +427,7 @@ private[http] case object EmptyResponse extends BasicResponse {
 
   def size = 0
 
-  def toResponse = this
+  def toResponse: olon.http.EmptyResponse.type = this
 }
 
 final case class InMemoryResponse(
@@ -426,7 +436,7 @@ final case class InMemoryResponse(
     cookies: List[HTTPCookie],
     code: Int
 ) extends BasicResponse {
-  def toResponse = this
+  def toResponse: olon.http.InMemoryResponse = this
 
   def size = data.length
 
@@ -445,7 +455,7 @@ final case class StreamingResponse(
     cookies: List[HTTPCookie],
     code: Int
 ) extends BasicResponse {
-  def toResponse = this
+  def toResponse: olon.http.StreamingResponse = this
 
   override def toString =
     "StreamingResponse( steaming_data , " + headers + ", " + cookies + ", " + code + ")"
@@ -482,7 +492,7 @@ case class OutputStreamResponse(
     code: Int
 ) extends BasicResponse {
 
-  def toResponse = this
+  def toResponse: olon.http.OutputStreamResponse = this
 
 }
 
@@ -490,7 +500,7 @@ case class OutputStreamResponse(
   */
 case class PermRedirectResponse(uri: String, request: Req, cookies: HTTPCookie*)
     extends LiftResponse {
-  def toResponse =
+  def toResponse: olon.http.InMemoryResponse =
     InMemoryResponse(Array(), List("Location" -> uri), cookies.toList, 301)
 }
 
@@ -501,7 +511,7 @@ case class TemporaryRedirectResponse(
     request: Req,
     cookies: HTTPCookie*
 ) extends LiftResponse {
-  def toResponse =
+  def toResponse: olon.http.InMemoryResponse =
     InMemoryResponse(Array(), List("Location" -> uri), cookies.toList, 307)
 }
 
@@ -526,7 +536,7 @@ object RedirectResponse {
 case class RedirectResponse(uri: String, request: Req, cookies: HTTPCookie*)
     extends LiftResponse {
   // The Location URI is not resolved here, instead it is resolved with context path prior of sending the actual response
-  def toResponse = InMemoryResponse(
+  def toResponse: olon.http.InMemoryResponse = InMemoryResponse(
     Array(),
     List("Location" -> uri, "Content-Type" -> "text/plain"),
     cookies.toList,
@@ -554,7 +564,7 @@ object SeeOtherResponse {
 case class SeeOtherResponse(uri: String, request: Req, cookies: HTTPCookie*)
     extends LiftResponse {
   // The Location URI is not resolved here, instead it is resolved with context path prior of sending the actual response
-  def toResponse = InMemoryResponse(
+  def toResponse: olon.http.InMemoryResponse = InMemoryResponse(
     Array(),
     List("Location" -> uri, "Content-Type" -> "text/plain"),
     cookies.toList,
@@ -669,7 +679,7 @@ case class PlainTextResponse(
     headers: List[(String, String)],
     code: Int
 ) extends LiftResponse {
-  def toResponse = {
+  def toResponse: olon.http.InMemoryResponse = {
     val bytes = text.getBytes("UTF-8")
     InMemoryResponse(
       bytes,
@@ -691,7 +701,7 @@ object CSSResponse {
 
 case class CSSResponse(text: String, headers: List[(String, String)], code: Int)
     extends LiftResponse {
-  def toResponse = {
+  def toResponse: olon.http.InMemoryResponse = {
     val bytes = text.getBytes("UTF-8")
     InMemoryResponse(
       bytes,
@@ -742,7 +752,7 @@ trait NodeResponse extends LiftResponse {
   protected lazy val _encoding: String =
     LiftRules.calculateXmlHeader(this, out, headers.ciGet("Content-Type"))
 
-  def toResponse = {
+  def toResponse: olon.http.InMemoryResponse = {
     val bos = new ByteArrayOutputStream(64000)
     val writer = new OutputStreamWriter(bos, "UTF-8")
 
@@ -783,7 +793,7 @@ trait XmlNodeResponse extends LiftResponse {
     writer.append(doc)
   }
 
-  def toResponse = {
+  def toResponse: olon.http.InMemoryResponse = {
     val bos = new ByteArrayOutputStream(64000)
     val writer = new OutputStreamWriter(bos, "UTF-8")
 
@@ -859,7 +869,7 @@ case class XmlMimeResponse(
     mime: String,
     addlHeaders: List[(String, String)] = XmlResponse.addlHeaders
 ) extends XmlNodeResponse {
-  def docType = Empty
+  def docType: olon.common.Empty.type = Empty
 
   def code = 200
 
@@ -878,7 +888,7 @@ class XmlResponse(
     val cookies: List[HTTPCookie],
     val addlHeaders: List[(String, String)] = XmlResponse.addlHeaders
 ) extends XmlNodeResponse {
-  def docType = Empty
+  def docType: olon.common.Empty.type = Empty
 
   val headers: List[(String, String)] =
     S.getResponseHeaders(("Content-Type" -> mime) :: addlHeaders)
@@ -980,7 +990,7 @@ case class AtomResponse(
     xml: Node,
     addlHeaders: List[(String, String)] = XmlResponse.addlHeaders
 ) extends XmlNodeResponse {
-  def docType = Empty
+  def docType: olon.common.Empty.type = Empty
 
   def code = 200
 
@@ -999,7 +1009,7 @@ case class OpenSearchResponse(
     xml: Node,
     addlHeaders: List[(String, String)] = XmlResponse.addlHeaders
 ) extends XmlNodeResponse {
-  def docType = Empty
+  def docType: olon.common.Empty.type = Empty
 
   def code = 200
 
@@ -1016,17 +1026,20 @@ case class OpenSearchResponse(
 /** The Atom entity was successfully created and is shown to the client.
   */
 case class AtomCreatedResponse(xml: Node) extends LiftResponse {
-  def toResponse = CreatedResponse(xml, "application/atom+xml").toResponse
+  def toResponse: olon.http.InMemoryResponse =
+    CreatedResponse(xml, "application/atom+xml").toResponse
 }
 
 /** Returning an Atom category document.
   */
 case class AtomCategoryResponse(xml: Node) extends LiftResponse {
-  def toResponse = XmlMimeResponse(xml, "application/atomcat+xml").toResponse
+  def toResponse: olon.http.InMemoryResponse =
+    XmlMimeResponse(xml, "application/atomcat+xml").toResponse
 }
 
 /** Returning an Atom Service Document.
   */
 case class AtomServiceResponse(xml: Node) extends LiftResponse {
-  def toResponse = XmlMimeResponse(xml, "application/atomsvc+xml").toResponse
+  def toResponse: olon.http.InMemoryResponse =
+    XmlMimeResponse(xml, "application/atomsvc+xml").toResponse
 }

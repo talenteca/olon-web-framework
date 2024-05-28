@@ -22,7 +22,7 @@ object CanResolveAsyncSpec extends Spec {
 
       myPromise.success("All done!")
 
-      receivedResolution.get must_== "All done!"
+      receivedResolution.get() must_== "All done!"
     }
 
     "resolve LAFutures" in {
@@ -36,7 +36,7 @@ object CanResolveAsyncSpec extends Spec {
 
       myFuture.satisfy("Got it!")
 
-      receivedResolution.get must_== "Got it!"
+      receivedResolution.get() must_== "Got it!"
     }
   }
 }

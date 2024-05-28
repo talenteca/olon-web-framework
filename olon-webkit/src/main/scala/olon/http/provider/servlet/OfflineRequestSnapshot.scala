@@ -120,12 +120,12 @@ private[servlet] class OfflineRequestSnapshot(
 
   val locale: Box[Locale] = req.locale
 
-  def setCharacterEncoding(encoding: String) =
+  def setCharacterEncoding(encoding: String): Nothing =
     throw new UnsupportedOperationException(
       "It is unsafe to set the character encoding "
     )
 
-  def snapshot = this
+  def snapshot: olon.http.provider.servlet.OfflineRequestSnapshot = this
 
   /** The User-Agent of the request
     */

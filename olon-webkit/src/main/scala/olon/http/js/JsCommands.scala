@@ -307,7 +307,7 @@ object JE {
   object LjSwappable {
     def apply(visible: JsExp, hidden: JsExp): JxBase = {
       new JxNodeBase {
-        def child = Nil
+        def child: scala.collection.immutable.Nil.type = Nil
 
         def appendToParent(name: String): JsCmd =
           JsRaw(
@@ -319,7 +319,7 @@ object JE {
 
     def apply(visible: NodeSeq, hidden: NodeSeq): JxBase = {
       new JxNodeBase {
-        def child = Nil
+        def child: scala.collection.immutable.Nil.type = Nil
 
         def appendToParent(name: String): JsCmd =
           JsRaw(

@@ -7,7 +7,6 @@ import org.mozilla.javascript.UniqueTag
 
 import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
-// import scala.compiletime.uninitialized
 import scala.reflect.ClassTag
 import scala.xml.Group
 import scala.xml._
@@ -2207,8 +2206,9 @@ class LiftSession(
     * default lift tag processing. If you need to change the way a particular
     * session handles lift tags, alter this partial function.
     */
+  // (reverted scala.compiletime.uninitialised for scala 2.13)
   @volatile
-  var liftTagProcessing: List[LiftRules.LiftTagPF] = _ // (reverted scala.compiletime.uninitialised for scala 2.13)
+  var liftTagProcessing: List[LiftRules.LiftTagPF] = _
 
   /** The basic partial function that does lift tag processing
     */
@@ -2475,7 +2475,7 @@ class LiftSession(
           Helpers.tryo(shutdownFunc.foreach(_(this)))
         }
 
-        override def lifespan =
+        override def lifespan: olon.common.Full[olon.util.Helpers.TimeSpan] =
           Full(TimeSpan(LiftRules.clientActorLifespan.vend.apply(this)))
 
         override def hasOuter = false
@@ -3117,7 +3117,7 @@ class LiftSession(
           */
         def render: RenderOut = NodeSeq.Empty
 
-        override def lifespan =
+        override def lifespan: olon.common.Full[olon.util.Helpers.TimeSpan] =
           Full(TimeSpan(LiftRules.clientActorLifespan.vend.apply(this)))
 
         override def hasOuter = false
@@ -3215,11 +3215,10 @@ class LiftSession(
               if (func.manifest == jvmanifest) Some(payload)
               else {
                 try {
-                  type A
                   Some(
-                    payload.extract[A](
+                    payload.extract[Any](
                       defaultFormats,
-                      func.manifest.asInstanceOf[Tag[A]]
+                      func.manifest.asInstanceOf[Tag[Any]]
                     )
                   ) // SCALA3 investigate
                 } catch {
@@ -3334,7 +3333,7 @@ class LiftSession(
 
       // SCALA3 using `x*` instead of `x: _*`
       JsObj(
-        build :: info
+        (build :: info
           .map(info => info.name -> JsRaw(s"""
           |function(param) {
           |  var promise = lift.createPromise();
@@ -3342,7 +3341,7 @@ class LiftSession(
           |  return promise;
           |}
           |""".stripMargin))
-          .toList*
+          .toList)*
       )
     }
   }

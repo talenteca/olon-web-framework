@@ -108,7 +108,7 @@ trait JxBase {
 abstract class JxNodeBase extends Node with JxBase {}
 
 case class JxAttr(in: JsCmd) extends Node with JxBase {
-  def child = Nil
+  def child: scala.collection.immutable.Nil.type = Nil
 
   def appendToParent(parentName: String): JsCmd = {
     Noop
@@ -116,7 +116,7 @@ case class JxAttr(in: JsCmd) extends Node with JxBase {
 }
 
 case class JxFuncAttr(in: JsCmd) extends Node with JxBase {
-  def child = Nil
+  def child: scala.collection.immutable.Nil.type = Nil
 
   def appendToParent(parentName: String): JsCmd = {
     Noop
@@ -124,7 +124,7 @@ case class JxFuncAttr(in: JsCmd) extends Node with JxBase {
 }
 
 case class JxMap(in: JsExp, what: JxYieldFunc) extends Node with JxBase {
-  def child = Nil
+  def child: scala.collection.immutable.Nil.type = Nil
 
   def appendToParent(parentName: String): JsCmd = {
     val ran = "v" + Helpers.nextFuncName
@@ -141,13 +141,13 @@ case class JxMap(in: JsExp, what: JxYieldFunc) extends Node with JxBase {
 }
 
 case class JxCmd(in: JsCmd) extends Node with JxBase {
-  def child = Nil
+  def child: scala.collection.immutable.Nil.type = Nil
 
   def appendToParent(parentName: String) = in
 }
 
 case class JxMatch(exp: JsExp, cases: JxCase*) extends Node with JxBase {
-  def child = Nil
+  def child: scala.collection.immutable.Nil.type = Nil
 
   def appendToParent(parentName: String): JsCmd = {
     val vn = "v" + Helpers.nextFuncName
@@ -169,7 +169,7 @@ case class JxMatch(exp: JsExp, cases: JxCase*) extends Node with JxBase {
 case class JxCase(toMatch: JsExp, toDo: NodeSeq)
 
 case class JxIf(toTest: JsExp, ifTrue: NodeSeq) extends Node with JxBase {
-  def child = Nil
+  def child: scala.collection.immutable.Nil.type = Nil
 
   def appendToParent(parentName: String): JsCmd = {
     JsRaw(
@@ -183,7 +183,7 @@ case class JxIf(toTest: JsExp, ifTrue: NodeSeq) extends Node with JxBase {
 case class JxIfElse(toTest: JsExp, ifTrue: NodeSeq, ifFalse: NodeSeq)
     extends Node
     with JxBase {
-  def child = Nil
+  def child: scala.collection.immutable.Nil.type = Nil
 
   def appendToParent(parentName: String): JsCmd = {
     JsRaw(

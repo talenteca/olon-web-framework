@@ -17,7 +17,7 @@ class ScheduleSpec
     with BeforeEach {
   "Schedule Specification".title
 
-  def before = Schedule.restart()
+  def before: Unit = Schedule.restart()
 
   "The Schedule object" should {
     "provide a schedule method to ping an actor regularly" in {

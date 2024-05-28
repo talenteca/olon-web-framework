@@ -138,7 +138,7 @@ case class HttpDigestAuthentication(realmName: String)(
 
   override def realm = realmName
 
-  override def unauthorizedResponse = {
+  override def unauthorizedResponse: olon.http.UnauthorizedDigestResponse = {
     val nonce = randomString(64);
     nonceMap += (nonce -> System.currentTimeMillis)
     UnauthorizedDigestResponse(realm, Qop.AUTH, nonce, randomString(64))

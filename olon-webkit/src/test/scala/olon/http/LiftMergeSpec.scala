@@ -45,12 +45,13 @@ class LiftMergeSpec extends Specification with XmlMatchers {
   eventExtractingTestRules.extractInlineJavaScript = true
 
   "LiftMerge when doing the final page merge" should {
-    "merge head segments in the page body in order into main head" in WithRules(
-      testRules
-    ) {
-      val result =
-        testSession.merge(
-          <html>
+    "merge head segments in the page body in order into main head" in SpecContextHelpers
+      .WithRules(
+        testRules
+      ) {
+        val result =
+          testSession.merge(
+            <html>
             <head>
               <script src="testscript"></script>
             </head>
@@ -68,23 +69,24 @@ class LiftMergeSpec extends Specification with XmlMatchers {
               </div>
             </body>
           </html>,
-          mockReq
-        )
+            mockReq
+          )
 
-      (result \ "head" \ "_") must_== (Seq(
-        <script src="testscript"></script>,
-        <script src="testscript2"></script>,
-        <link href="testlink" />,
-        <link href="testlink2" />
-      ): NodeSeq)
-    }
+        (result \ "head" \ "_") must_== (Seq(
+          <script src="testscript"></script>,
+          <script src="testscript2"></script>,
+          <link href="testlink" />,
+          <link href="testlink2" />
+        ): NodeSeq)
+      }
 
-    "merge tail segments in the page body in order at the end of the body" in WithRules(
-      testRules
-    ) {
-      val result =
-        testSession.merge(
-          <html>
+    "merge tail segments in the page body in order at the end of the body" in SpecContextHelpers
+      .WithRules(
+        testRules
+      ) {
+        val result =
+          testSession.merge(
+            <html>
             <head>
               <script src="testscript"></script>
             </head>
@@ -105,17 +107,19 @@ class LiftMergeSpec extends Specification with XmlMatchers {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
-        )
+            mockReq
+          )
 
-      (result \ "body" \ "_").takeRight(3) must_== (Seq(
-        <script src="testscript2"></script>,
-        <link href="testlink" />,
-        <link href="testlink2" />
-      ): NodeSeq)
-    }
+        (result \ "body" \ "_").takeRight(3) must_== (Seq(
+          <script src="testscript2"></script>,
+          <link href="testlink" />,
+          <link href="testlink2" />
+        ): NodeSeq)
+      }
 
-    "not merge tail segments in the head" in WithRules(testRules) {
+    "not merge tail segments in the head" in SpecContextHelpers.WithRules(
+      testRules
+    ) {
       val result =
         testSession.merge(
           <html>
@@ -151,13 +155,14 @@ class LiftMergeSpec extends Specification with XmlMatchers {
       ): NodeSeq)
     }
 
-    "normalize absolute link hrefs everywhere" in WithLiftContext(
-      testRules,
-      testSession
-    ) {
-      val result =
-        testSession.merge(
-          <html>
+    "normalize absolute link hrefs everywhere" in SpecContextHelpers
+      .WithLiftContext(
+        testRules,
+        testSession
+      ) {
+        val result =
+          testSession.merge(
+            <html>
             <head>
               <script src="testscript"></script>
               <link href="/testlink" />
@@ -179,22 +184,23 @@ class LiftMergeSpec extends Specification with XmlMatchers {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
-        )
+            mockReq
+          )
 
-      (result \\ "link").map(_ \@ "href") must_==
-        "/context-path/testlink" ::
-          "/context-path/testlink2" ::
-          "/context-path/testlink3" :: Nil
-    }
+        (result \\ "link").map(_ \@ "href") must_==
+          "/context-path/testlink" ::
+            "/context-path/testlink2" ::
+            "/context-path/testlink3" :: Nil
+      }
 
-    "normalize absolute script srcs everywhere" in WithLiftContext(
-      testRules,
-      testSession
-    ) {
-      val result =
-        testSession.merge(
-          <html>
+    "normalize absolute script srcs everywhere" in SpecContextHelpers
+      .WithLiftContext(
+        testRules,
+        testSession
+      ) {
+        val result =
+          testSession.merge(
+            <html>
             <head>
               <script src="/testscript"></script>
               <link href="testlink" />
@@ -216,21 +222,22 @@ class LiftMergeSpec extends Specification with XmlMatchers {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
-        )
+            mockReq
+          )
 
-      (result \\ "script").map(_ \@ "src") must_==
-        "/context-path/testscript" ::
-          "/context-path/testscript2" :: Nil
-    }
+        (result \\ "script").map(_ \@ "src") must_==
+          "/context-path/testscript" ::
+            "/context-path/testscript2" :: Nil
+      }
 
-    "normalize absolute a hrefs everywhere" in WithLiftContext(
-      testRules,
-      testSession
-    ) {
-      val result =
-        testSession.merge(
-          <html>
+    "normalize absolute a hrefs everywhere" in SpecContextHelpers
+      .WithLiftContext(
+        testRules,
+        testSession
+      ) {
+        val result =
+          testSession.merge(
+            <html>
             <head>
               <a href="/testa1">Booyan</a>
             </head>
@@ -252,25 +259,26 @@ class LiftMergeSpec extends Specification with XmlMatchers {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
-        )
+            mockReq
+          )
 
-      (result \\ "a").map(_ \@ "href") must_==
-        "/context-path/testa1" ::
-          "testa3" ::
-          "/context-path/testa2" ::
-          "testa4" ::
-          "/context-path/testa6" ::
-          "/context-path/testa5" :: Nil
-    }
+        (result \\ "a").map(_ \@ "href") must_==
+          "/context-path/testa1" ::
+            "testa3" ::
+            "/context-path/testa2" ::
+            "testa4" ::
+            "/context-path/testa6" ::
+            "/context-path/testa5" :: Nil
+      }
 
-    "normalize absolute form actions everywhere" in WithLiftContext(
-      testRules,
-      testSession
-    ) {
-      val result =
-        testSession.merge(
-          <html>
+    "normalize absolute form actions everywhere" in SpecContextHelpers
+      .WithLiftContext(
+        testRules,
+        testSession
+      ) {
+        val result =
+          testSession.merge(
+            <html>
             <head>
               <form action="/testform1">Booyan</form>
             </head>
@@ -292,19 +300,19 @@ class LiftMergeSpec extends Specification with XmlMatchers {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
-        )
+            mockReq
+          )
 
-      (result \\ "form").map(_ \@ "action") must_==
-        "/context-path/testform1" ::
-          "testform3" ::
-          "/context-path/testform2" ::
-          "testform4" ::
-          "/context-path/testform6" ::
-          "/context-path/testform5" :: Nil
-    }
+        (result \\ "form").map(_ \@ "action") must_==
+          "/context-path/testform1" ::
+            "testform3" ::
+            "/context-path/testform2" ::
+            "testform4" ::
+            "/context-path/testform6" ::
+            "/context-path/testform5" :: Nil
+      }
 
-    "not rewrite script srcs anywhere" in WithLiftContext(
+    "not rewrite script srcs anywhere" in SpecContextHelpers.WithLiftContext(
       testRules,
       testSession
     ) {
@@ -341,7 +349,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "testscript3" :: Nil
     }
 
-    "not rewrite link hrefs anywhere" in WithLiftContext(
+    "not rewrite link hrefs anywhere" in SpecContextHelpers.WithLiftContext(
       testRules,
       testSession
     ) {
@@ -378,7 +386,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "testlink3" :: Nil
     }
 
-    "rewrite a hrefs everywhere" in WithLiftContext(
+    "rewrite a hrefs everywhere" in SpecContextHelpers.WithLiftContext(
       testRules,
       testSession
     ) {
@@ -415,7 +423,7 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "rewritten" :: Nil
     }
 
-    "rewrite form actions everywhere" in WithLiftContext(
+    "rewrite form actions everywhere" in SpecContextHelpers.WithLiftContext(
       testRules,
       testSession
     ) {
@@ -452,13 +460,14 @@ class LiftMergeSpec extends Specification with XmlMatchers {
           "rewritten" :: Nil
     }
 
-    "include a page script in the page tail if events are extracted" in WithLiftContext(
-      eventExtractingTestRules,
-      testSession
-    ) {
-      val result =
-        testSession.merge(
-          <html>
+    "include a page script in the page tail if events are extracted" in SpecContextHelpers
+      .WithLiftContext(
+        eventExtractingTestRules,
+        testSession
+      ) {
+        val result =
+          testSession.merge(
+            <html>
             <head>
               <title>Booyan</title>
             </head>
@@ -470,45 +479,46 @@ class LiftMergeSpec extends Specification with XmlMatchers {
               </div>
             </body>
           </html>,
-          mockReq
-        )
+            mockReq
+          )
 
-      val scripts = (result \\ "script")
+        val scripts = (result \\ "script")
 
-      scripts must have length (1)
-      scripts.map(_ \@ "src") must beLike { case scriptSrc :: Nil =>
-        scriptSrc must beMatching("/context-path/lift/page/F[^.]+.js")
+        scripts must have length (1)
+        scripts.map(_ \@ "src") must beLike { case scriptSrc :: Nil =>
+          scriptSrc must beMatching("/context-path/lift/page/F[^.]+.js")
+        }
+        pageScript.is must beLike { case Full(response) =>
+          response.js.toJsCmd must contain("tryme()")
+          response.js.toJsCmd must contain("tryyou()")
+        }
       }
-      pageScript.is must beLike { case Full(response) =>
-        response.js.toJsCmd must contain("tryme()")
-        response.js.toJsCmd must contain("tryyou()")
-      }
-    }
 
-    "include a page script in the page tail even if the page doesn't have a head and body" in WithLiftContext(
-      eventExtractingTestRules,
-      testSession
-    ) {
-      val result =
-        testSession.merge(
-          <div onclick="tryme();">
+    "include a page script in the page tail even if the page doesn't have a head and body" in SpecContextHelpers
+      .WithLiftContext(
+        eventExtractingTestRules,
+        testSession
+      ) {
+        val result =
+          testSession.merge(
+            <div onclick="tryme();">
             <p onmouseover="tryyou();">
               Test
             </p>
           </div>,
-          mockReq
-        )
+            mockReq
+          )
 
-      val scripts = (result \\ "script")
+        val scripts = (result \\ "script")
 
-      scripts must have length (1)
-      scripts.map(_ \@ "src") must beLike { case scriptSrc :: Nil =>
-        scriptSrc must beMatching("/context-path/lift/page/F[^.]+.js")
+        scripts must have length (1)
+        scripts.map(_ \@ "src") must beLike { case scriptSrc :: Nil =>
+          scriptSrc must beMatching("/context-path/lift/page/F[^.]+.js")
+        }
+        pageScript.is must beLike { case Full(response) =>
+          response.js.toJsCmd must contain("tryme()")
+          response.js.toJsCmd must contain("tryyou()")
+        }
       }
-      pageScript.is must beLike { case Full(response) =>
-        response.js.toJsCmd must contain("tryme()")
-        response.js.toJsCmd must contain("tryyou()")
-      }
-    }
   }
 }

@@ -38,7 +38,10 @@ trait JValueGen {
     })
   implicit def cogenJField: Cogen[JField] =
     Cogen[JField]({ (seed: Seed, field: JField) =>
-      Cogen.perturbPair(seed, (field.name -> field.value))
+      Cogen.perturbPair[String, olon.json.JsonAST.JValue[Any]](
+        seed,
+        (field.name -> field.value)
+      )
     })
 
   val genJValueFn: Gen[JValue => JValue] = function1(genJValue)

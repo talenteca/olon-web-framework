@@ -69,7 +69,8 @@ class HTTPRequestServlet(
 
   // don't cache... allow multiple sessions for the request
   // necessary for session destruction on login
-  def session = new HTTPServletSession(req.getSession)
+  def session: olon.http.provider.servlet.HTTPServletSession =
+    new HTTPServletSession(req.getSession)
 
   def uri = req.getRequestURI
 

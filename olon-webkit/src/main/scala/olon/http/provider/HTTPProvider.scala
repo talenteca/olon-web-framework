@@ -7,7 +7,6 @@ import olon.util._
 
 import java.util.Locale
 import java.util.ResourceBundle
-import scala.compiletime.uninitialized
 
 import Helpers._
 
@@ -17,7 +16,7 @@ import Helpers._
 trait HTTPProvider {
 
   // SCALA3 Using `uninitialized` instead of `_`
-  private var actualServlet: LiftServlet = uninitialized
+  private var actualServlet: LiftServlet = _ // (reverted for scala 2.13)
 
   def liftServlet = actualServlet
 

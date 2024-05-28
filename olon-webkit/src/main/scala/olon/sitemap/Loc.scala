@@ -5,7 +5,6 @@ import olon.common._
 import olon.http._
 import olon.util._
 
-import scala.compiletime.uninitialized
 import scala.xml.NodeSeq
 import scala.xml.Text
 
@@ -370,8 +369,8 @@ trait Loc[T] {
   // SCALA3 Removing `_` for passing function as a value
   def linkText: Box[NodeSeq] = currentValue.map(linkText)
 
-  // SCALA3 Using `uninitialized` instead of `_`
-  private var _menu: Menu = uninitialized
+  // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
+  private var _menu: Menu = _
 
   private[sitemap] def menu_=(m: Menu): Unit = {
     _menu = m

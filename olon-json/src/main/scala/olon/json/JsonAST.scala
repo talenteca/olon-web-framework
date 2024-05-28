@@ -63,7 +63,7 @@ object JsonAST {
     * `[[JField]]` which does not extend this class because it really ''can't''
     * properly exist as a first-class citizen of JSON.
     */
-  sealed abstract class JValue[Values] extends Diff.Diffable {
+  sealed abstract class JValue[+Values] extends Diff.Diffable {
 
     /** An XPath-like expression to find a child of a `[[JObject]]` or a
       * `[[JArray]]` of `JObject` by name. If you call this method on anything

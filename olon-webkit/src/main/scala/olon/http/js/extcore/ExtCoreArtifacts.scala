@@ -17,32 +17,32 @@ object ExtCoreArtifacts extends JSArtifacts {
 
   /** Toggles between current JS object and the object denominated by id
     */
-  def toggle(id: String) = new JsExp {
+  def toggle(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd = "Ext.fly(" + id.encJs + ").toggle()"
   }
 
   /** Hides the element denominated by id
     */
-  def hide(id: String) = new JsExp {
+  def hide(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd = "Ext.fly(" + id.encJs + ").hide()"
   }
 
   /** Shows the element denominated by this id
     */
-  def show(id: String) = new JsExp {
+  def show(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd = "Ext.fly(" + id.encJs + ").show()"
   }
 
   /** Shows the element denoinated by id and puts the focus on it
     */
-  def showAndFocus(id: String) = new JsExp {
+  def showAndFocus(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd = "Ext.fly(" + id.encJs + ").show().focus(200)"
   }
 
   /** Serializes a form denominated by the id. It returns a query string
     * containing the fields that are to be submitted
     */
-  def serialize(id: String) = new JsExp {
+  def serialize(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd = "Ext.Ajax.serializeForm(" + id.encJs + ")"
   }
 

@@ -25,6 +25,8 @@ trait NamedCometActorTrait extends BaseCometActor with Loggable {
   }
 
   // time out the comet actor if it hasn't been on a page for 2 minutes
-  override def lifespan = Full(120.seconds)
+  override def lifespan: olon.common.Full[olon.util.Helpers.TimeSpan] = Full(
+    120.seconds
+  )
 
 }

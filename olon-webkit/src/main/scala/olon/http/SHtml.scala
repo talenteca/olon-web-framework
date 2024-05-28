@@ -1108,7 +1108,7 @@ trait SHtml extends Loggable {
     area(
       shape,
       alt,
-      (("onclick" -> jsCmd.toJsCmd): ElemAttr) :: attrs.toList*
+      ((("onclick" -> jsCmd.toJsCmd): ElemAttr) :: attrs.toList)*
     )
 
   /** Generate an Area tag
@@ -1134,8 +1134,8 @@ trait SHtml extends Loggable {
       area(
         shape,
         alt,
-        (("onclick" -> (makeAjaxCall(Str(funcName + "=true")).toJsCmd +
-          "; return false;")): ElemAttr) :: attrs.toList*
+        ((("onclick" -> (makeAjaxCall(Str(funcName + "=true")).toJsCmd +
+          "; return false;")): ElemAttr) :: attrs.toList)*
       )
     }
   }

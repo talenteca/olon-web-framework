@@ -18,27 +18,27 @@ object YUIArtifacts extends JSArtifacts {
 
   /** Toggles between current JS object and the object denominated by id
     */
-  def toggle(id: String) = new JsExp {
+  def toggle(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd = "YAHOO.lift.toggle(this, " + id.encJs + ");";
   }
 
   /** Hides the element denominated by id
     */
-  def hide(id: String) = new JsExp {
+  def hide(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd =
       "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'none');"
   }
 
   /** Shows the element denominated by this id
     */
-  def show(id: String) = new JsExp {
+  def show(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd =
       "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'block');"
   }
 
   /** Shows the element denoinated by id and puts the focus on it
     */
-  def showAndFocus(id: String) = new JsExp {
+  def showAndFocus(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd =
       "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'block');" +
         "setTimeout(function() { document.getElementById(" + id.encJs + ").focus(); }, 200);"
@@ -47,7 +47,7 @@ object YUIArtifacts extends JSArtifacts {
   /** Serializes a form denominated by the id. It returns a query string
     * containing the fields that are to be submitted
     */
-  def serialize(id: String) = new JsExp {
+  def serialize(id: String): olon.http.js.JsExp = new JsExp {
     def toJsCmd = "YAHOO.util.Connect.setForm(" + id.encJs + ", false)"
   }
 

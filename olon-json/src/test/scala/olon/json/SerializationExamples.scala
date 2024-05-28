@@ -247,7 +247,7 @@ object CustomTypeHintFieldNameExample extends TypeHintExamples {
 
   implicit val formats: Formats = new Formats {
     val dateFormat = DefaultFormats.lossless.dateFormat
-    override val typeHints = ShortTypeHints(
+    override val typeHints: olon.json.TypeHints = ShortTypeHints(
       classOf[Fish] :: classOf[Dog] :: Nil
     )
     override val typeHintFieldName = "$type$"

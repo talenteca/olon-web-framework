@@ -1,6 +1,7 @@
 package olon
 package http
 
+import org.mockito.Mockito._
 import org.specs2.matcher.XmlMatchers
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -42,7 +43,7 @@ class ReqSpec extends Specification with XmlMatchers {
   "Req" should {
     "recognize safari 5" in {
       val uac = new UserAgentCalculator {
-        def userAgent = Full(
+        def userAgent: Full[String] = Full(
           "Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-HK) AppleWebKit/533.18.1 (KHTML, like Gecko) Version/5.0.2 Safari/533.18.5"
         )
       }
@@ -53,7 +54,7 @@ class ReqSpec extends Specification with XmlMatchers {
       iPhoneUserAgents map { agent =>
         {
           val uac = new UserAgentCalculator {
-            def userAgent = Full(agent)
+            def userAgent: Full[String] = Full(agent)
           }
           uac.isIPhone must_== true
           uac.isIPad must_== false
@@ -67,7 +68,7 @@ class ReqSpec extends Specification with XmlMatchers {
       iPadUserAgents map { agent =>
         {
           val uac = new UserAgentCalculator {
-            def userAgent = Full(agent)
+            def userAgent: Full[String] = Full(agent)
           }
           uac.isIPhone must_== false
           uac.isIPad must_== true
@@ -80,7 +81,7 @@ class ReqSpec extends Specification with XmlMatchers {
     "Correctly recognize IE versions 6-11" in {
       val ieVersions = ieUserAgents.flatMap { ieUserAgent =>
         val userAgentCalculator = new UserAgentCalculator {
-          def userAgent = Full(ieUserAgent)
+          def userAgent: Full[String] = Full(ieUserAgent)
         }
 
         userAgentCalculator.ieVersion

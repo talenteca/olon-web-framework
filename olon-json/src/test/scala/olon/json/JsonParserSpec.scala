@@ -36,7 +36,7 @@ class JsonParserSpec extends Specification with JValueGen with ScalaCheck {
     val executor = Executors.newFixedThreadPool(100)
     val results = (0 to 100)
       .map(_ =>
-        executor.submit(new Callable[JValue] { def call = parse(json) })
+        executor.submit(new Callable[JValue] { def call: JValue = parse(json) })
       )
       .toList
       .map(_.get)

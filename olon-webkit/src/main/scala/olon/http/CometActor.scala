@@ -10,7 +10,6 @@ import olon.util._
 
 import java.util.Locale
 import scala.collection.mutable.ListBuffer
-// import scala.compiletime.uninitialized
 import scala.xml.Elem
 import scala.xml.Node
 import scala.xml.NodeSeq

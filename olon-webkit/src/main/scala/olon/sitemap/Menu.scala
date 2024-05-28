@@ -11,7 +11,6 @@ import olon.http._
 import olon.util._
 
 import scala.annotation._
-import scala.compiletime.uninitialized
 
 import Helpers._
 
@@ -227,7 +226,7 @@ object Menu extends MenuSingleton {
       def name = ParamMenuable.this.name
 
       // the default parameters (used for generating the menu listing)
-      def defaultValue = Empty
+      def defaultValue: olon.common.Empty.type = Empty
 
       // no extra parameters
       def params = ParamMenuable.this.params
@@ -242,7 +241,7 @@ object Menu extends MenuSingleton {
 
       def listToFrom(in: List[String]): Box[String] = in.headOption
 
-      val link = new ParamLocLink[T](
+      val link: olon.sitemap.ParamLocLink[T] = new ParamLocLink[T](
         ParamMenuable.this.path,
         ParamMenuable.this.headMatch,
         t => List(encoder(t))
@@ -402,7 +401,7 @@ object Menu extends MenuSingleton {
       def headMatch: Boolean = ParamsMenuable.this.headMatch
 
       // the default parameters (used for generating the menu listing)
-      def defaultValue = Empty
+      def defaultValue: olon.common.Empty.type = Empty
 
       // no extra parameters
       def params = ParamsMenuable.this.params
@@ -411,7 +410,7 @@ object Menu extends MenuSingleton {
         */
       def text = ParamsMenuable.this.linkText
 
-      val link = new ParamLocLink[T](
+      val link: olon.sitemap.ParamLocLink[T] = new ParamLocLink[T](
         ParamsMenuable.this.path,
         ParamsMenuable.this.headMatch,
         encoder
@@ -720,8 +719,8 @@ case class Menu(loc: Loc[?], private val convertableKids: ConvertableToMenu*)
   lazy val kids: Seq[Menu] = convertableKids.map(_.toMenu)
   private[sitemap] var _parent: Box[HasKids] = Empty
 
-  // SCALA3 Using `uninitialized` instead of `_`
-  private[sitemap] var siteMap: SiteMap = uninitialized
+  // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
+  private[sitemap] var siteMap: SiteMap = _
 
   private[sitemap] def init(siteMap: SiteMap): Unit = {
     this.siteMap = siteMap

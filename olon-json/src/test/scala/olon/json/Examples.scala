@@ -73,12 +73,17 @@ trait AbstractExamples extends Specification {
   }
 
   "Unbox values using XPath-like type expression" in {
-    (parse(objArray) \ "children" \\ classOf[JInt] mustEqual List(5, 3)) and
-      (parse(lotto) \ "lotto" \ "winning-numbers" \ classOf[
-        JInt
-      ] mustEqual List(2, 45, 34, 23, 7, 5, 3)) and
-      (parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(2, 45,
-        34, 23, 7, 5, 3))
+    ((parse(objArray) \ "children").\\[BigInt, JInt](
+      classOf[JInt]
+    ) mustEqual List(5, 3)) and
+      ((parse(lotto) \ "lotto" \ "winning-numbers").\[BigInt, JInt](
+        classOf[
+          JInt
+        ]
+      ) mustEqual List(2, 45, 34, 23, 7, 5, 3)) and
+      ((parse(lotto) \\ "winning-numbers").\[BigInt, JInt](
+        classOf[JInt]
+      ) mustEqual List(2, 45, 34, 23, 7, 5, 3))
   }
 
   "Quoted example" in {
@@ -142,11 +147,12 @@ trait AbstractExamples extends Specification {
 
   "Example which collects all integers and forms a new JSON" in {
     val json = parse(person)
-    val ints = json.fold(JNothing: JValue) { (a, v) =>
-      v match {
-        case x: JInt => a ++ x
-        case _       => a
-      }
+    val ints = json.fold[olon.json.JsonAST.JValue[Any]](JNothing: JValue) {
+      (a, v) =>
+        v match {
+          case x: JInt => a ++ x
+          case _       => a
+        }
     }
     print(ints) mustEqual """[35,33]"""
   }

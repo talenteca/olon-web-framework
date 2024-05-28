@@ -62,7 +62,11 @@ trait JQueryArtifacts extends JSArtifacts {
   /** Fades out the element having the provided id, by waiting for the given
     * duration and fades out during fadeTime
     */
-  def fadeOut(id: String, duration: TimeSpan, fadeTime: TimeSpan) =
+  def fadeOut(
+      id: String,
+      duration: TimeSpan,
+      fadeTime: TimeSpan
+  ): olon.http.js.jquery.JqJsCmds.FadeOut =
     FadeOut(id, duration, fadeTime)
 
   /** Transforms a JSON object in to its string representation

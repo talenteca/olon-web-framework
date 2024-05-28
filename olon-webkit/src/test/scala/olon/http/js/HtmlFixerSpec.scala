@@ -13,14 +13,15 @@ class HtmlFixerSpec extends Specification {
     val testRules = new LiftRules()
     testRules.extractInlineJavaScript = true
 
-    "never extract inline JS in fixHtmlFunc" in WithLiftContext(
-      testRules,
-      testSession
-    ) {
-      testFixer.fixHtmlFunc("test", <div onclick="clickMe();"></div>)(
-        identity
-      ) must_==
-        """"<div onclick=\"clickMe();\"></div>""""
-    }
+    "never extract inline JS in fixHtmlFunc" in SpecContextHelpers
+      .WithLiftContext(
+        testRules,
+        testSession
+      ) {
+        testFixer.fixHtmlFunc("test", <div onclick="clickMe();"></div>)(
+          identity
+        ) must_==
+          """"<div onclick=\"clickMe();\"></div>""""
+      }
   }
 }

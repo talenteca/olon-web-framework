@@ -500,8 +500,7 @@ object Menu extends DispatchSnippet with Loggable {
         // SCALA3 Using `&` instead of the `with` type operator
         case (_, Full(param), Full(loc: (Loc[_] & ConvertableLoc[_]))) => {
           // SCALA3 Moved from an existential type above to an abstract type here
-          type T
-          val typedLoc = loc.asInstanceOf[Loc[T] & ConvertableLoc[T]]
+          val typedLoc = loc.asInstanceOf[Loc[Any] & ConvertableLoc[Any]]
 
           (for {
             pv <- typedLoc.convert(param)

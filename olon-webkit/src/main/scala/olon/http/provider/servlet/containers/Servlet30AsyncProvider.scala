@@ -7,7 +7,7 @@ package containers
 import olon.common._
 import olon.http._
 
-import scala.reflect.Selectable.reflectiveSelectable
+// import scala.reflect.Selectable.reflectiveSelectable
 
 object Servlet30AsyncProvider extends AsyncProviderMeta {
 
@@ -54,7 +54,7 @@ object Servlet30AsyncProvider extends AsyncProviderMeta {
 class Servlet30AsyncProvider(req: HTTPRequest)
     extends ServletAsyncProvider
     with Loggable {
-  import scala.language.reflectiveCalls
+  import scala.language.reflectiveCalls // deprecated in scala 3
 
   private var asyncCtx: Object = null
 
