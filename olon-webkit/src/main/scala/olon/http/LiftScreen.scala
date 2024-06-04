@@ -868,7 +868,8 @@ trait AbstractScreen extends Factory with Loggable {
           override def name: String = theName
 
           // SCALA3 Using `ClassTag` instead of `Manifest`
-          override implicit def manifest: ClassTag[T] = buildIt[T]
+          override implicit def manifest: ClassTag[T] =
+            buildIt[Any].asInstanceOf[ClassTag[T]]
 
           override def default: T = defaultValue
 
@@ -908,7 +909,8 @@ trait AbstractScreen extends Factory with Loggable {
           override def name: String = theName
 
           // SCALA3 Using `ClassTag` instead of `Manifest`
-          override implicit def manifest: ClassTag[T] = buildIt[T]
+          override implicit def manifest: ClassTag[T] =
+            buildIt[Any].asInstanceOf[ClassTag[T]]
 
           override def default: T = defaultValue
 

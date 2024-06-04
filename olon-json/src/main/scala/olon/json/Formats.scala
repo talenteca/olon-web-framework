@@ -237,11 +237,11 @@ private[json] object ClassDelta {
 /** Do not use any type hints.
   */
 case object NoTypeHints extends TypeHints {
-  val hints: List[Class[_]] = Nil
+  val hints: List[Class[?]] = Nil
   // SCALA3 using `?` instead of `_`
   def hintFor(clazz: Class[?]): String =
     sys.error("NoTypeHints does not provide any type hints.")
-  def classFor(hint: String): Option[Class[_]] = None
+  def classFor(hint: String): Option[Class[?]] = None
 }
 
 /** Use short class name as a type hint.

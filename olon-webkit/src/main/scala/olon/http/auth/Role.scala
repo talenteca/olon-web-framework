@@ -6,6 +6,8 @@ import olon.common.Box
 import olon.common.Empty
 import olon.common.Full
 
+import scala.annotation.nowarn
+
 object AuthRole {
   def apply(roleName: String): Role = new Role {
     def name = roleName
@@ -66,7 +68,7 @@ trait Role {
         childs.find(role =>
           role.getRoleByName(roleName) match {
             case Empty       => false
-            case theRole @ _ => return theRole
+            case theRole @ _ => (return theRole): @nowarn
           }
         )
         Empty

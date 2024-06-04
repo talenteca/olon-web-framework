@@ -3382,7 +3382,10 @@ sealed trait NodeSeqFuncOrSeqNodeSeqFunc extends Function1[NodeSeq, NodeSeq]
 object NodeSeqFuncOrSeqNodeSeqFunc {
   implicit def promoteNodeSeq(
       in: NodeSeq => NodeSeq
-  ): NodeSeqFuncOrSeqNodeSeqFunc = in
+  ): NodeSeqFuncOrSeqNodeSeqFunc = {
+    // quickfix for scala 3 warning about infinite loop here
+    in.asInstanceOf[NodeSeqFuncOrSeqNodeSeqFunc]
+  }
 
   implicit def promoteSeqNodeSeq(
       in: Seq[NodeSeq => NodeSeq]

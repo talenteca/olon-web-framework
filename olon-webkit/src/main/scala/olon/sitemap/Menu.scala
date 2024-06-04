@@ -11,6 +11,7 @@ import olon.http._
 import olon.util._
 
 import scala.annotation._
+import scala.annotation.nowarn
 
 import Helpers._
 
@@ -720,7 +721,7 @@ case class Menu(loc: Loc[?], private val convertableKids: ConvertableToMenu*)
   private[sitemap] var _parent: Box[HasKids] = Empty
 
   // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
-  private[sitemap] var siteMap: SiteMap = _
+  @nowarn private[sitemap] var siteMap: SiteMap = _
 
   private[sitemap] def init(siteMap: SiteMap): Unit = {
     this.siteMap = siteMap

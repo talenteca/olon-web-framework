@@ -71,7 +71,7 @@ class LiftRulesGuardedSetting[T](val name: String, val default: T)
     with HasCalcDefaultValue[T] {
   // SCALA3 Using `private` instead of `private[this]`
   private var v: T = default
-  private var lastSet: Option[StackTrace] = None
+  // private var lastSet: Option[StackTrace] = None
   private var lastRead: Option[StackTrace] = None
 
   // SCALA3 Using `private` instead of `private[this]`
@@ -110,7 +110,7 @@ class LiftRulesGuardedSetting[T](val name: String, val default: T)
       LiftRules.guardedSettingViolationFunc.get.apply(e2)
     }
 
-    lastSet = Some(currentStackTrace)
+    // lastSet = Some(currentStackTrace)
     v = value
     v
   }

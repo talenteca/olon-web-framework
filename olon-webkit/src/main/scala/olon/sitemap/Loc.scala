@@ -5,6 +5,7 @@ import olon.common._
 import olon.http._
 import olon.util._
 
+import scala.annotation.nowarn
 import scala.xml.NodeSeq
 import scala.xml.Text
 
@@ -93,7 +94,7 @@ trait Loc[T] {
     params.collect { case lp: Loc.QueryParameters => lp.f }
 
   private lazy val calcQueryParams: List[Box[T] => List[(String, String)]] =
-    params.collect { case lp: Loc.LocQueryParameters[T] => lp.f }
+    params.collect { case lp: Loc.LocQueryParameters[T @unchecked] => lp.f }
 
   /** The current value of the cell: overrideValue or requestValue.is or
     * defaultValue oe paramValue
@@ -370,7 +371,7 @@ trait Loc[T] {
   def linkText: Box[NodeSeq] = currentValue.map(linkText)
 
   // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
-  private var _menu: Menu = _
+  @nowarn private var _menu: Menu = _
 
   private[sitemap] def menu_=(m: Menu): Unit = {
     _menu = m

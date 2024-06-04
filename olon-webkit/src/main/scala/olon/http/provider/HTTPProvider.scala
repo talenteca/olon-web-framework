@@ -7,6 +7,7 @@ import olon.util._
 
 import java.util.Locale
 import java.util.ResourceBundle
+import scala.annotation.nowarn
 
 import Helpers._
 
@@ -15,8 +16,8 @@ import Helpers._
   */
 trait HTTPProvider {
 
-  // SCALA3 Using `uninitialized` instead of `_`
-  private var actualServlet: LiftServlet = _ // (reverted for scala 2.13)
+  // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
+  @nowarn private var actualServlet: LiftServlet = _
 
   def liftServlet = actualServlet
 

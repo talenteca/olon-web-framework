@@ -14,6 +14,7 @@ import java.util.ResourceBundle
 import java.util.TimeZone
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{ConcurrentHashMap => CHash}
+import scala.annotation.nowarn
 import scala.reflect.ClassTag
 import scala.xml._
 
@@ -1364,7 +1365,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   @volatile var calculateContextPath: () => Box[String] = () => Empty
 
   // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
-  @volatile private var _context: HTTPContext = _
+  @nowarn @volatile private var _context: HTTPContext = _
 
   /** Should an exception be thrown on out of scope Session and RequestVar
     * access. By default, no.
@@ -1532,7 +1533,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   val earlyInStateless = RulesSeq[Box[Req] => Unit]
 
   // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
-  private var _configureLogging: () => Unit = _
+  @nowarn private var _configureLogging: () => Unit = _
 
   /** Holds the function that configures logging. Must be set before any loggers
     * are created

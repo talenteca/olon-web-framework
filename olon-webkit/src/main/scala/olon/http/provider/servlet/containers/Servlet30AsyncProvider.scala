@@ -7,7 +7,7 @@ package containers
 import olon.common._
 import olon.http._
 
-// import scala.reflect.Selectable.reflectiveSelectable
+import scala.annotation.nowarn
 
 object Servlet30AsyncProvider extends AsyncProviderMeta {
 
@@ -73,7 +73,7 @@ class Servlet30AsyncProvider(req: HTTPRequest)
     asyncCtx = startAsync.invoke(servletReq)
     try {
       val st = asyncCtx.asInstanceOf[SetTimeout]
-      st.setTimeout(0L)
+      st.setTimeout(0L): @nowarn
     } catch {
       case e: Exception =>
         logger.error("Servlet 3.0 Async: Failed to set timeout", e)

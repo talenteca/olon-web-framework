@@ -153,27 +153,9 @@ ThisBuild / scalacOptions ++=
     "-deprecation",
     "-feature",
     "-language:implicitConversions",
-    // SCALA3 FIXME ignored option "-Ypatmat-exhaust-depth",
-    "80",
-    // "-Xfatal-warnings",
+    "-Xfatal-warnings",
     "-Wunused:imports",
-    // SCALA3 FIXME temporary silence warnings
-    // "-Wconf:any:silent",
-    // SCALA3 FIXME temporary ignored option "-Ywarn-unused"
-    
-    "-Xsource:3",
-    // "-Xmigration",
-    // "-quickfix:cat=scala3-migration"
-    // "-Wconf:any:warning-verbose"
-    // ""
-  ) //++ {
-    // scalaBinaryVersion.value match {
-    //   case "2.13" =>
-    //     Seq("-Xsource:3")
-    //   case "3" =>
-    //     Seq.empty
-    // }
-  // }
+  )
 
 ThisBuild / scalafmtOnCompile := true
 
@@ -240,6 +222,19 @@ def commonProjectSettings = {
         }
       }
       apiUrlSeq.filter(_.nonEmpty).map(_.get).toMap
+    },
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "2.13" =>
+          Seq(
+            "-Xsource:3",
+            "-Ywarn-unused",
+            "-Ypatmat-exhaust-depth", "80",
+            "-Wconf:msg=@nowarn annotation does not suppress any warnings:s"
+          )
+        case "3" =>
+          Seq.empty
+      }
     }
   )
 }

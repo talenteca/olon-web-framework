@@ -32,7 +32,6 @@ object ScalaSigReader {
       cl: quotes.reflect.Symbol,
       argNames: List[String]
   ): Option[quotes.reflect.Symbol] = { // TODO may not work with empty argNames
-    import quotes.reflect._
     (cl.methodMembers :+ cl.primaryConstructor)
       .filter(_.isClassConstructor)
       .filter { m =>
@@ -147,7 +146,6 @@ object ScalaSigReader {
   private def toClass(using quotes: Quotes)(
       s: quotes.reflect.Symbol
   ): Class[?] =
-    import quotes.reflect._
     s.fullName match {
       case "scala.Short"   => classOf[Short]
       case "scala.Int"     => classOf[Int]

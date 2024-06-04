@@ -2,6 +2,7 @@ package olon
 package util
 
 import java.lang.ref.WeakReference
+import scala.annotation.nowarn
 
 import Helpers.TimeSpan
 
@@ -276,7 +277,7 @@ object FuncCell {
 
 final case class FuncCell1[A, Z](a: Cell[A], f: A => Z) extends Cell[Z] {
   // SCALA3 using `uninitialized` instead of `_` (reverted to cross-compile)
-  private var value: Z = _
+  @nowarn private var value: Z = _
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
@@ -302,7 +303,7 @@ final case class FuncCell1[A, Z](a: Cell[A], f: A => Z) extends Cell[Z] {
 final case class FuncCell2[A, B, Z](a: Cell[A], b: Cell[B], f: (A, B) => Z)
     extends Cell[Z] {
   // SCALA3 using `uninitialized` instead of `_` (reverted to cross-compile)
-  private var value: Z = _
+  @nowarn private var value: Z = _
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
@@ -332,7 +333,7 @@ final case class FuncCell3[A, B, C, Z](
     f: (A, B, C) => Z
 ) extends Cell[Z] {
   // SCALA3 using `uninitialized` instead of `_` (reverted to cross-compile)
-  private var value: Z = _
+  @nowarn private var value: Z = _
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
@@ -365,7 +366,7 @@ final case class FuncCell4[A, B, C, D, Z](
     f: (A, B, C, D) => Z
 ) extends Cell[Z] {
   // SCALA3 using `uninitialized` instead of `_` (reverted to cross-compile)
-  private var value: Z = _
+  @nowarn private var value: Z = _
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified
@@ -403,7 +404,7 @@ final case class FuncCell5[A, B, C, D, E, Z](
     f: (A, B, C, D, E) => Z
 ) extends Cell[Z] {
   // SCALA3 using `uninitialized` instead of `_` (reverted to cross-compile)
-  private var value: Z = _
+  @nowarn private var value: Z = _
   private var ct: Long = 0
 
   /** If the predicate cell changes, the Dependent will be notified

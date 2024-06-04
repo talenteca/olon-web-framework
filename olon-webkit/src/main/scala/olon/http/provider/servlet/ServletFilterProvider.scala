@@ -8,12 +8,12 @@ import jakarta.servlet.http._
 import olon.common._
 import olon.util._
 
-// import scala.compiletime.uninitialized
+import scala.annotation.nowarn
 
 trait ServletFilterProvider extends Filter with HTTPProvider {
 
   // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
-  var ctx: HTTPContext = _
+  @nowarn var ctx: HTTPContext = _
 
   // We need to capture the ServletContext on init
   override def init(config: FilterConfig): Unit = {

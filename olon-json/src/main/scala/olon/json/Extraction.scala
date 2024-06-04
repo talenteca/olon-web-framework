@@ -375,7 +375,7 @@ object Extraction {
             fail("No information known about type")
           // SCALA3 using `x*` instead of `_*`
           val instance = jconstructor.newInstance(
-            args.map(_.asInstanceOf[AnyRef]).toArray: _*
+            args.map(_.asInstanceOf[AnyRef]).toArray*
           )
           setFields(instance.asInstanceOf[AnyRef], json, jconstructor)
         } catch {

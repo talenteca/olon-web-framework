@@ -9,6 +9,7 @@ import olon.util.Helpers._
 import olon.util._
 
 import java.util.Locale
+import scala.annotation.nowarn
 import scala.collection.mutable.ListBuffer
 import scala.xml.Elem
 import scala.xml.Node
@@ -415,7 +416,7 @@ trait BaseCometActor
     */
   // SCALA3 Using `private` instead of `private[this]`
   // SCALA3 Using `uninitialized` instead of `_` (reverted for scala 2.13)
-  private var _realLastRendering: RenderOut = _
+  @nowarn private var _realLastRendering: RenderOut = _
 
   /** Get the current render clock for the CometActor
     * @return
@@ -486,12 +487,12 @@ trait BaseCometActor
     }
 
   // Using `uninitialized` instead of `_` (reverted for scala 2.13)
-  private var _theSession: LiftSession = _
+  @nowarn private var _theSession: LiftSession = _
 
   def theSession = _theSession
 
   // Using `uninitialized` instead of `_` (reverted for scala 2.13)
-  @volatile private var _defaultHtml: NodeSeq = _
+  @nowarn @volatile private var _defaultHtml: NodeSeq = _
 
   /** The template that was passed to this component during comet
     * initializations
