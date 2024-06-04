@@ -3,8 +3,6 @@ package json
 
 import izumi.reflect.Tag
 
-import scala.reflect.ClassTag
-
 /** Functions to serialize and deserialize a case class. Custom serializer can
   * be inserted if a class is not a case class. <p> Example:<pre> val hints =
   * new ShortTypeHints( ... ) implicit val formats =

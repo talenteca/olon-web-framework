@@ -38,7 +38,10 @@ class CombParserHelpersSpec extends Specification with ScalaCheck {
     "provide a whitespace parser: white. Alias: wsc" in {
       import WhiteStringGen._
       // SCALA3 Using `?` instead of `_`
-      val whiteParse = (s: String) => wsc(s).isInstanceOf[Success[?]]
+      // Scala 2 throws an incorrect warning with `?` (works with `_`)
+      @scala.annotation.nowarn
+      val whiteParse =
+        (s: String) => wsc(s).isInstanceOf[Success[? @unchecked]]
       forAll(whiteParse)
     }
     "provide a whiteSpace parser always succeeding and discarding its result" in {

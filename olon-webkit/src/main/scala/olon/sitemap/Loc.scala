@@ -246,7 +246,7 @@ trait Loc[T] {
   // SCALA3 Using `T` for defining value snippets correct type
   lazy val calcSnippets: SnippetTest =
     allParams
-      .collect { case v: Loc.ValueSnippets[T] => v.snippets }
+      .collect { case v: Loc.ValueSnippets[T @unchecked] => v.snippets }
       .reduceLeftOption(_.orElse(_))
       .getOrElse(Map.empty)
 

@@ -4,7 +4,6 @@ package json
 import izumi.reflect.Tag
 
 import java.lang.StringBuilder
-import scala.reflect.ClassTag
 
 /** This object contains the abstract syntax tree (or AST) for working with JSON
   * objects in lift-json.

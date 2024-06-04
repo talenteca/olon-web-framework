@@ -1,8 +1,6 @@
 package olon
 package http
 
-import org.specs2._
-
 import common.{Box, Empty}
 
 object SpecContextHelpers {

@@ -2,7 +2,6 @@ package olon
 package builtin
 package snippet
 
-import scala.language.existentials
 import scala.xml._
 
 import http.{S, DispatchSnippet, LiftRules}

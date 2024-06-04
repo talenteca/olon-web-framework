@@ -4,7 +4,6 @@ package http
 import olon.common._
 import olon.util._
 
-import scala.language.reflectiveCalls
 import scala.xml.Node
 import scala.xml.NodeSeq
 
