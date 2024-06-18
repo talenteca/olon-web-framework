@@ -7,7 +7,7 @@ lazy val root = project
     scalaVersion := "2.13.12",
     scalacOptions ++= Seq("-deprecation"),
     libraryDependencies ++= Seq(
-      "com.talenteca" %% "olon-webkit" % "6.0.0-RC1",
+      "com.talenteca" %% "olon-webkit" % "6.0.0-SNAPSHOT",
       "ch.qos.logback" % "logback-classic" % "1.4.11",
       "org.codehaus.janino" % "janino" % "3.1.8",
       "org.slf4j" % "log4j-over-slf4j" % "1.7.36",
