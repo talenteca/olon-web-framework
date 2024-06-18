@@ -32,6 +32,11 @@ class Boot {
     // each page, just comment this line out.
     LiftRules.setSiteMap(SiteMap(entries*))
 
+    // Use HTML5
+    LiftRules.htmlProperties.default.set((r: Req) =>
+      new Html5Properties(r.userAgent)
+    )
+
     //Show the spinny image when an Ajax call starts
     LiftRules.ajaxStart =
       Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
