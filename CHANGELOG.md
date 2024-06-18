@@ -1,5 +1,7 @@
 # CHANGELOG
 
+* 2024/06/18 Release Olon 6.0.0-RC1 with new support for Scala 2 and Scala 3.
+
 * 2023/11/05 Release Olon 5.0.0-RC1 with support Jetty 12 and Jakarta EE
   Servlet API 6 (JDK 11+ is required). The cookie version field is dropped to
   align with RFC 6265 cookies standard included at the new Jakarta EE Servlet

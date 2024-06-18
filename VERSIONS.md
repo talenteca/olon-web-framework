@@ -1,5 +1,14 @@
 # VERSIONS
 
+## Olon 6.0.0
+
+  * Supports Tomcat 10.1 and Jetty 12
+  * Compatible with Jakarta EE 10 Servlet API 6
+  * JDK 11+ and Scala 2.13 or Scala 3.4+ are required
+  * JDK 17+ is required for running the tests
+  * For Scala 3 on production, add the module `scala3-staging_3-X.X.X.jar` with
+    the exact version you are using at runtime.
+
 ## Olon 5.0.0
 
   * Supports Tomcat 10.1 and Jetty 12

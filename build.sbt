@@ -3,7 +3,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / pgpSigningKey := Some("csaltos@talenteca.io")
 
 ThisBuild / organization := "com.talenteca"
-ThisBuild / version := "6.0.0-SNAPSHOT"
+ThisBuild / version := "6.0.0-RC1"
 ThisBuild / description := "Olon is a modern web framework based on the view first strategy (based on the Lift web framework)"
 ThisBuild / homepage := Some(
   url("https://github.com/talenteca/olon-web-framework")
@@ -30,7 +30,8 @@ lazy val libs = new {
 
   type ModuleMap = String => ModuleID
 
-  lazy val scala3Staging = "org.scala-lang" %% "scala3-staging" //% scalaVersion.value
+  lazy val scala3Staging =
+    "org.scala-lang" %% "scala3-staging" // % scalaVersion.value
 
   lazy val commons_codec = Seq("commons-codec" % "commons-codec" % "1.11")
 
@@ -59,7 +60,8 @@ lazy val libs = new {
 
   // SCALA3 Using old scala-compiler for Scala 2 as an experiment only, we might
   // want to rewrite for Scala 3 compiler
-  lazy val scala_compiler = "org.scala-lang" % "scala-compiler" % versions.scala2Version
+  lazy val scala_compiler =
+    "org.scala-lang" % "scala-compiler" % versions.scala2Version
 
   lazy val slf4j_api = Seq("org.slf4j" % "slf4j-api" % versions.slf4jVersion)
 
@@ -67,7 +69,6 @@ lazy val libs = new {
   // support for Scala 3
   lazy val scala_parallel_collections =
     Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4")
-
 
   // SCALA3 Previous versions for scala-parser-combinators were not
   // released for Scala 3
@@ -148,13 +149,13 @@ ThisBuild / libraryDependencies ++=
     libs.mockito ++
     libs.scalacheck
 
-ThisBuild / scalacOptions ++= 
+ThisBuild / scalacOptions ++=
   Seq(
     "-deprecation",
     "-feature",
     "-language:implicitConversions",
     "-Xfatal-warnings",
-    "-Wunused:imports",
+    "-Wunused:imports"
   )
 
 ThisBuild / scalafmtOnCompile := true
@@ -229,7 +230,8 @@ def commonProjectSettings = {
           Seq(
             "-Xsource:3",
             "-Ywarn-unused",
-            "-Ypatmat-exhaust-depth", "80",
+            "-Ypatmat-exhaust-depth",
+            "80",
             "-Wconf:msg=@nowarn annotation does not suppress any warnings:s"
           )
         case "3" =>
@@ -280,17 +282,17 @@ lazy val olon_json = Project("olon-json", file("olon-json"))
     description := "JSON Library",
     Test / parallelExecution := false,
     libraryDependencies ++=
-        libs.paranamer ++
-        libs.scala_xml ++
-        libs.json4s :+
-        libs.izumi_reflect :+ {
+      libs.paranamer ++
+        libs.scala_xml ++ {
           scalaBinaryVersion.value match {
             case "2.13" =>
-              libs.scalap
+              Seq(libs.scalap)
             case "3" =>
-              libs.scala3Staging % scalaVersion.value
+              Seq(libs.scala3Staging % scalaVersion.value % Provided)
           }
-        }
+        } ++
+        libs.json4s :+
+        libs.izumi_reflect
   )
 
 lazy val olon_json_ext = Project("olon-json-ext", file("olon-json-ext"))
@@ -300,7 +302,14 @@ lazy val olon_json_ext = Project("olon-json-ext", file("olon-json-ext"))
     libraryDependencies ++=
       libs.commons_codec ++
         libs.joda_time ++
-        libs.joda_convert
+        libs.joda_convert ++ {
+          scalaBinaryVersion.value match {
+            case "2.13" =>
+              Seq()
+            case "3" =>
+              Seq(libs.scala3Staging % scalaVersion.value % Provided)
+          }
+        }
   )
   .dependsOn(olon_common, olon_json)
 
