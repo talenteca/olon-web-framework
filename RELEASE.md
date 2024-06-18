@@ -4,7 +4,12 @@
 
 > Use the command `gpg --keyserver keys.openpgp.org --send-keys FFE4D7AF28EC0EA5C8338752B7D6E88FA79E18BD` to upload and update a new expiration date if required.
 
-* Decrypt the file `.credentials.asc` into `.credentials` using GPG.
+* Decrypt the file `.credentials.asc` into `.credentials` using GPG
+
+* Replace the username and password at the file `.credentials` with a fresh user
+  token from `https://s01.oss.sonatype.org/` signing in with
+  the user csaltos@talenteca.io and then select "Profile" and choose
+  "User Token" from the menu box.
 
 * Bump the version to an official release at the `version` value in the `build.sbt` file.
 
