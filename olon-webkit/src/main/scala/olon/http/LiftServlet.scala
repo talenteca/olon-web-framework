@@ -1174,7 +1174,7 @@ class LiftServlet extends Loggable {
             val ba = new Array[Byte](8192)
             val os = response.outputStream
             // SCALA3 Using normal function calls instead of the old structural types
-            read(ba)
+            len = read(ba)
             while (len >= 0) {
               if (len > 0) os.write(ba, 0, len)
               // SCALA3 Using normal function calls instead of the old structural types
