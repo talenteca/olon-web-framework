@@ -50,6 +50,14 @@ class Boot {
 
     //Init the jQuery module, see http://liftweb.net/jquery for more information.
     LiftRules.jsArtifacts = JQueryArtifacts
+ 
+    ResourceServer.rewrite {
+      case "jquery.js" :: Nil => List("jquery-1.4.4.js")
+    }
+
+    ResourceServer.rewrite {
+      case "json.js" :: Nil => List("json2.js")
+    }
 
     LiftRules.securityRules = () => {
       SecurityRules(content = Some(ContentSecurityPolicy(
